@@ -7,6 +7,7 @@
                 <th>Index</th>
                 <th>Name</th>
                 <th>Requestor</th>
+                <th>Date</th>
                 <th>Link</th>
             </thead>
             <tbody>
@@ -14,6 +15,7 @@
                     <td>{{index + 1}}</td>
                     <td>{{req.assumptions.request_name}}</td>
                     <td>{{req.requestor_name}}</td>
+                    <td>{{req.formatted_date}}</td>
                     <td><a :href="generateUrl(req._id)">Link</a></td>
                 </tr>
             </tbody>
@@ -23,7 +25,7 @@
 </template>
 
 <script>
-
+//    const moment = require('moment');
     export default {
         data() {
             return {
@@ -36,7 +38,11 @@
         methods: {
             generateUrl(_id) {
                 return `http://linkcalc.thaicom.net/results/${_id}`;
-            }
+            },
+//            generateDate(date) {
+//                const moment = require('moment');
+//                return moment(date).format("MM Do, YYYY  HH:mm");
+//            }
         }
 
     }
