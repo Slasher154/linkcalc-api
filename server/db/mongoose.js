@@ -6,4 +6,4 @@ mongoose.Promise = Promise;
 // Mongoose maintains connection for us, no need to use callback like MongoClient
 mongoose.connect('mongodb://localhost:27017/link');
 
-module.exports = {mongoose};
+module.exports.mongoose = mongoose;

@@ -1,13 +1,13 @@
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');
-const {ObjectID} = require('mongodb');
+const ObjectID = require('mongodb').ObjectID;
 const path = require('path');
 const moment = require('moment');
 
 
-var {mongoose} = require('./db/mongoose');
-var {LinkRequests} = require('./models/link_requests');
+var mongoose = require('./db/mongoose').mongoose;
+var LinkRequests = require('./models/link_requests').LinkRequests;
 
 var expressVue = require('express-vue');
 
@@ -69,4 +69,4 @@ app.listen(port, () => {
     console.log(`Started on port ${port}`);
 });
 
-module.exports = {app};
+module.exports.app = app;

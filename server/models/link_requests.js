@@ -27,4 +27,4 @@ var LinkRequests = mongoose.model('link_requests', {
     }
 });
 
-module.exports = {LinkRequests};
+module.exports.LinkRequests = LinkRequests;
