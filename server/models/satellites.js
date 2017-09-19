@@ -24,7 +24,8 @@ var Satellites = mongoose.model('satellites', new mongoose.Schema({
     isActive: {
         type: Boolean,
         required: true,
-    }
+    },
+    skb: Number
 
 }));
 
