@@ -1,6 +1,6 @@
 var mongoose = require('mongoose');
 
-var LinkRequests = mongoose.model('link_requests', {
+var LinkRequests = mongoose.model('link_requests', new mongoose.Schema({
     _id: {
         type: String
     },
@@ -25,6 +25,6 @@ var LinkRequests = mongoose.model('link_requests', {
     formatted_date: { // included to show in link requests tables
         type: String
     }
-});
+}));
 
 module.exports.LinkRequests = LinkRequests;

@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const ObjectID = require('mongodb').ObjectID;
 const path = require('path');
 const moment = require('moment');
+const routes = require('./routes');
 
 
 var mongoose = require('./db/mongoose').mongoose;
@@ -27,9 +28,11 @@ app.use(expressVueMiddleware);
 
 app.use(bodyParser.json());
 
-app.get('/', (req, res) => {
-    res.send('Hello world!');
-});
+app.use('/', routes);
+
+// app.get('/', (req, res) => {
+//     res.send('Hello world!');
+// });
 
 app.get('/requests', (req, res) => {
     let requests = [];
@@ -61,9 +64,8 @@ app.get('/requests', (req, res) => {
         }
         res.renderVue('main', data, vueOptions);
     })
-
-
 });
+
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
