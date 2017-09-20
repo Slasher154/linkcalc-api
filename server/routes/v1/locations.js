@@ -5,13 +5,23 @@
 const _ = require('lodash');
 const locationRouter = require('express').Router();
 
-var {RainData} = require('../../models/locations');
+var {Locations} = require('../../models/locations');
 
-// return all locations (without data)
+// return all locations
 
 locationRouter.get('/locations', (req, res) => {
-    RainData.find().then((locations) => {
+    Locations.find().then((locations) => {
         res.status(200).send({locations});
+    }).catch((e) => {
+        res.status(404).send(e);
+    });
+});
+
+// return only location name
+
+locationRouter.get('/locations/name', (req, res) => {
+    Locations.find().then((locations) => {
+        res.status(200).send({locations: _.map(locations, 'name').sort() });
     }).catch((e) => {
         res.status(404).send(e);
     });
@@ -19,7 +29,7 @@ locationRouter.get('/locations', (req, res) => {
 
 locationRouter.get('/locations/:id', (req, res) => {
     const locId = req.params.id;
-    RainData.findOne({_id: locId}).then((location) => {
+    Locations.findOne({_id: locId}).then((location) => {
         res.status(200).send({location});
     }).catch((e) => {
         res.status(404).send(e);
@@ -30,7 +40,7 @@ locationRouter.get('/locations/:id', (req, res) => {
 
 locationRouter.post('/singleLocationByName', (req, res) => {
     let locationName = req.body.location;
-    RainData.findOne({name: locationName}).then((location) => {
+    Locations.findOne({name: locationName}).then((location) => {
         res.status(200).send({location});
     }).catch((e) => {
         res.status(404).send(e);
@@ -41,7 +51,7 @@ locationRouter.post('/singleLocationByName', (req, res) => {
 
 locationRouter.post('/multipleLocationsByNames', (req, res) => {
     let locationNames = req.body.locations;
-    RainData.find({ name: { $in: locationNames} }).then((locations) => {
+    Locations.find({ name: { $in: locationNames} }).then((locations) => {
         res.status(200).send({locations});
     }).catch((e) => {
         res.status(404).send(e);

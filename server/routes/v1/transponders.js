@@ -10,13 +10,25 @@ var {Transponders} = require('../../models/transponders');
 
 // find all transponders by Beam
 
-transponderRouter.get('/transponders/:beam', (req, res) => {
+// transponderRouter.get('/transponders/:beam', (req, res) => {
+//
+//     const beam = req.params.beam;
+//
+//     Transponders.find({ uplink_beam: beam }).then((transponders) => {
+//        let sortedTransponders = _.sortBy(transponders, 'name');
+//        res.status(200).send({ transponders: sortedTransponders });
+//     }).catch((e) => {
+//         res.status(404).send(e);
+//     });
+// })
 
-    const beam = req.params.beam;
+transponderRouter.post('/transponders', (req, res) => {
+
+    const beam = req.body.beam;
 
     Transponders.find({ uplink_beam: beam }).then((transponders) => {
-       let sortedTransponders = _.sortBy(transponders, 'name');
-       res.status(200).send({ transponders: sortedTransponders });
+        let sortedTransponders = _.sortBy(transponders, 'name');
+        res.status(200).send({ transponders: sortedTransponders });
     }).catch((e) => {
         res.status(404).send(e);
     });
