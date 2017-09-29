@@ -11,8 +11,12 @@ var mongoose = require('./db/mongoose').mongoose;
 var LinkRequests = require('./models/link_requests').LinkRequests;
 
 var expressVue = require('express-vue');
+var cors = require('cors');
 
 var app = express();
+
+app.use(cors());
+
 const port = process.env.PORT || 23324;
 
 const vueOptions = {
