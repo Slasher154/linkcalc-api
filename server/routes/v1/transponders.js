@@ -22,6 +22,15 @@ var {Transponders} = require('../../models/transponders');
 //     });
 // })
 
+transponderRouter.get('/allTransponders', (req, res) => {
+    Transponders.find().then((transponders) => {
+        let sortedTransponders = _.sortBy(transponders, 'satellite');
+        res.status(200).send({ transponders: sortedTransponders });
+    }).catch((e) => {
+        res.status(404).send(e);
+    });
+});
+
 transponderRouter.post('/transponders', (req, res) => {
 
     const beam = req.body.beam;

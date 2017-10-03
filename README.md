@@ -240,6 +240,53 @@
         }
       });
 
+**All transponders**
+----
+  Returns all transponders in the database.
+
+* **URL**
+
+  /transponders
+
+* **Method:**
+
+  `GET`
+ 
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+    
+    ```
+    
+    "transponders": [
+        {
+            "_id": "3yuXhekavq24mRRrW",
+            "name": "1B",
+            "satellite": "Apstar-7",
+            "uplink_cf": 5.885,
+            "downlink_cf": 3.66,
+            "bandwidth": 36,
+            "type": "broadcast", ]
+            ....
+    }              
+    ```
+ 
+* **Error Response:**
+
+  * **Code:** 404 NOT FOUND <br />
+ 
+ * **Sample Call:**
+   
+     ```javascript
+       $.ajax({
+         url: "/allTransponders",
+         dataType: "json",
+         type : "GET",
+         success : function(r) {
+           console.log(r);
+         }
+       });
 
 **Transponders by beam name**
 ----
