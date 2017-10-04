@@ -18,6 +18,10 @@ v1routes.use(version, beamRoutes);
 const transponderRoutes = require('./transponders');
 v1routes.use(version, transponderRoutes);
 
+// Gateway routes
+const gatewayRoutes = require('./gateways');
+v1routes.use(version, gatewayRoutes);
+
 // Modem routes
 const modemRoutes = require('./modems');
 v1routes.use(version, modemRoutes);

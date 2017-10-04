@@ -344,6 +344,60 @@
         }
       });
 
+**All gateways**
+----
+ Returns all gateways in the database.
+
+* **URL**
+
+  /gateways
+
+* **Method:**
+
+  `GET`
+ 
+* **Success Response:**
+
+  * **Code:** 200 <br />
+    **Content:** 
+    
+    ```
+    {
+        "gateways": [
+            {
+                "_id": "2xgP2rMxZu953e5g5",
+                "name": "3V",
+                "city": "LLK",
+                "country": "Thailand",
+                "lat": 14.0847,
+                "lon": 100.4211,
+                "gateway_availability": 99.58,
+                "remote_availability": 99.7,
+                "ant_size": 8.1,
+                ......
+            },
+            {
+                ...
+            }    
+        ]
+    }            
+    ```
+* **Error Response:**
+
+  * **Code:** 404 NOT FOUND <br />
+ 
+ * **Sample Call:**
+   
+     ```javascript
+       $.ajax({
+         url: "/gateways",
+         dataType: "json",
+         type : "GET",
+         success : function(r) {
+           console.log(r);
+         }
+       });
+
 **All modems**
 ----
   Returns all modems in the database.
