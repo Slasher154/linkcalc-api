@@ -4,7 +4,7 @@
 
 var mongoose = require('mongoose');
 
-var AdjSat = mongoose.model('adjacent_satellites', new mongoose.Schema({
+var AdjSats = mongoose.model('adjacent_satellites', new mongoose.Schema({
     _id: {
         type: String,
         required: true
@@ -50,4 +50,4 @@ var AdjSat = mongoose.model('adjacent_satellites', new mongoose.Schema({
 
 }));
 
-module.exports = {AdjSat};
+module.exports = {AdjSats};
