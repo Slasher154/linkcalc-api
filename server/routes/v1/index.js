@@ -5,6 +5,13 @@
 const v1routes = require('express').Router();
 const version = '/v1';
 
+// Linkbudget routes
+const linkbudgetRoutes = require('./linkbudget');
+v1routes.use(version, linkbudgetRoutes);
+
+// Adjacent Satellite routes
+const adjSatRoutes = require('./adjacent_satellites')
+v1routes.use(version, adjSatRoutes);
 
 // Satellite routes
 const satelliteRoutes = require('./satellites');
@@ -21,6 +28,14 @@ v1routes.use(version, transponderRoutes);
 // Gateway routes
 const gatewayRoutes = require('./gateways');
 v1routes.use(version, gatewayRoutes);
+
+// Antenna routes
+const antennaRoutes = require('./antennas');
+v1routes.use(version, antennaRoutes);
+
+// Buc routes
+const bucRoutes = require('./bucs');
+v1routes.use(version, bucRoutes);
 
 // Modem routes
 const modemRoutes = require('./modems');

@@ -27,6 +27,15 @@ locationRouter.get('/locations/name', (req, res) => {
     });
 });
 
+// return location name, country, city, lat, lon
+locationRouter.get('/locationswithcoords', (req, res) => {
+    Locations.find().then((locations) => {
+        res.status(200).send({locations: _.sortBy(_.map(locations, loc => _.pick(loc, ['name', 'country', 'city', 'lat', 'lon'])), 'name') });
+    }).catch((e) => {
+        res.status(404).send(e);
+    });
+});
+
 locationRouter.get('/locations/:id', (req, res) => {
     const locId = req.params.id;
     Locations.findOne({_id: locId}).then((location) => {
