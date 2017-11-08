@@ -3,6 +3,15 @@
  */
 
 const _ = require('lodash')
+const Antenna = require('./antenna')
+const Bandwidth = require('./bandwidth')
+const Buc = require('./buc')
+const GatewayStation = require('./gatewayStation')
+const Location = require('./location')
+const Modem = require('./modem')
+const RemoteStation = require('./remoteStation')
+const Satellite = require('./satellite')
+const Transponder = require('./transponder')
 
 class LinkBudget {
     constructor (requestObject) {
@@ -23,7 +32,7 @@ class LinkBudget {
 
         // If finding best transponder is selected, extract unique locations out of remote stations and find the their respective best transponders
         if (this.findBestTransponders) {
-            let uniqueLocations = this.extractUniqueLocations()
+            let uniqueLocations = this.extractUniqueRemoteLocations()
 
             // Get the best transponders for each selected satellite
             let locationWithBestTransponders = []
@@ -58,7 +67,7 @@ class LinkBudget {
         // Start looping remote stations
         this.remoteStations.forEach(station => {
 
-            this.station = station
+            this.remoteStation = new RemoteStation(station)
 
             // Start looping gateway/hub stations
             this.gatewayStations.forEach(gateway => {
@@ -66,16 +75,16 @@ class LinkBudget {
                 // Start looping platform
                 this.modemsAndMcgs.forEach(modem => {
 
-                    this.modem = modem
+                    this.modem = new Modem(modem)
 
                     // Find appropriate gateway
-                    this.gateway = this.findGateway(gateway)
+                    this.gateway = new GatewayStation(this.findGateway(gateway))
 
                     // Run forward link
-                    let forwardLinkResult = this.runForwardLink()
+                    let forwardLinkResult = this.runLinkByPath('forward')
 
                     // Run return link
-                    let returnLinkResult = this.runReturnLink()
+                    let returnLinkResult = this.runLinkByPath('return')
 
                     // Record cases
                     this.linkBudgetResults.push({
@@ -94,6 +103,9 @@ class LinkBudget {
 
         // Find transponder by path
         this.transponder = this.findTransponderByPath(this.station.transponder, 'forward')
+        
+        // Find and set satellite
+        this.satellite = new Satellite(this.findSatellite(this.transponder))
 
         // Find application by path
         this.application = this.findApplicationByPath(this.modem, 'forward')
@@ -291,7 +303,9 @@ class LinkBudget {
         let linkResult = {}
 
         // Find transponder by path
-        this.transponder = this.findTransponderByPath(this.station.transponder, path)
+        this.transponder = new Transponder(this.findTransponderByPath(this.station.transponder, path))
+
+        // Set satellite
 
         // Find application by path
         this.application = this.findApplicationByPath(this.modem, path)
@@ -408,8 +422,8 @@ class LinkBudget {
 
         // If yes-yes, perform normal search over looping MCG and available symbol rates
         if (this.application.acm && this.application.dynamic_channels) {
-            let lowerMcgs = findLowerMcgsThanClearSky(mcgClearSky)
-            let lowerBandwidthPool = findLowerBandwidthPool()
+            let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
+            let lowerBandwidthPool = this.findLowerBandwidthPool()
 
             let results = []
             lowerMcgs.forEach(mcg => {
@@ -427,7 +441,7 @@ class LinkBudget {
 
         // If yes-no, perform binary search over looping MCG
         else if (this.application.acm) {
-            let lowerMcgs = findLowerMcgsThanClearSky(mcgClearSky)
+            let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
             let minIndex = 0
             let maxIndex = lowerMcgs.length - 1
             let currentIndex
@@ -496,52 +510,579 @@ class LinkBudget {
 
     runLink () {
 
+        let result = {}
+
         // Seek the occupied bandwidth
         this.seekOccupiedBandwidth()
+        
+        // Setup parameters
+        let orbitalSlot = this.satellite.orbitalSlot
+        let skb = this.satellite.skb
+        let noiseBandwidth = this.occupiedBandwidth / this.application.roll_off_factor
+        let transponder = this.transponder
 
-        // Check if the transponder is operating in FGM or ALC mode
-        if (this.transponder.mode === 'FGM') {
+        let numCarriersInChannel = 10 * log10(this.transponder.bandwidth / this.occupiedBandwidth); // number of carriers in dB
 
-            // If FGM, find operating PFD at 100% power utilization
+        // ---------------------------------- Uplink ---------------------------------------------
 
-            // If rain fade case, EIRPup = desired level - rain
+        // Setup variables
+        let uplinkFrequency = transponder.uplink_cf;
+        let uplinkSlantRange = slantRange(uplink_station.location, orbitalSlot);
+        // let uplink_elevation_angle = elevationAngle(uplink_station.location, orbitalSlot);
+        let upllinkXpolLoss = xpolLoss(), uplink_pointingLoss = pointingLoss(uplinkFrequency, uplink_station.antenna.size, skb);
+        let uplinkAtmLoss = atmosphericLoss({
+            condition: condition.uplink,
+            location: uplink_station.location,
+            orbitalSlot: orbitalSlot,
+            freq: uplinkFrequency,
+            polarization: transponder.uplink_pol,
+            diameter: uplink_station.antenna.size,
+            availability: uplink_availability
+        });
+        let uplinkOtherLoss = upllinkXpolLoss + uplink_pointingLoss;
+        let uplinkSpreadingLoss = spreadingLoss(uplinkSlantRange);
+        let uplinkContour = uplink_station.location.contour;
 
-            // Otherwise, EIRPup = desired
-        } else {
+        let gainVariation = 0;
+        let gainVariationDiff = 0;
 
-            // If ALC, find operating PFD at desired deep-in
-
-            // If rain-fade case, EIRPup = desired level - rain + UPC (but not more than desired)
-
-            // Otherwise, EIRPup = desired
+        // For IPSTAR satellite, applies gain variation
+        if(this.satellite.name == "IPSTAR" && _.contains(["return"],transponder.type)){
+            if(_.contains(["328","514","608"],transponder.uplink_beam)){ // shape beam
+                gainVariation = -0.0015 * Math.pow(uplinkContour,3) - 0.0163 * Math.pow(uplinkContour,2) + 0.1827 * uplinkContour - 0.1737;
+            }
+            else{
+                gainVariation = -0.0019 * Math.pow(uplinkContour,2) + 0.2085 * uplinkContour - 0.5026;
+            }
+            gainVariationDiff = gainVariation > -1.4 ? 0 : 1.4 + gainVariation;
         }
 
-        // Calculate C/N up (need to check max mode)
+        let uplinkGt = transponder.gt_peak + uplinkContour + gainVariationDiff;
 
-        // Calculate EIRPdown (need to check max mode)
+        let operatingPfd = 0, operatingPfdPerCarrier = 0, eirpUp = 0, carrierPfd = 0, carrierOutputBackoff = 0;
 
-        // Calculate C/I
+        // If channel is FGM, find operating PFD at 100% utilization
 
-        // Calculate C/N Total
+        if (transponder.mode === 'FGM') {
 
-        // Calculate link margin and determine pass condition
+            // Get the backoff settings (IBO, OBO, Intermod) from the database based on the default number of carriers ("One","Two","Multi") set in the database
+            let numCarriers = transponder.current_num_carriers;
+            let backoffSettings = _.where(transponder.backoff_settings, {"num_carriers": numCarriers})[0];
 
-        // Return result
+            // SFD in the database is the -X value of -X-G/T (derived from -(X+G/T)
+            // Operating PFD = -(X + G/T) - (Atten.Range - defaultAtten) + TransponderIBO - Backoff from bandwidth
+            operatingPfd = transponder.sfd - uplinkGt - (transponder.atten_range - transponder.default_atten);
+            operatingPfdPerCarrier = operatingPfd + backoffSettings.ibo - numCarriersInChannel;
+
+            // Derive EIRP up (at ground station) needed to compensate spreading loss, pointing, xpol and atmospheric loss
+            eirpUp = operatingPfdPerCarrier + uplinkSpreadingLoss + uplinkOtherLoss + uplinkAtmLoss
+
+            // Apply overused power (for normal case, overused power = 0). It will be more than 0 when we're goal seeking
+            // the amount of power-utilization to pass the margin
+            eirpUp += overused_power;
+
+            // check if it's rain fade case and uplink station hpa has UPC (such as gateways), increase EIRP up by that UPC
+            if (condition.uplink === "rain" && _.has(uplink_station.hpa, 'upc')) {
+                eirpUp += uplink_station.hpa.upc;
+
+            }
+
+            // Check if the uplink HPA is BUC type. If yes, use the uplink power of that BUC (use 100% of BUC power instead of show the result of desired EIRP level)
+            if (_.has(uplink_station.hpa, 'category') && uplink_station.hpa.category.toLowerCase() == 'buc') {
+                // check if eirp of this buc & antenna can reach the desired level
+                let eirpUpFromBuc = eirp_uplink(uplink_station.hpa, uplink_station.antenna, uplinkFrequency);
+                if (eirpUp > eirpUpFromBuc) {
+                    eirpUp = eirpUpFromBuc;
+                }
+            }
+
+            // Find carrier PFD. This may not equal to operating pfd in case of overused power
+            carrierPfd = eirpUp - uplinkSpreadingLoss - uplinkOtherLoss - uplinkAtmLoss;
+
+            // Find carrier output backoff = transponder obo + (carrier input backoff)
+            //carrier_output_backoff = backoff_settings.obo + (carrier_pfd - operating_sfd);
+            let opPfd = operatingPfd + backoffSettings.ibo;
+
+            // if PFD of carrier is higher than operating PFD per transponder (such as too much overused)
+            // return transponder obo (maximum backoff)
+
+            if (carrierPfd > opPfd) {
+                carrierOutputBackoff = backoffSettings.obo;
+            }
+            else {
+                carrierOutputBackoff = backoffSettings.obo + (carrierPfd - opPfd);
+            }
+
+            _.extend(result, {
+                channel_input_backoff: backoffSettings.ibo,
+                channel_output_backoff: backoffSettings.obo
+            })
+
+        }
+
+        // If channel is ALC, find operating PFD at desired deep-in
+        else if (transponder.mode === 'ALC') {
+
+            // Operating SFD is equal to SFD at uplink location (max)
+            operatingPfd = transponder.sfd - uplinkGt;
+
+            // For IPSTAR FWD Link, the data is stored in format fixed gateway EIRP Up
+            if (_.has(transponder, 'eirp_up_channel')) {
+                eirpUp = transponder.eirp_up_channel - numCarriersInChannel;
+                operatingPfdPerCarrier = eirpUp - uplinkSpreadingLoss - uplinkOtherLoss;
+            }
+
+            // For other ALC transponders, the data is stored in desired deep-in value
+            // so, we find PFD at designed deepin first, then derive for EIRP up
+            // the derived EIRP up will need to compensate spreading loss, pointing, xpol and atmoshperic loss
+            else {
+                operatingPfdPerCarrier = operatingPfd - transponder.dynamic_range + transponder.designed_deepin - numCarriersInChannel;
+                eirpUp = operatingPfdPerCarrier + uplinkSpreadingLoss + uplinkOtherLoss + uplinkAtmLoss;
+            }
+
+            // check if it's rain fade case and uplink station hpa has UPC (such as gateways), increase EIRP up by that UPC
+            if (condition.uplink === "rain" && _.has(uplink_station.hpa, 'upc')) {
+                eirpUp += uplink_station.hpa.upc;
+
+            }
+
+            // Apply overused power (for normal case, overused power = 0). It will be more than 0 when we're goal seeking
+            // the amount of power-utilization to pass the margin
+            eirpUp += overused_power;
+
+            // Check if the uplink HPA is BUC type. If yes, use the uplink power of that BUC (use 100% of BUC power instead of show the result of desired EIRP level)
+            if (_.has(uplink_station.hpa, 'category') && uplink_station.hpa.category.toLowerCase() == 'buc') {
+                console.log("This is BUC.")
+                // check if eirp of this buc & antenna can reach the desired level
+                let eirpUpFromBuc = eirp_uplink(uplink_station.hpa, uplink_station.antenna, uplinkFrequency);
+
+                if (eirpUp > eirpUpFromBuc) {
+                    console.log("EIRP Up of " + eirpUp + " dBW is more than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
+                    eirpUp = eirpUpFromBuc;
+                }
+                else{
+                    console.log("EIRP Up of " + eirpUp + " dBW is less than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
+                }
+            }
+            else{
+                console.log("This is not a BUC.")
+            }
+
+            // Find carrier PFD. This may not equal to operating pfd in case of overused power or the BUC power is not enough to get to designed point
+            carrierPfd = eirpUp - uplinkSpreadingLoss - uplinkOtherLoss - uplinkAtmLoss;
+            console.log('Uplink Spreading Loss = ' + uplinkSpreadingLoss + ' dB');
+            console.log('Uplink Other Loss = ' + uplinkOtherLoss + ' dB');
+
+
+            // For ALC transponders, assume the transponder is full-loaded (always reach deep-in)
+            // Find deep-in per channel at full-load
+            let channelPfd = carrierPfd + numCarriersInChannel;
+            let channelDeepin = channelPfd - (operatingPfd - transponder.dynamic_range);
+
+            // set carrier output backoff to the OBO at backoff settings based on current load
+            // normally for Conventional Ku-ALC is single carrier and IPSTAR is multi carrier
+            carrierOutputBackoff = _.where(transponder.backoff_settings, {"num_carriers": transponder.current_num_carriers})[0].obo;
+
+            // If the pfd not reach deep-in, output backoff is increased to that amount out of deepin
+            carrierOutputBackoff += channelDeepin > 0 ? 0 : channelDeepin;
+            carrierOutputBackoff -= numCarriersInChannel;
+
+            _.extend(result, {
+                channel_output_backoff: _.where(transponder.backoff_settings, {"num_carriers": transponder.current_num_carriers})[0].obo,
+                channel_deepin: channelDeepin.toFixed(2)
+            });
+
+        }
+
+        else {
+            this.logError("Transponder mode is not FGM or ALC.");
+            return false;
+        }
+
+        // Calculate required HPA power
+        let operatingPowerAtHpaOutput = eirpUp - antenna_gain(uplink_station.antenna.size, uplinkFrequency);
+        this.logTitle('HPA IFL = ' + uplink_station.hpa.ifl + ' HPA OBO = ' + uplink_station.hpa.obo + ' dB');
+        this.logTitle('OP Power = ' + operatingPowerAtHpaOutput);
+        let operatingHpaPower = Math.pow(10, (operatingPowerAtHpaOutput + uplink_station.hpa.ifl) / 10);
+
+        // Calculate C/N Uplink
+
+        let eirpUpAtSatellite = eirpUp - uplinkOtherLoss - uplinkAtmLoss;
+        let uplinkPathLoss = pathLoss(uplinkSlantRange, uplinkFrequency);
+        let cnUplink = carrierOverNoise(eirpUpAtSatellite, uplinkGt, uplinkPathLoss, noiseBw);
+
+        console.log('-------Power optimization---------');
+        console.log('Operating SFD ' + operatingPfd + ' dBW/m^2');
+        console.log('Operating PFD ' + operatingPfdPerCarrier + ' dBW/m^2');
+        console.log('Channel PFD ' + channel_pfd + ' dBW/m^2');
+        console.log('Carrier OBO ' + carrierOutputBackoff + ' dB');
+        console.log('Carrier PFD ' + carrierPfd + ' dBW/m^2');
+        console.log('Channel deepin ' + channel_deepin + ' dB');
+
+        console.log('----Uplink-----');
+        console.log('Condition: ' + condition.uplink);
+        console.log('Atmoshperic Loss: ' + uplinkAtmLoss + " dB");
+        console.log('EIRP UP ' + eirpUp + ' dBW');
+        console.log('G/T ' + uplinkGt + ' dB/K');
+        console.log('Path Loss: ' + uplinkPathLoss + ' dB');
+        console.log('Noise BW: ' + noiseBw + ' dB');
+        console.log('C/N uplink ' + cnUplink + ' dB');
+
+        // ---------------------------------- Downlink ---------------------------------------------
+
+        // Setup variables
+        let downlinkFrequency = transponder.downlink_cf;
+        let downlinkSlantRange = slantRange(downlink_station.location, orbitalSlot);
+        let downlinkXpolLoss = xpolLoss(), downlink_pointingLoss = pointingLoss(downlinkFrequency, downlink_station.antenna.size, skb);
+        let downlinkAtmLoss = atmosphericLoss({
+            condition: condition.downlink,
+            location: downlink_station.location,
+            orbitalSlot: orbitalSlot,
+            freq: downlinkFrequency,
+            diameter: downlink_station.antenna.size,
+            polarization: transponder.downlink_pol,
+            availability: downlink_availability
+        });
+        let downlinkOtherLoss = downlinkXpolLoss + downlink_pointingLoss;
+        let downlinkContour = downlink_station.location.contour;
+
+        // Find saturated EIRP at location for debug purpose (no backoff per carrier)
+        let saturatedEirpDownAtLocation = transponder.saturated_eirp_peak + downlinkContour;
+
+        // For IPSTAR satellite, applies gain letiation
+        if(satellite.name == "IPSTAR" && _.contains(["forward","broadcast"],transponder.type)){
+            if(_.contains(["328","514","608"],transponder.downlink_beam)){ // shape beam
+                gainVariation = -0.0022 * Math.pow(downlinkContour,3) - 0.0383 * Math.pow(downlinkContour,2) - 0.0196 * downlinkContour - 0.2043;
+            }
+            else{
+                gainVariation = -0.0006 * Math.pow(downlinkContour,2) + 0.1999 * downlinkContour - 0.4185;
+            }
+            gainVariationDiff = gainVariation > -1.1 ? 0 : 1.1 + gainVariation;
+        }
+
+        // Find driven EIRP at location = Saturated EIRP at peak + carrier OBO + Gain Variation + downlink relative contour
+        let drivenEirpDownAtLocation = transponder.saturated_eirp_peak + carrierOutputBackoff + downlinkContour + gainVariationDiff;
+        console.log('Driven EIRP at loc = ' + drivenEirpDownAtLocation);
+
+        // Find EIRP Down at location = Saturated EIRP at peak + carrier OBO + downlink relative contour + other losses (pointing, xpol) + atm loss
+        let carrierEirpDownAtLocation = transponder.saturated_eirp_peak + carrierOutputBackoff + downlinkContour + gainVariationDiff - downlinkOtherLoss - downlinkAtmLoss;
+
+        // Find G/T of receive antenna
+        let antGt = 0;
+
+        // If the antenna has gt property already (such as the phased-array antenna)
+        let ant = downlink_station.antenna;
+        if (_.has(ant, 'gt')) {
+            antGt = ant.gt;
+        }
+        else {
+            let antennaTemperature = antenna_temp(downlinkAtmLoss, condition.downlink);
+            let systemTemperature = system_temp(antennaTemperature)
+
+            // If the antenna has rx_gain property, use that value, otherwise, calculate from standard value
+            let antennaGain = 0;
+            if (_.has(ant, 'rx_gain')) {
+                antennaGain = antenna_gain_at_frequency(ant.rx_gain.value, ant.rx_gain.freq, downlinkFrequency, ant.size);
+            }
+            else {
+                antennaGain = antenna_gain(ant.size, downlinkFrequency);
+            }
+            antGt = antennaGain - 10 * log10(systemTemperature)
+
+            console.log("----------Antenna---------------");
+            console.log("Antenna Temp: " + antennaTemperature + " K");
+            console.log("System Temp: " + systemTemperature + " K");
+            console.log("Ant Gain: " + antennaGain + "dBi");
+
+        }
+
+        // Calculate C/N Downlink
+        let downlinkPathLoss = pathLoss(downlinkSlantRange, downlinkFrequency);
+        let cnDownlink = carrierOverNoise(carrierEirpDownAtLocation, antGt, downlinkPathLoss, noiseBw);
+
+        console.log('------Downlink-----');
+        console.log('Condition: ' + condition.downlink);
+        console.log('Pointing loss = ' + downlink_pointingLoss + ' dB , Xpol loss = ' + downlinkXpolLoss + ' dB');
+        console.log('Atmoshperic Loss: ' + downlinkAtmLoss + " dB");
+        console.log('EIRP Down: ' + carrierEirpDownAtLocation + ' dBW');
+        console.log('G/T ' + antGt + ' dB/K');
+        console.log('Path Loss ' + downlinkPathLoss + ' dB');
+        console.log('Noise BW ' + noiseBw + ' dB');
+        console.log('C/N Downlink ' + cnDownlink + ' dB');
+
+        // ---------------------------------- Interferences ---------------------------------------------
+
+        // -------------------------------Uplink Interferences ---------------------------------------------
+
+        // C/I Intermod from HPA, C/I Adjacent satellite
+        // If uplink HPA, do not have C/I intermod specified, assume it is 25
+        let ciUplinkIntermod = _.has(uplink_station.hpa, 'intermod') ? uplink_station.hpa.intermod : 50;
+
+        // If the HPA has data for rain_fade use that value. (for IPSTAR gateways, this value will become 19 dB at rain fade.
+        if(condition.uplink == "rain" && _.has(uplink_station.hpa, 'intermod_rain')){
+            ciUplinkIntermod = uplink_station.hpa.intermod_rain;
+        }
+
+        // Uplink adjacent satellite interferences
+        // uplink adjacent satellite interferences
+        let ciUplinkSatelliteObject = ci_adjacent_satellite({
+            path: "uplink",
+            channel: transponder,
+            interference_channels: [],
+            eirp_density: eirpUp - 10 * log10(bandwidth * Math.pow(10, 6)),
+            location: uplink_station.location,
+            diameter: uplink_station.antenna.size,
+            orbitalSlot: orbitalSlot
+        });
+        let ciUplinkAdjacentSatellite = ciUplinkSatelliteObject.ci;
+
+        // Uplink cross-polarization interferences
+        let ciUplinkXpol = 30; // default, assume the antenna points correctly
+
+        // Uplink cross cells interferences
+        let ciUplinkXCells = ci_cross_cells(transponder, "uplink", uplink_station.location);
+
+        // -------------------------------Downlink Interferences ---------------------------------------------
+
+        // Downlink adjacent satellite interferences
+        let ciDownlinkAdjacentSatelliteObject = ci_adjacent_satellite({
+            path: "downlink",
+            channel: transponder,
+            interference_channels: downlink_adj_sat_interferences,
+            eirp_density: drivenEirpDownAtLocation - 10 * log10(bandwidth * Math.pow(10, 6)), // use driven eirp to find C/I
+            location: downlink_station.location,
+            diameter: downlink_station.antenna.size,
+            orbitalSlot: orbitalSlot
+        });
+
+        // Find the start frequency, stop frequency and bandwidth of this interference range and add it to the C/I downlink object
+
+        let ciDownlinkAdjacentSatellite = ciDownlinkAdjacentSatelliteObject.ci;
+
+        // C/I Intermod from satellite
+        let ciDownlinkIntermod = 20; // default
+
+        // If the channel has the backoff settings property, use that value
+        if (_.has(transponder, 'backoff_settings')) {
+            ciDownlinkIntermod = _.where(transponder.backoff_settings, {"num_carriers": transponder.current_num_carriers})[0].intermod;
+        }
+
+        // Downlink cross-polarization interferences
+        let ciDownlinkXpol = 30; // default, assume the antenna points correctly
+
+        // Downlink cross cells interferences
+        let ciDownlinkXcells = ci_cross_cells(transponder, "downlink", downlink_station.location);
+
+        // Total C/I uplink
+        let ciUplink = cnOperation(ciUplinkIntermod, ciUplinkAdjacentSatellite, ciUplinkXpol, ciUplinkXCells);
+
+        // Total C/I downlink
+        let ciDownlink = cnOperation(ciDownlinkIntermod, ciDownlinkAdjacentSatellite, ciDownlinkXpol, ciDownlinkXcells);
+
+        console.log('------Interferences------');
+        console.log('C/I Up X-pol = ' + ciUplinkXpol);
+        console.log('C/I Up Intermod = ' + ciUplinkIntermod);
+        console.log('C/I Up Adj. Sat = ' + ciUplinkAdjacentSatellite);
+        console.log('C/I Up Adj. Cells = ' + ciUplinkXCells);
+        console.log('C/I Down X-pol = ' + ciDownlinkXpol);
+        console.log('C/I Down Intermod = ' + ciDownlinkIntermod);
+        console.log('C/I Down Adj. Sat = ' + ciDownlinkAdjacentSatellite);
+        console.log('C/I Down Cross Cells = ' + ciDownlinkXcells);
+
+        // ---------------------------------- C/N Total ---------------------------------------------
+
+        let cnTotal = cnOperation(cnUplink, cnDownlink, ciUplink, ciDownlink);
+
+        // If this is TOLL platform, include warble loss
+        if(application.name == "TOLL"){
+            let numChannels = symbolRate(bandwidth, application) / 3.375;
+            let warbleLoss = 10 * log10((Math.pow(10,2.2/10) + numChannels - 1) / numChannels);
+            console.log('This is TOLL. Warble loss = ' + warbleLoss + ' dB');
+            console.log('C/N Total before warble loss = ' + cnTotal + ' dB');
+            cnTotal -= warbleLoss;
+            _.extend(result, {warble_loss: warbleLoss});
+        }
+
+        let linkAvailability = total_availability(uplink_availability, uplink_diversity, downlink_availability, downlink_diversity);
+        let linkMargin = cnTotal - mcg.es_no;
+        let pass = linkMargin > required_margin;
+
+        console.log('-------Total---------');
+        console.log('C/N Total: ' + cnTotal + ' dB');
+        console.log('Link margin ' + linkMargin + ' dB');
+        console.log('Pass? ' + pass);
+        console.log('Total link availability: ' + linkAvailability);
+
+        // ---------------------------------- Data Rate ---------------------------------------------
+
+        let dataRate = symbolRate(bandwidth, application) * mcg.spectral_efficiency;
+
+        // For TOLL, data_rate is a little complicated....
+        if(application.name == "TOLL"){
+            console.log('Find data rate for TOLL...');
+            let bit_rate_channel_0 = 0;
+            // if use code higher than QPSK 835, the bit rate channel 0 will be at most QPSK 835
+            if(mcg.spectral_efficiency > 1.67){
+                bit_rate_channel_0 = _.where(application.mcgs,{name:"QPSK835"})[0].bit_rate_per_slot;
+            }
+            else{
+                bit_rate_channel_0 = mcg.bit_rate_per_slot;
+            }
+            console.log("Bit rate channel 0 = " + bit_rate_channel_0);
+
+            let num_channels = symbolRate(bandwidth, application) / 3.375;
+            console.log('Num of channels = ' + num_channels);
+
+            dataRate = ((num_channels - 1) * 252 * mcg.bit_rate_per_slot + 250 * bit_rate_channel_0) / 1000;
+
+            let data_rate_ipstar_channel = dataRate / num_channels;
+            _.extend(result,{data_rate_ipstar_channel: data_rate_ipstar_channel.toFixed(2)});
+        }
+
+        if(application.name == "STAR"){
+            console.log('Find data rate for STAR....');
+            // round down the normal data rate (from symbol rate x MBE) value to predefined values
+            let bit_rates_without_header = [0,0.1168,0.1603,0.2513,0.3205,0.5026,0.6411,1.0052,1.2821,2.0105,2.5642,4.021];
+            let temp = 0;
+            _.each(bit_rates_without_header, function(item){
+                if(item < dataRate && item > temp){
+                    temp = item;
+                }
+            })
+            dataRate = temp;
+        }
+
+
+        // ---------------------------------- Power utilization -------------------------------------
+
+        // Calculate power utilization percentage by comparing real carrier PFD and operating PFD per carrier
+        // PFD diff is positive if overused
+        let pfdDiff = carrierPfd - operatingPfdPerCarrier;
+        let powerUtilPercent = 100 * Math.pow(10, pfdDiff / 10);
+
+        // Calculate guard band in percent for this carrier
+        // Conventional result needs this as Sales team do not accept the bandwidth in decimal
+        let roundupBandwidth = Math.ceil(bandwidth);
+        let guardband = ((roundupBandwidth - bandwidth) * 100 / bandwidth).toFixed(2);
+
+
+        // Store the letiables in the result object.
+        // We will use this object to represent all parameters in the result.
+
+        _.extend(result, {
+            // satellite
+            channel: transponder.name,
+            operating_mode: transponder.mode,
+            operating_sfd: operatingPfd.toFixed(2),
+            operating_pfd_per_carrier: operatingPfdPerCarrier.toFixed(2),
+            carrier_pfd: carrierPfd.toFixed(2),
+            carrier_obo: carrierOutputBackoff.toFixed(2),
+            gain_letiation: gainVariation.toFixed(2),
+            // uplink
+            uplink_antenna: uplink_station.antenna,
+            uplink_hpa: uplink_station.hpa,
+            uplink_pointing_loss: uplink_pointingLoss.toFixed(2),
+            uplink_xpol_loss: upllinkXpolLoss.toFixed(2),
+            uplink_atmLoss: uplinkAtmLoss.toFixed(2),
+            uplink_eirp: eirpUp.toFixed(2),
+            uplink_gt: uplinkGt.toFixed(2),
+            uplink_path_loss: uplinkPathLoss.toFixed(2),
+            uplink_condition: condition.uplink,
+            uplink_availability: uplink_availability.toFixed(2),
+            uplink_location: uplink_station.location,
+            operating_hpa_power: operatingHpaPower.toFixed(2),
+            cn_uplink: cnUplink.toFixed(2),
+            // downlink
+            downlink_antenna: downlink_station.antenna,
+            // Following 3 parameters are aAvailable only if G/T is not specified in the antenna spec
+            antenna_temp: _.has(downlink_station.antenna, 'gt') ? 'N/A' : ant_temp.toFixed(2),
+            system_temp: _.has(downlink_station.antenna, 'gt') ? 'N/A' : sys_temp.toFixed(2),
+            ant_gain: _.has(downlink_station.antenna, 'gt') ? 'N/A' : ant_gain.toFixed(2),
+            downlink_pointing_loss: downlink_pointingLoss.toFixed(2),
+            downlink_xpol_loss: downlinkXpolLoss.toFixed(2),
+            downlink_atmLoss: downlinkAtmLoss.toFixed(2),
+            downlink_eirp: carrierEirpDownAtLocation.toFixed(2),
+            saturated_eirp_at_loc: saturatedEirpDownAtLocation.toFixed(2),
+            downlink_gt: antGt.toFixed(2),
+            downlink_path_loss: downlinkPathLoss.toFixed(2),
+            downlink_condition: condition.downlink,
+            downlink_availability: downlink_availability.toFixed(2),
+            downlink_location: downlink_station.location,
+            cn_downlink: cnDownlink.toFixed(2),
+            // interferences
+            ci_uplink_intermod: ciUplinkIntermod.toFixed(2),
+            ci_uplink_adj_sat: ciUplinkAdjacentSatellite.toFixed(2),
+            ci_uplink_xpol: ciUplinkXpol.toFixed(2),
+            ci_uplink_xcells: ciUplinkXCells.toFixed(2),
+            ci_downlink_adj_sat: ciDownlinkAdjacentSatellite.toFixed(2),
+            ci_downlink_adj_sat_obj: ciDownlinkAdjacentSatelliteObject,
+            ci_downlink_intermod: ciDownlinkIntermod.toFixed(2),
+            ci_downlink_xpol: ciDownlinkXpol.toFixed(2),
+            ci_downlink_xcells: ciDownlinkXcells.toFixed(2),
+            ci_uplink: ciUplink.toFixed(2),
+            ci_downlink: ciDownlink.toFixed(2),
+            // total
+            cn_total: cnTotal.toFixed(2),
+            link_margin: linkMargin.toFixed(2),
+            required_margin: required_margin,
+            pass: pass,
+            link_availability: linkAvailability.toFixed(2),
+            mcg: mcg,
+            occupied_bandwidth: bandwidth.toFixed(2),
+            noise_bandwidth: noiseBw.toFixed(2),
+            roundup_bandwidth: roundupBandwidth.toFixed(2),
+            guardband: guardband,
+            data_rate: dataRate.toFixed(2),
+            power_util_percent: powerUtilPercent.toFixed(2),
+            roll_off_factor: roll_off_factor
+        });
+
+
+        return result
+
+        // // Check if the transponder is operating in FGM or ALC mode
+        // if (this.transponder.mode === 'FGM') {
+        //
+        //     // If FGM, find operating PFD at 100% power utilization
+        //
+        //     // If rain fade case, EIRPup = desired level - rain
+        //
+        //     // Otherwise, EIRPup = desired
+        // } else {
+        //
+        //     // If ALC, find operating PFD at desired deep-in
+        //
+        //     // If rain-fade case, EIRPup = desired level - rain + UPC (but not more than desired)
+        //
+        //     // Otherwise, EIRPup = desired
+        // }
+        //
+        // // Calculate C/N up (need to check max mode)
+        //
+        // // Calculate EIRPdown (need to check max mode)
+        //
+        // // Calculate C/I
+        //
+        // // Calculate C/N Total
+        //
+        // // Calculate link margin and determine pass condition
+        //
+        // // Return result
     }
 
-    extractUniqueLocations () {
-
+    extractUniqueRemoteLocations () {
+        return _.uniq(_.map(this.remoteStations, 'location'))
     }
 
-    findApplicationByPath () {
-
+    findApplicationByPath (path) {
+        return this.modem.applications.find(app => app.type === path || app.type === 'SCPC' || app.type === 'broadcast')
     }
 
     findBestTransponderFromLocationAndSatellite ({ location, satellite }) {
         return {}
     }
     
-    fincContourRange () {
+    findContourRange () {
         return {
             max: 0,
             min: -15
@@ -554,13 +1095,49 @@ class LinkBudget {
 
     findLowerBandwidthPool () {
 
+        // Check the the application has array of available symbol rates
+        if (!_.has(this.application, 'symbol_rates') || application.symbol_rates.length == 0) {
+            console.log("Cannot find list of available symbol rates.")
+            return false;
+        }
+        let symbolRate = _.filter(this.application.symbol_rates, sr => {
+            return sr < this.occupiedBandwidth / this.application.roll_off_factor;
+        })
+        // Return array of bandwidth from symbol rate
+        return _.map(symbolRate, item => {
+            if(this.application.name == "TOLL"){
+                return (item / 1000) + 3.375;
+            }
+            return (item / 1000) * this.application.roll_off_factor;
+        })
     }
 
-    findLowerMcgsThanClearSky (mcg) {
+    findLowerMcgsThanClearSky (inputMcg) {
+        // Assume the MCG in the application is sorted from lowest to highest efficiency
+        let mcgs = _.filter(this.mcgs, mcg => {
+            return mcg.spectral_efficiency <= inputMcg.spectral_efficiency;
+        })
+        // Return sorted mcg by spectral efficiency
+        return _.sortBy(mcgs, num => {
+            return -(num.spectral_efficiency);
+        })
+    }
 
+    findSatellite (transponder) {
+        return this.satellites.find(satellite => satellite.name === transponder.satellite)
     }
 
     findTransponderByPath () {
+    }
+
+    // Record the error message
+    logError(message) {
+        console.log(message);
+        this.errorMessage = message;
+    }
+
+    logTitle(string) {
+        console.log('---------------------- ' + string + ' ----------------------');
     }
     
     // Copied from old program

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
+    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="this">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
     </list>
@@ -34,11 +34,12 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="351">
-              <caret line="521" column="0" lean-forward="true" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
+            <state relative-caret-position="335">
+              <caret line="750" column="0" lean-forward="true" selection-start-line="750" selection-start-column="0" selection-end-line="750" selection-end-column="0" />
               <folding>
                 <element signature="n#!!block;n#runForwardLink#0;n#LinkBudget#0" expanded="false" />
                 <element signature="n#!!block;n#runReturnLink#0;n#LinkBudget#0" expanded="false" />
+                <marker date="1510157483000" expanded="false" signature="49449:52864" ph="{...}" />
               </folding>
             </state>
           </provider>
@@ -56,35 +57,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="station.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/classes/station.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="23" column="24" lean-forward="false" selection-start-line="23" selection-start-column="24" selection-end-line="23" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#41#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="remoteStation.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="15">
               <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-              <folding>
-                <element signature="e#0#41#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="transmission.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/classes/transmission.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
               <folding>
                 <element signature="e#0#41#0" expanded="false" />
               </folding>
@@ -164,6 +141,14 @@
       <find>Transp</find>
       <find>Antenna</find>
       <find>unit</find>
+      <find>forward</find>
+      <find>fincContourRange</find>
+      <find>MaxCont</find>
+      <find>this.trans</find>
+      <find>Bandwidth</find>
+      <find>this.transpon</find>
+      <find>logError</find>
+      <find>LogTitle</find>
     </findStrings>
     <replaceStrings>
       <replace>locationRouter</replace>
@@ -171,6 +156,9 @@
       <replace>buc</replace>
       <replace>B</replace>
       <replace>this.station.bandwidth.unit</replace>
+      <replace>return</replace>
+      <replace>orbitalSlot</replace>
+      <replace>this.logTitle</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -557,7 +545,7 @@
       <workItem from="1507006151374" duration="8399000" />
       <workItem from="1508054873557" duration="1935000" />
       <workItem from="1508997889492" duration="7101000" />
-      <workItem from="1509699451045" duration="15131000" />
+      <workItem from="1509699451045" duration="18845000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -650,11 +638,18 @@
       <option name="project" value="LOCAL" />
       <updated>1510132799312</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="Adding functions to show calculation flows">
+      <created>1510151846067</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1510151846067</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="72677000" />
+    <option name="totallyTimeSpent" value="76391000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -722,7 +717,8 @@
     <MESSAGE value="Add adjacent satellites API" />
     <MESSAGE value="Fix adjacent satellites API" />
     <MESSAGE value="Adding linkbudget classes" />
-    <option name="LAST_COMMIT_MESSAGE" value="Adding linkbudget classes" />
+    <MESSAGE value="Adding functions to show calculation flows" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding functions to show calculation flows" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1138,40 +1134,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="15">
-          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/gatewayStation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="75">
           <caret line="7" column="26" lean-forward="false" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/station.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="23" column="24" lean-forward="false" selection-start-line="23" selection-start-column="24" selection-end-line="23" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#41#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/transmission.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="16" column="5" lean-forward="true" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
           <folding>
             <element signature="e#0#41#0" expanded="false" />
           </folding>
@@ -1188,6 +1154,32 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/transmission.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/station.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#41#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/transponder.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
@@ -1200,11 +1192,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="351">
-          <caret line="521" column="0" lean-forward="true" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
+        <state relative-caret-position="335">
+          <caret line="750" column="0" lean-forward="true" selection-start-line="750" selection-start-column="0" selection-end-line="750" selection-end-column="0" />
           <folding>
             <element signature="n#!!block;n#runForwardLink#0;n#LinkBudget#0" expanded="false" />
             <element signature="n#!!block;n#runReturnLink#0;n#LinkBudget#0" expanded="false" />
+            <marker date="1510157483000" expanded="false" signature="49449:52864" ph="{...}" />
           </folding>
         </state>
       </provider>
