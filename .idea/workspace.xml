@@ -2,24 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/antenna.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/bandwidth.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/buc.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/gatewayStation.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/location.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/modem.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/remoteStation.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/satellite.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/station.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/transmission.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/transponder.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/lib/utils.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/index.js" afterPath="$PROJECT_DIR$/server/routes/v1/index.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/linkbudget.js" afterPath="$PROJECT_DIR$/server/routes/v1/linkbudget.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/raindata.js" afterPath="$PROJECT_DIR$/server/routes/v1/raindata.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/server.js" afterPath="$PROJECT_DIR$/server/server.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -50,9 +34,12 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="251">
-              <caret line="111" column="49" lean-forward="true" selection-start-line="111" selection-start-column="49" selection-end-line="111" selection-end-column="49" />
-              <folding />
+            <state relative-caret-position="351">
+              <caret line="521" column="0" lean-forward="true" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
+              <folding>
+                <element signature="n#!!block;n#runForwardLink#0;n#LinkBudget#0" expanded="false" />
+                <element signature="n#!!block;n#runReturnLink#0;n#LinkBudget#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -176,12 +163,14 @@
       <find>antenna</find>
       <find>Transp</find>
       <find>Antenna</find>
+      <find>unit</find>
     </findStrings>
     <replaceStrings>
       <replace>locationRouter</replace>
       <replace>Locations</replace>
       <replace>buc</replace>
       <replace>B</replace>
+      <replace>this.station.bandwidth.unit</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -568,7 +557,7 @@
       <workItem from="1507006151374" duration="8399000" />
       <workItem from="1508054873557" duration="1935000" />
       <workItem from="1508997889492" duration="7101000" />
-      <workItem from="1509699451045" duration="7558000" />
+      <workItem from="1509699451045" duration="15131000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -654,11 +643,18 @@
       <option name="project" value="LOCAL" />
       <updated>1509093665783</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Adding linkbudget classes">
+      <created>1510132799312</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1510132799312</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65104000" />
+    <option name="totallyTimeSpent" value="72677000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -670,7 +666,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.4188119" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23366337" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17272249" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32871288" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -725,11 +721,12 @@
     <MESSAGE value="Add all gateways API" />
     <MESSAGE value="Add adjacent satellites API" />
     <MESSAGE value="Fix adjacent satellites API" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix adjacent satellites API" />
+    <MESSAGE value="Adding linkbudget classes" />
+    <option name="LAST_COMMIT_MESSAGE" value="Adding linkbudget classes" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="3" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -1203,9 +1200,12 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="251">
-          <caret line="111" column="49" lean-forward="true" selection-start-line="111" selection-start-column="49" selection-end-line="111" selection-end-column="49" />
-          <folding />
+        <state relative-caret-position="351">
+          <caret line="521" column="0" lean-forward="true" selection-start-line="521" selection-start-column="0" selection-end-line="521" selection-end-column="0" />
+          <folding>
+            <element signature="n#!!block;n#runForwardLink#0;n#LinkBudget#0" expanded="false" />
+            <element signature="n#!!block;n#runReturnLink#0;n#LinkBudget#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>
