@@ -17,7 +17,7 @@ rainDataRouter.post('/rainValue', (req, res) => {
         x1 = result.x1, x2 = result.x2, y1 = result.y1, y2 = result.y2;
     } else {
         res.status(404).send('Lat/Lon is invalid');
-    }
+    } pr
 
     // Query 4 rain points
     RainData.find({ lat: { $in: [y1, y2] }, lon: { $in: [x1, x2]}}).then((rainPoints) => {

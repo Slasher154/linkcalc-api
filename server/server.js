@@ -1,3 +1,5 @@
+const Antenna = require('./classes/antenna');
+const jsonLog = require('./lib/utils').jsonLog;
 const _ = require('lodash');
 const express = require('express');
 const bodyParser = require('body-parser');

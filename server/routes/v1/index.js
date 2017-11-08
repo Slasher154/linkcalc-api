@@ -21,7 +21,7 @@ v1routes.use(version, satelliteRoutes);
 const beamRoutes = require('./beams');
 v1routes.use(version, beamRoutes);
 
-// Transponder routes
+// Location routes
 const transponderRoutes = require('./transponders');
 v1routes.use(version, transponderRoutes);
 
@@ -29,7 +29,7 @@ v1routes.use(version, transponderRoutes);
 const gatewayRoutes = require('./gateways');
 v1routes.use(version, gatewayRoutes);
 
-// Antenna routes
+// Buc routes
 const antennaRoutes = require('./antennas');
 v1routes.use(version, antennaRoutes);
 
