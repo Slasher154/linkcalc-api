@@ -16,6 +16,10 @@ const Station = require('./station')
 const Transponder = require('./transponder')
 const Utils = require('./utils')
 
+// Mongoose Models
+const {Locations} = require('../models/locations')
+const {Satellites} = require('../models/satellites');
+
 class LinkBudget {
     constructor (requestObject) {
         for (var field in requestObject) {
@@ -831,7 +835,7 @@ class LinkBudget {
             interference_channels: [],
             eirp_density: eirpUp - 10 * Utils.log10(this.occupiedBandwidth * Math.pow(10, 6)),
             location: uplinkStation.location,
-            diameter: uplinkStation.antenna.size,
+            station: uplinkStation,
             orbitalSlot: orbitalSlot
         });
         let ciUplinkAdjacentSatellite = ciUplinkSatelliteObject.ci;
@@ -840,13 +844,13 @@ class LinkBudget {
         let ciUplinkXpol = 30; // default, assume the antenna points correctly
 
         // Uplink cross cells interferences
-        let ciUplinkXCells = this.ciCrossCells(transponder, "uplink", uplinkStation.location);
+        let ciUplinkXCells = this.ciCrossCells(transponder, "uplink", uplinkStation);
 
         // -------------------------------Downlink Interferences ---------------------------------------------
 
         // Downlink adjacent satellite interferences
         let downlink_adj_sat_interferences = {}
-        let ciDownlinkAdjacentSatelliteObject = this.ciCrossCells({
+        let ciDownlinkAdjacentSatelliteObject = this.ciAdjacentSatellite({
             path: "downlink",
             channel: transponder,
             interference_channels: downlink_adj_sat_interferences,
@@ -872,7 +876,7 @@ class LinkBudget {
         let ciDownlinkXpol = 30; // default, assume the antenna points correctly
 
         // Downlink cross cells interferences
-        let ciDownlinkXcells = this.ciCrossCells(transponder, "downlink", downlinkStation.location);
+        let ciDownlinkXcells = this.ciCrossCells(transponder, "downlink", downlinkStation);
 
         // Total C/I uplink
         let ciUplink = Utils.cnOperation(ciUplinkIntermod, ciUplinkAdjacentSatellite, ciUplinkXpol, ciUplinkXCells);
@@ -1092,7 +1096,7 @@ class LinkBudget {
 
         // ------------------------------ Separate by IPSTAR and Conventional --------------------------
 
-        else if(Satellites.findOne({name:channel.satellite}).type == "Broadband"){
+        else if(this.satellite.isBroadband){
             if (_.has(channel,'eirp_density_adjacent_satellite_' + path)){
 
                 if(channel['eirp_density_adjacent_satellite_' + path] == -100){
@@ -1105,8 +1109,10 @@ class LinkBudget {
                 }
                 else{
                     var deg_diff = Math.abs(data.orbital_slot - channel.adjacent_satellite_orbital_slot);
-                    ci = data.eirp_density - channel['eirp_density_adjacent_satellite_' + path] + gain_rejection_ratio(channel[path + '_cf'],data.diameter,deg_diff) + gain_improvment(data.diameter, deg_diff);
-                    console.log('eirp den = ' + data.eirp_density + ' eirp_den_sat = ' + channel['eirp_density_adjacent_satellite_'+ path] + ' grr = ' + gain_rejection_ratio(channel[path + '_cf'],data.diameter,deg_diff) + ' gain improve = ' + gain_improvment(data.diameter, deg_diff));
+                    let grr = data.station.antenna.gainRejectionRatio(channel[path + '_cf'], deg_diff)
+                    let gainImprovement = data.station.antenna.gainImprovment(deg_diff)
+                    ci = data.eirp_density - channel['eirp_density_adjacent_satellite_' + path] + grr + gainImprovement;
+                    console.log('eirp den = ' + data.eirp_density + ' eirp_den_sat = ' + channel['eirp_density_adjacent_satellite_'+ path] + ' grr = ' + grr + ' gain improve = ' + gainImprovement);
 
                     ci_objects.push({
                         interference: true,
@@ -1151,8 +1157,8 @@ class LinkBudget {
                         console.log('Finding interferences from satellite ' + intf.satellite + ' channel: ' + intf.name + ' at ' + intf_sat.orbital_slot + ' degrees');
 
                         // find the gain rejection ratio (relative gain)
-                        var grr = gain_rejection_ratio(channel[path + '_cf'], diameter, deg_diff);
-                        console.log('GRR of ' + diameter + ' m. antenna at ' + deg_diff + ' degrees = ' + grr + ' dB');
+                        var grr = data.station.antenna.gainRejectionRatio(channel[path + '_cf'], deg_diff);
+                        console.log('GRR of ' + data.station.antenna.size + ' m. antenna at ' + deg_diff + ' degrees = ' + grr + ' dB');
 
                         // find the EIRP of the location on that satellite from the database
                         var loc = Locations.findOne({name: location.name});
@@ -1160,7 +1166,7 @@ class LinkBudget {
                         // location is not found
                         if (!location) continue;
 
-                        var loc_data = _.where(loc.data, {beam: intf[path + '_beam'], satellite: intf.satellite, type: path})[0];
+                        var loc_data = loc.data.find(l => l.beam === intf[path + '_beam' && l.satellite === intf.satellite && l.type === path])
 
                         // location is found, but this location is not under this beam contour
                         if (!loc_data) continue;
@@ -1171,15 +1177,15 @@ class LinkBudget {
                             console.log('The location ' + loc.name + ' has value on beam ' + loc_data.beam + ' = ' + loc_data.value);
 
                             // find the output backoff of the interfered channels
-                            var intf_obo = _.where(intf.backoff_settings, {num_carriers: intf.current_num_carriers})[0].obo;
+                            var intf_obo = intf.backoff_settings.find(s => s.num_carriers === intf.current_num_carriers).obo
 
                             // find EIRP density of interfered channels at that location
-                            var intf_eirp_density = loc_data.value + intf_obo - 10 * log10(intf.bandwidth * Math.pow(10, 6));
+                            var intf_eirp_density = loc_data.value + intf_obo - 10 * Utils.log10(intf.bandwidth * Math.pow(10, 6));
 
                             console.log("EIRP density for " + intf.satellite + ' ' + intf.name + ' = ' + intf_eirp_density + ' dBW');
 
                             // return C/I = our eirp density - intf eirp density + GRR + polarization improvement
-                            var c_intf = eirp_density - intf_eirp_density + grr + pol_improvement(channel[path + '_pol'], intf[path + '_pol']);
+                            var c_intf = eirp_density - intf_eirp_density + grr + polImprovement(channel[path + '_pol'], intf[path + '_pol']);
 
                             console.log("C/I for " + channel.satellite + ' ' + channel.name + ' = ' + c_intf + ' dB');
 
@@ -1191,7 +1197,7 @@ class LinkBudget {
                                 channel: intf.name
                             });
 
-                            ci = cnOperation(ci, c_intf);
+                            ci = Utils.cnOperation(ci, c_intf);
 
                         }
 
@@ -1205,16 +1211,16 @@ class LinkBudget {
 
         return ci_objects;
 
-        function pol_improvement(our_pol, intf_pol) {
+        function polImprovement(our_pol, intf_pol) {
             var circular_pols = ["LHCP", "RHCP"];
             var linear_pols = ["H", "V"];
 
             // if our pol is linear and intf pol is circular, we gain +3
-            if (_.contains(linear_pols, our_pol) && _.contains(circular_pols, intf_pol)) {
+            if (_.includes(linear_pols, our_pol) && _.includes(circular_pols, intf_pol)) {
                 return 3;
             }
             // and vice versa, we gain -3
-            else if (_.contains(circular_pols, our_pol) && _.contains(linear_pols, intf_pol)) {
+            else if (_.includes(circular_pols, our_pol) && _.includes(linear_pols, intf_pol)) {
                 return -3;
             }
             else return 0;
@@ -1223,7 +1229,7 @@ class LinkBudget {
 
 
     // Return C/I cross cells from the given channel, path and location
-    ciCrossCells(channel, path, location) {
+    ciCrossCells(channel, path, station) {
         var ci = 50 // default value
         if (path == "uplink") {
             // For IPSTAR forward channels KA-uplink (or Ku for BC)
@@ -1234,17 +1240,17 @@ class LinkBudget {
             else if (_.has(channel, 'ci_uplink_adj_cell_50') && _.has(channel, 'ci_uplink_adj_cell_eoc')) {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
-                if (location.contour >= channel.contour_50) {
-                    ci = channel.ci_uplink_adj_cell_50 + (location.contour - channel.contour_50);
+                if (station.contour >= channel.contour_50) {
+                    ci = channel.ci_uplink_adj_cell_50 + (station.contour - channel.contour_50);
                 }
                 // If location is between 50% and EOC, C/I = linear interpolation of C/I at 50% and C/I at EOC
-                else if (location.contour < channel.contour_50 && location.contour >= channel.contour_eoc) {
-                    ci = linearInterpolation(location.contour, channel.contour_50, channel.contour_eoc, channel.ci_uplink_adj_cell_50, channel.ci_uplink_adj_cell_eoc);
+                else if (station.contour < channel.contour_50 && station.contour >= channel.contour_eoc) {
+                    ci = Utils.linearInterpolation(station.contour, channel.contour_50, channel.contour_eoc, channel.ci_uplink_adj_cell_50, channel.ci_uplink_adj_cell_eoc);
                 }
                 // If location is beyond EOC, C/I = C/I at EOC minus the distance between EOC and that location
                 // (if farther from EOC, C/I is worse)
                 else {
-                    ci = channel.ci_uplink_adj_cell_eoc - (location.contour - channel.contour_eoc);
+                    ci = channel.ci_uplink_adj_cell_eoc - (station.contour - channel.contour_eoc);
                 }
             }
             else {
@@ -1259,17 +1265,17 @@ class LinkBudget {
             else if (_.has(channel, 'ci_downlink_adj_cell_50') && _.has(channel, 'ci_downlink_adj_cell_eoc')) {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
-                if (location.contour >= channel.contour_50) {
-                    ci = channel.ci_downlink_adj_cell_50 + (location.contour - channel.contour_50);
+                if (station.contour >= channel.contour_50) {
+                    ci = channel.ci_downlink_adj_cell_50 + (station.contour - channel.contour_50);
                 }
                 // If location is between 50% and EOC, C/I = linear interpolation of C/I at 50% and C/I at EOC
-                else if (location.contour < channel.contour_50 && location.contour >= channel.contour_eoc) {
-                    ci = linearInterpolation(location.contour, channel.contour_50, channel.contour_eoc, channel.ci_downlink_adj_cell_50, channel.ci_downlink_adj_cell_eoc);
+                else if (station.contour < channel.contour_50 && station.contour >= channel.contour_eoc) {
+                    ci = Utils.linearInterpolation(station.contour, channel.contour_50, channel.contour_eoc, channel.ci_downlink_adj_cell_50, channel.ci_downlink_adj_cell_eoc);
                 }
                 // If location is beyond EOC, C/I = C/I at EOC minus the distance between EOC and that location
                 // (if farther from EOC, C/I is worse)
                 else {
-                    ci = channel.ci_downlink_adj_cell_eoc + (location.contour - channel.contour_eoc);
+                    ci = channel.ci_downlink_adj_cell_eoc + (station.contour - channel.contour_eoc);
                 }
             }
             else {

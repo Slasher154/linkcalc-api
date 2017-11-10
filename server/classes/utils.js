@@ -30,6 +30,10 @@ class Utils {
         return  c_light / (freq * Math.pow(10, 9));
     }
 
+    static linearInterpolation(x, x1, x2, fx1, fx2) {
+        return ((fx2 - fx1) / (x2 - x1)) * (x - x1) + fx1;
+    }
+
     static log10(num) {
         return Math.log(num) / Math.LN10;
     }

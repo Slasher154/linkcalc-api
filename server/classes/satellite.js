@@ -8,6 +8,14 @@ class Satellite {
             this[field] = satelliteObject[field]
         }
     }
+
+    get isBroadband () {
+        return this.type === 'Broadband'
+    }
+
+    get isConventional () {
+        return this.type === 'Conventional'
+    }
 }
 
 module.exports = Satellite
