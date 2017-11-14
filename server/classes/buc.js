@@ -8,6 +8,10 @@ class Buc {
             this[field] = bucObject[field]
         }
     }
+
+    print () {
+        console.log(`BUC: ${this.name}`)
+    }
 }
 
 module.exports = Buc

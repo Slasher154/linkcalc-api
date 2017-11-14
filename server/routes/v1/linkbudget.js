@@ -14,6 +14,9 @@ const RemoteStation = require('../../classes/remoteStation')
 linkbudgetRouter.post('/linkbudget-request', (req, res) => {
     const requestObject = req.body.requestObject;
     let linkBudget = new LinkBudget(requestObject)
+    linkBudget.runLinkBudget().then(() => {
+        console.log('Link budget finished')
+    })
     res.status(200).send({requestObject})
 });
 

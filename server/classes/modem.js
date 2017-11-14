@@ -8,6 +8,10 @@ class Modem {
             this[field] = modemObject[field]
         }
     }
+
+    print () {
+        console.log(`Modem: ${this.name}`)
+    }
 }
 
 module.exports = Modem

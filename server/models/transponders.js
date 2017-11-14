@@ -23,10 +23,31 @@ var Transponders = mongoose.model('channels', new mongoose.Schema({
     transponder: String,
     mode: String,
     sfd: Number,
+    dynamic_range: Number,
+    designed_deepin: Number,
+    eirp_up_channel: Number,
+    country: String,
+    contour_50: Number,
+    contour_eoc: Number,
     atten_range: Number,
     default_atten: Number,
     current_num_carriers: String,
-    backoff_settings: Array
+    backoff_settings: Array,
+    default_gateway: String,
+    lat: Number,
+    lon: Number,
+    actual: Number,
+    ci_downlink_adj_cell_50: Number,
+    ci_downlink_adj_cell_eoc: Number,
+    ci_uplink_adj_cell_50: Number,
+    ci_uplink_adj_cell_eoc: Number,
+    ci_uplink_adj_sat: Number,
+    ci_downlink_adj_sat: Number,
+    ci_uplink_adj_cell: Number,
+    ci_downlink_adj_cell: Number,
+    eirp_density_adjacent_satellite_downlink: Number,
+    adjacent_satellite_orbital_slot: Number
+    
 
 }));
 

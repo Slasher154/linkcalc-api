@@ -10,9 +10,13 @@ class Utils {
         this.init()
     }
 
+    static get k() {
+        return -228.6
+    }
+
     static carrierOverNoise(eirp, gt, pathLoss, noise_bandwidth) {
         // EIRP in dBW, G/T in dB/K, path loss in dB, bandwidth in MHz
-        return eirp + gt - pathLoss - k - 10 * log10(noise_bandwidth * Math.pow(10, 6));
+        return eirp + gt - pathLoss - this.k - 10 *this.log10(noise_bandwidth * Math.pow(10, 6));
     }
 
     static cnOperation() {
@@ -23,6 +27,45 @@ class Utils {
             result += 1 / (Math.pow(10, arguments[i] / 10));
         }
         return 10 * Utils.log10(1 / result);
+    }
+
+    static elevationAngle(location, sat_lon) {
+        // Function to find parameters for satellite-earth geometry
+        // Based on methods derived by GEOM Spreadsheet
+        // Paiboon P. 30 November 1999
+
+        // INPUT
+        // es_lat = latitude of earth station in degree (positive in North)
+        // es_lon = longitude of earth station in degree (positive in East)
+        // sat_lon = longitude of satellite in degree (positive in East)
+
+        // Constants
+        var es_lat = location.lat;
+        var degrees_to_radians = Math.PI / 180;
+        var radians_to_degrees = 180 / Math.PI;
+        var equatorial_earth_radius = 6378144;  // Equatorial Earth Radius in meters; changed from 6378159.9
+        var geo_altitude_radius = 42164500;  // Radius at Geosynchronous Altitude; changed from 42166454
+        var earth_oblateness = 1 / 298.257;  // Earth Oblateness
+
+        // Calculates basic parameters
+        var x_1 = equatorial_earth_radius * Math.cos(es_lat * degrees_to_radians) / Math.sqrt(1 - (2 - earth_oblateness) * earth_oblateness * Math.pow(Math.sin(es_lat * degrees_to_radians), 2));
+        var z_1 = Math.pow((1 - earth_oblateness), 2) * equatorial_earth_radius * Math.sin(es_lat * degrees_to_radians) / Math.sqrt(1 - (2 - earth_oblateness) * earth_oblateness * Math.pow(Math.sin(es_lat * degrees_to_radians), 2));
+        var slant_range = Utils.slantRange(location, sat_lon);
+
+        // Calculates elevation angle
+        var re_prime = Math.sqrt(Math.pow(x_1, 2) + Math.pow(z_1, 2))
+        var cos_el = (Math.pow(re_prime, 2) + Math.pow((slant_range * 1000), 2) - Math.pow(geo_altitude_radius, 2)) / (2 * re_prime * slant_range * 1000);
+        var elevation = (Math.atan(-cos_el / Math.sqrt(-cos_el * cos_el + 1)) + 2 * Math.atan(1)) * radians_to_degrees;
+        if (elevation > 90) {
+            return elevation - 90;
+        }
+        return elevation;
+    }
+
+
+    // Return gain of 1 square.meter. antenna at the given frequency
+    static gain1m(freq) {
+        return 10 *this.log10(4 * Math.PI / Math.pow(this.lambda(freq), 2));
     }
 
     static lambda(freq) {
@@ -40,7 +83,7 @@ class Utils {
 
     // Return path loss in dB
     static pathLoss(range, freq) {
-        return spreadingLoss(range) + gain1m(freq);
+        return this.spreadingLoss(range) + this.gain1m(freq);
     }
 
     // Return pointing loss in dB
@@ -101,7 +144,20 @@ class Utils {
         if(app.name=="TOLL"){
             return occupied_bandwidth - 3.375;
         }
-        return occupied_bandwidth / roll_off_factor;
+        return occupied_bandwidth / app.roll_off_factor;
+    }
+
+    static tau_value(polarization) {
+        if (polarization === "H") {
+            return 0;
+        }
+        else if (polarization === "V") {
+            return Math.PI / 2;
+        }
+        else if (_.contains(["LHCP", "RHCP"], polarization)) {
+            return Math.PI / 4;
+        }
+        return false;
     }
 
     static totalAvailability(up_avail, up_diversity, down_avail, down_diversity) {

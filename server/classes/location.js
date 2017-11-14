@@ -8,6 +8,14 @@ class Location {
             this[field] = locationObject[field]
         }
     }
+
+    print () {
+        if (this.lat && this.lon) {
+            console.log(`Location: ${this.name} (${this.lat},${this.lon})`)
+        } else {
+            console.log(`Location: ${this.name}`)
+        }
+    }
 }
 
 module.exports = Location

@@ -7,7 +7,9 @@ class Transponder {
         for (var field in transponderObject) {
             this[field] = transponderObject[field]
         }
-        this.init()
+    }
+    print () {
+        console.log(`Transponder: ${this.name} - ${this.type}`)
     }
 
 
