@@ -12,6 +12,16 @@ class Contour {
         }
     }
 
+    static async getBestBeam({ location, satellite, path, parameter }) {
+        let bestContour = await this.getContour({
+            location,
+            satellite,
+            path,
+            parameter
+        })
+        return bestContour
+    }
+
     static async getContour ({ location, satellite, beam, path, parameter }) {
         // This query will return all contours that covers the given point
         console.log(`Location: ${location.lat}, ${location.lon}`)
@@ -29,10 +39,12 @@ class Contour {
                             }
                     }
             },
-            'properties.name': beam,
             'properties.satellite': satellite,
             'properties.path': path,
             'properties.parameter': parameter
+        }
+        if (beam) {
+            query['properties'][name] = beam
         }
         // console.log(`Query: ${JSON.stringify(query, undefined, 2)}`)
         try {
@@ -41,8 +53,14 @@ class Contour {
             if (results) {
                 let valueIndicator = results[0][parameter] ? parameter : 'relativeGain'
                 console.log(`Value indicator is ${valueIndicator}`)
-                // The best contour is contour with maximum value indicator (gain, eirp, g/t)
-                let bestContour = _.min(results, (re) => {
+                // The best contour is contour with maximum value indicator (gain, eirp, g/t) unless it's only beam
+                let filteredResults = results
+                if (results.length > 1) {
+                    filteredResults = _.remove(results, re => {
+                        return !re.properties.name.startsWith('BC')
+                    })
+                }
+                let bestContour = _.min(filteredResults, (re) => {
                     return re['properties'][valueIndicator]
                 })
                 return bestContour
@@ -57,4 +75,4 @@ class Contour {
     }
 }
 
-module.exports = Buc
+module.exports = Contour

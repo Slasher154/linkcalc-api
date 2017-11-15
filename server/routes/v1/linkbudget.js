@@ -14,10 +14,12 @@ const RemoteStation = require('../../classes/remoteStation')
 linkbudgetRouter.post('/linkbudget-request', (req, res) => {
     const requestObject = req.body.requestObject;
     let linkBudget = new LinkBudget(requestObject)
-    linkBudget.runLinkBudget().then(() => {
-        console.log('Link budget finished')
+    linkBudget.runLinkBudget().then((results) => {
+        res.status(200).send(results)
+    }).catch(e => {
+        res.status(404).send(e)
     })
-    res.status(200).send({requestObject})
+
 });
 
 module.exports = linkbudgetRouter;

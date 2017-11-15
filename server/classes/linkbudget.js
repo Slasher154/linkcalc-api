@@ -101,13 +101,13 @@ class LinkBudget {
                     let returnLinkResult = {}
 
                     forwardLinkResult = await this.runLinkByPath('forward')
-                    returnLinkResult = await this.runLinkByPath('return')
-                        // Record cases
-                        console.log('Recording results')
-                        this.linkBudgetResults.push({
-                            forwardLink: forwardLinkResult,
-                            returnLink: returnLinkResult
-                        })
+                    // returnLinkResult = await this.runLinkByPath('return')
+                    // Record cases
+                    console.log('Recording results')
+                    this.linkBudgetResults.push({
+                        forwardLink: forwardLinkResult,
+                        returnLink: returnLinkResult
+                    })
                     // })
                     // this.runLinkByPath('forward').then(result => {
                     //     console.log(`Forward Result : ${result}`)
@@ -136,8 +136,8 @@ class LinkBudget {
 
                 }
             }
-
         }
+        return this.linkBudgetResults
     }
 
     async runLinkByPath(path) {
@@ -188,6 +188,11 @@ class LinkBudget {
         this.gateway = new GatewayStation(gw)
         // console.log(this.gateway)
         this.gateway.print()
+
+        // Set uplink contour of gateway if default gateway is used
+        if (this.useDefaultGateway) {
+            this.gateway.contour = -1
+        }
 
         // Find application by path
         this.application = this.findApplicationByPath(this.modem, path)
@@ -746,9 +751,11 @@ class LinkBudget {
         });
         let downlinkOtherLoss = downlinkXpolLoss + downlinkPointingLoss;
         let downlinkContour = downlinkStation.contour;
+        console.log('Downlink contour = ' + downlinkContour + ' dB')
 
         // Find saturated EIRP at location for debug purpose (no backoff per carrier)
         let saturatedEirpDownAtLocation = transponder.saturated_eirp_peak + downlinkContour;
+        console.log(`Saturated EIRP down at location = ${saturatedEirpDownAtLocation} dBW`)
 
         // For IPSTAR satellite, applies gain variation
         if (this.satellite.name == "IPSTAR" && _.includes(["forward", "broadcast"], transponder.type)) {
@@ -760,6 +767,7 @@ class LinkBudget {
             }
             gainVariationDiff = gainVariation > -1.1 ? 0 : 1.1 + gainVariation;
         }
+        console.log(`Gain vairation diff = ${gainVariationDiff}`)
 
         // Find driven EIRP at location = Saturated EIRP at peak + carrier OBO + Gain Variation + downlink relative contour
         let drivenEirpDownAtLocation = transponder.saturated_eirp_peak + carrierOutputBackoff + downlinkContour + gainVariationDiff;
@@ -863,6 +871,8 @@ class LinkBudget {
         console.log('C/I Down Intermod = ' + ciDownlinkIntermod);
         console.log('C/I Down Adj. Sat = ' + ciDownlinkAdjacentSatellite);
         console.log('C/I Down Cross Cells = ' + ciDownlinkXcells);
+        console.log(`C/I Up Total = ${ciUplink} dB`)
+        console.log(`C/I Down Total = ${ciDownlink} dB`)
 
         // ---------------------------------- C/N Total ---------------------------------------------
 

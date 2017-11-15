@@ -49,7 +49,7 @@ class Station {
     }
 
     static get lnaNoise () {
-        return 50
+        return 60
     }
 
     gt(freq, attenuation, condition) {

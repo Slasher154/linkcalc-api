@@ -4,6 +4,7 @@
 
 const _ = require('lodash');
 const contourRouter = require('express').Router();
+const Contour = require('../../classes/contour')
 
 var {Contours2} = require('../../models/contours');
 
@@ -39,12 +40,22 @@ contourRouter.post('/get-contour', (req, res) => {
             console.log(`Value indicator is ${valueIndicator}`)
             // The best contour is contour with maximum value indicator (gain, eirp, g/t)
             let bestContour = _.min(results, (re) => {
-                return re['properties'][valueIndicator]
+                // We won't return broadcast beam by default
+                return re['properties'][valueIndicator] && !re.properties.name.startsWith('BC')
             })
             res.status(200).send(bestContour)
         } else {
             res.status(200).send('This location is out of coverage of the given beam')
         }
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
+contourRouter.post('/get-bestbeam', (req, res) => {
+    let {location, satellite, path, parameter} = req.body;
+    Contour.getBestBeam({ location, satellite, path, parameter }).then(result => {
+        res.status(200).send(result)
     }).catch(e => {
         res.status(404).send(e)
     })
