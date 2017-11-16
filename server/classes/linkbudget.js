@@ -104,7 +104,7 @@ class LinkBudget {
                     let returnLinkResult = {}
 
                     await this.runLinkByPath('forward')
-                    await this.runLinkByPath('return')
+                    // await this.runLinkByPath('return')
 
                     // forwardLinkResult = await this.runLinkByPath('forward')
                     // returnLinkResult = await this.runLinkByPath('return')
@@ -164,6 +164,7 @@ class LinkBudget {
 
 
         // console.log(this.downlinkStation)
+        this.path = path
 
         console.log()
         console.log()
@@ -264,34 +265,40 @@ class LinkBudget {
                         currentElement = contourRangeArray[currentIndex]
 
                         // Set station relative contour to this value
-                        this.station.relativeContour = currentElement
+                        // If this forward link, change the downlink station, if this is return link, change the uplink station
+                        if (path === 'forward') {
+                            this.downlinkStation.contour = currentElement
+                        } else {
+                            this.uplinkStation.contour = currentElement
+                        }
                         console.log(`Setting contour to ${currentElement} dB`)
                         console.log(`Running clear sky link`)
                         result = await this.runClearSkyLink()
 
-                        if (result.passed) { // pass
+                        if (!result.passed) { // not pass => step to higher index of array (= narrower contour)
                             minIndex = currentIndex + 1
-                            console.log(`Contour ${currentElement} dB passes the condition`)
+                            console.log(`Contour ${currentElement} dB doesn't passes the condition`)
                             answer = currentElement
-                        } else { // not pass
+                        } else { // pass => step to lower index of array (= wider contour)
                             maxIndex = currentIndex - 1
-                            console.log(`Contour ${currentElement} dB doesn't pass the condition`)
+                            console.log(`Contour ${currentElement} dB pass the condition`)
                         }
                     }
                     console.log(`Searching for max contour finished, answer is ${currentElement} dB`)
                     console.log('Saving clear sky result')
-                    linkResult[path + 'Result']['clearSky'] = result
+                    linkResult.clearSky = result
 
+                } else {
+                    // If no, set parameters and then run a clear sky link and record the result
+                    console.log(`Max contour option is not selected`)
+                    console.log(`Running clear sky link`)
+                    // linkResult[path + 'Result']['clearSky'] = await this.runClearSkyLink()
+                    linkResult.clearSky = await this.runClearSkyLink()
                 }
-
-                // If no, set parameters and then run a clear sky link and record the result
-                console.log(`Max contour option is not selected`)
-                console.log(`Running clear sky link`)
-                // linkResult[path + 'Result']['clearSky'] = await this.runClearSkyLink()
-                linkResult.clearSky = await this.runClearSkyLink()
 
                 // Run the rain fade link
                 // Set clear sky result to instance of an object so it can get referred in rain fade case
+                // If max contour is selected, the link will be run at that contour
                 // this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
                 this.currentClearSkyResult = linkResult.clearSky
                 try {
@@ -1030,6 +1037,7 @@ class LinkBudget {
             uplink_condition: this.condition,
             uplink_availability: this.uplinkAvailability.toFixed(2),
             uplink_location: uplinkStation.location,
+            uplink_contour: uplinkContour,
             operating_hpa_power: operatingHpaPower.toFixed(2),
             cn_uplink: cnUplink.toFixed(2),
             // downlink
@@ -1047,6 +1055,7 @@ class LinkBudget {
             downlink_path_loss: downlinkPathLoss.toFixed(2),
             downlink_condition: this.condition,
             downlink_availability: this.downlinkAvailability.toFixed(2),
+            downlink_contour: downlinkContour,
             downlink_location: downlinkStation.location,
             cn_downlink: cnDownlink.toFixed(2),
             // interferences
