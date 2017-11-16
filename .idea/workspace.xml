@@ -4,7 +4,6 @@
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/station.js" afterPath="$PROJECT_DIR$/server/classes/station.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -55,11 +54,11 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="581">
-              <caret line="195" column="37" lean-forward="true" selection-start-line="195" selection-start-column="37" selection-end-line="195" selection-end-column="37" />
+            <state relative-caret-position="634">
+              <caret line="126" column="29" lean-forward="true" selection-start-line="126" selection-start-column="29" selection-end-line="126" selection-end-column="29" />
               <folding>
-                <element signature="e#22856#25964#0" expanded="false" />
-                <element signature="e#41489#41539#0" expanded="false" />
+                <element signature="e#22858#25966#0" expanded="false" />
+                <element signature="e#41499#41549#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -660,7 +659,7 @@
       <workItem from="1508054873557" duration="1935000" />
       <workItem from="1508997889492" duration="7101000" />
       <workItem from="1509699451045" duration="64235000" />
-      <workItem from="1510718358346" duration="20139000" />
+      <workItem from="1510718358346" duration="22558000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -809,11 +808,18 @@
       <option name="project" value="LOCAL" />
       <updated>1510806936855</updated>
     </task>
-    <option name="localTasksCounter" value="22" />
+    <task id="LOCAL-00022" summary="Separating forward and return transponder in remote stations">
+      <created>1510807963110</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1510807963110</updated>
+    </task>
+    <option name="localTasksCounter" value="23" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="141920000" />
+    <option name="totallyTimeSpent" value="144339000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -889,7 +895,8 @@
     <MESSAGE value="Add contour migration functions and get contours from new contour database" />
     <MESSAGE value="Check the correctness of forward link code (both clear sky and rain fade)" />
     <MESSAGE value="Start debugging return links" />
-    <option name="LAST_COMMIT_MESSAGE" value="Start debugging return links" />
+    <MESSAGE value="Separating forward and return transponder in remote stations" />
+    <option name="LAST_COMMIT_MESSAGE" value="Separating forward and return transponder in remote stations" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1313,11 +1320,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="581">
-          <caret line="195" column="37" lean-forward="true" selection-start-line="195" selection-start-column="37" selection-end-line="195" selection-end-column="37" />
+        <state relative-caret-position="634">
+          <caret line="126" column="29" lean-forward="true" selection-start-line="126" selection-start-column="29" selection-end-line="126" selection-end-column="29" />
           <folding>
-            <element signature="e#22856#25964#0" expanded="false" />
-            <element signature="e#41489#41539#0" expanded="false" />
+            <element signature="e#22858#25966#0" expanded="false" />
+            <element signature="e#41499#41549#0" expanded="false" />
           </folding>
         </state>
       </provider>

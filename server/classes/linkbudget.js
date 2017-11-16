@@ -205,6 +205,7 @@ class LinkBudget {
         if (path === 'forward') {
             this.uplinkStation = this.gateway
             this.downlinkStation = this.remoteStation
+
         } else if (path === 'return') {
             this.uplinkStation = this.remoteStation
             this.downlinkStation = this.gateway
@@ -214,7 +215,7 @@ class LinkBudget {
 
         // Set default link availability and site diversity based on the given stations
         this.uplinkAvailability = this.uplinkStation.gateway_availability || 99.5
-        this.downlinkAvailability = this.downlinkStation.remote_availability ||  99.5
+        this.downlinkAvailability = this.downlinkStation.gateway_availability ||  99.5
 
         // Check if this platform is MCG fixed
         if (!this.modem.findBestMcg) {``
@@ -712,7 +713,7 @@ class LinkBudget {
         let hpaType = _.has(uplinkStation, 'buc') ? 'buc' : 'hpa'
         console.log(`hpa type = ${hpaType}`)
         this.logTitle(`${hpaType} = ${uplinkStation[hpaType]['ifl']} ${hpaType} OBO = ${uplinkStation[hpaType]['obo']} dB`);
-        this.logTitle('OP Power = ' + operatingPowerAtHpaOutput);
+        this.logTitle('OP Power = ' + operatingPowerAtHpaOutput + ' dB');
         let operatingHpaPower = Math.pow(10, (operatingPowerAtHpaOutput + uplinkStation[hpaType]['ifl']) / 10);
 
         // Calculate C/N Uplink
