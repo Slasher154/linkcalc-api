@@ -144,6 +144,7 @@ class LinkBudget {
             }
         }
         // return this.linkBudgetResults
+        // console.log(JSON.stringify(this.forwardLinkResults, undefined, 2))
         return {
             forwardLinkResults: this.forwardLinkResults,
             returnLinkResults: this.returnLinkResults
@@ -301,7 +302,14 @@ class LinkBudget {
                 }
 
                 // Push the result into link results instance
-                this[`${path}LinkResults`].push({ linkResult })
+                // console.log(`Link result clearsky shows MCG as ${linkResult.clearSky.mcg.name}`)
+                // console.log(`Link result rainfade shows MCG as ${linkResult.rainFade.mcg.name}`)
+                // this[path + 'LinkResults'].push({ linkResult })
+                this[path + 'LinkResults'].push({
+                    clearSky: linkResult.clearSky,
+                    rainFade: linkResult.rainFade
+                })
+                // this.forwardLinkResults.push(`${linkResult.clearSky.mcg.name}`)
 
             }
         } else {
@@ -360,7 +368,10 @@ class LinkBudget {
             }
 
             // Push the result into link results instance
-            this[`${path}LinkResults`].push({ linkResult })
+            this[path + 'LinkResults'].push({
+                clearSky: linkResult.clearSky,
+                rainFade: linkResult.rainFade
+            })
         }
 
         console.log('--------')
@@ -380,11 +391,12 @@ class LinkBudget {
         console.log('Setting conditions for CLEAR SKY')
         this.condition = 'clear'
         this.requiredMargin = this.application.link_margin
-        console.log(`Setting link margin to ${this.requiredMargin}`)
+        console.log(`Setting link margin to ${this.requiredMargin} dB`)
 
         // Run link and return result
         try {
             let clearSkyResult = await this.runLink()
+            console.log(`Clear sky result shows MCG = ${clearSkyResult.mcg.name}`)
             return clearSkyResult
         } catch(e) {
             console.log(e)
@@ -941,6 +953,9 @@ class LinkBudget {
         // ---------------------------------- Data Rate ---------------------------------------------
 
         let dataRate = Utils.symbolRate(this.occupiedBandwidth, this.application) * this.mcg.spectral_efficiency;
+        console.log(`Data rate = ${dataRate} Mbps`)
+        console.log(`MCG = ${this.mcg.name}`)
+        console.log(`Occupied bandwidth = ${this.occupiedBandwidth} MHz`)
 
         // For TOLL, data_rate is a little complicated....
         // if (this.application.name == "TOLL") {

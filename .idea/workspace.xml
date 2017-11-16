@@ -54,13 +54,14 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
-              <caret line="327" column="21" lean-forward="true" selection-start-line="327" selection-start-column="21" selection-end-line="327" selection-end-column="21" />
+            <state relative-caret-position="435">
+              <caret line="124" column="30" lean-forward="true" selection-start-line="124" selection-start-column="30" selection-end-line="124" selection-end-column="30" />
               <folding>
-                <element signature="e#16329#17333#0" expanded="false" />
-                <element signature="e#17461#18937#0" expanded="false" />
-                <element signature="e#24390#27498#0" expanded="false" />
-                <element signature="e#43031#43081#0" expanded="false" />
+                <element signature="e#9440#11459#0" expanded="false" />
+                <element signature="e#13520#14475#0" expanded="false" />
+                <element signature="n#!!block;n#runRainFadeLink#0;n#LinkBudget#0" expanded="false" />
+                <element signature="e#18175#19651#0" expanded="false" />
+                <element signature="e#25104#28212#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -139,7 +140,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>this.system</find>
       <find>R</find>
       <find>RainDa</find>
       <find>calculateLo</find>
@@ -169,6 +169,7 @@
       <find>seekCo</find>
       <find>START</find>
       <find>findBest</find>
+      <find>this.mcg</find>
     </findStrings>
     <replaceStrings>
       <replace>locationRouter</replace>
@@ -661,7 +662,7 @@
       <workItem from="1508054873557" duration="1935000" />
       <workItem from="1508997889492" duration="7101000" />
       <workItem from="1509699451045" duration="64235000" />
-      <workItem from="1510718358346" duration="25259000" />
+      <workItem from="1510718358346" duration="27368000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -824,11 +825,18 @@
       <option name="project" value="LOCAL" />
       <updated>1510817467582</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="Modify the results to completely separate forward and return results">
+      <created>1510822117598</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1510822117598</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="147040000" />
+    <option name="totallyTimeSpent" value="149149000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -906,7 +914,8 @@
     <MESSAGE value="Start debugging return links" />
     <MESSAGE value="Separating forward and return transponder in remote stations" />
     <MESSAGE value="Finish validating forward and return links" />
-    <option name="LAST_COMMIT_MESSAGE" value="Finish validating forward and return links" />
+    <MESSAGE value="Modify the results to completely separate forward and return results" />
+    <option name="LAST_COMMIT_MESSAGE" value="Modify the results to completely separate forward and return results" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1312,14 +1321,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/index.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="780">
@@ -1328,15 +1329,24 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="0" lean-forward="true" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="327" column="21" lean-forward="true" selection-start-line="327" selection-start-column="21" selection-end-line="327" selection-end-column="21" />
+        <state relative-caret-position="435">
+          <caret line="124" column="30" lean-forward="true" selection-start-line="124" selection-start-column="30" selection-end-line="124" selection-end-column="30" />
           <folding>
-            <element signature="e#16329#17333#0" expanded="false" />
-            <element signature="e#17461#18937#0" expanded="false" />
-            <element signature="e#24390#27498#0" expanded="false" />
-            <element signature="e#43031#43081#0" expanded="false" />
+            <element signature="e#9440#11459#0" expanded="false" />
+            <element signature="e#13520#14475#0" expanded="false" />
+            <element signature="n#!!block;n#runRainFadeLink#0;n#LinkBudget#0" expanded="false" />
+            <element signature="e#18175#19651#0" expanded="false" />
+            <element signature="e#25104#28212#0" expanded="false" />
           </folding>
         </state>
       </provider>
