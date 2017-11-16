@@ -103,8 +103,8 @@ class LinkBudget {
                     let forwardLinkResult = {}
                     let returnLinkResult = {}
 
-                    await this.runLinkByPath('forward')
-                    // await this.runLinkByPath('return')
+                    // await this.runLinkByPath('forward')
+                    await this.runLinkByPath('return')
 
                     // forwardLinkResult = await this.runLinkByPath('forward')
                     // returnLinkResult = await this.runLinkByPath('return')
@@ -747,8 +747,8 @@ class LinkBudget {
             carrierOutputBackoff -= numCarriersInChannel;
 
             _.assign(result, {
-                channel_output_backoff: transponder.backoff_settings.find(s => s.num_carriers === transponder.current_num_carriers).obo,
-                channel_deepin: channelDeepin.toFixed(2)
+                channelOutputBackoff: transponder.backoff_settings.find(s => s.num_carriers === transponder.current_num_carriers).obo,
+                channelDeepin: channelDeepin.toFixed(2)
             });
 
         }
@@ -1019,71 +1019,71 @@ class LinkBudget {
         _.assign(result, {
             // satellite
             channel: transponder.name,
-            operating_mode: transponder.mode,
-            operating_sfd: operatingPfd.toFixed(2),
-            operating_pfd_per_carrier: operatingPfdPerCarrier.toFixed(2),
-            carrier_pfd: carrierPfd.toFixed(2),
-            carrier_obo: carrierOutputBackoff.toFixed(2),
-            gain_variation: gainVariation.toFixed(2),
+            operatingMode: transponder.mode,
+            operatingSfd: operatingPfd.toFixed(2),
+            operatingPfdPerCarrier: operatingPfdPerCarrier.toFixed(2),
+            carrierPfd: carrierPfd.toFixed(2),
+            carrierObo: carrierOutputBackoff.toFixed(2),
+            gainVariation: gainVariation.toFixed(2),
             // uplink
-            uplink_antenna: uplinkStation.antenna,
-            uplink_hpa: uplinkStation.hpa,
-            uplink_pointing_loss: uplink_pointingLoss.toFixed(2),
-            uplink_xpol_loss: uplinkXpolLoss.toFixed(2),
-            uplink_atmLoss: uplinkAtmLoss.toFixed(2),
-            uplink_eirp: eirpUp.toFixed(2),
-            uplink_gt: uplinkGt.toFixed(2),
-            uplink_path_loss: uplinkPathLoss.toFixed(2),
-            uplink_condition: this.condition,
-            uplink_availability: this.uplinkAvailability.toFixed(2),
-            uplink_location: uplinkStation.location,
-            uplink_contour: uplinkContour,
-            operating_hpa_power: operatingHpaPower.toFixed(2),
+            uplinkAntenna: uplinkStation.antenna,
+            uplinkHpa: uplinkStation.hpa,
+            uplinkPointingLoss: uplink_pointingLoss.toFixed(2),
+            uplinkXpolLoss: uplinkXpolLoss.toFixed(2),
+            uplinkAtmLoss: uplinkAtmLoss.toFixed(2),
+            uplinkEirp: eirpUp.toFixed(2),
+            uplinkGt: uplinkGt.toFixed(2),
+            uplinkPathLoss: uplinkPathLoss.toFixed(2),
+            uplinkCondition: this.condition,
+            uplinkAvailability: this.uplinkAvailability.toFixed(2),
+            uplinkLocation: uplinkStation.location,
+            uplinkContour: uplinkContour,
+            operatingHpaPower: operatingHpaPower.toFixed(2),
             cn_uplink: cnUplink.toFixed(2),
             // downlink
-            downlink_antenna: downlinkStation.antenna,
+            downlinkAntenna: downlinkStation.antenna,
             // Following 3 parameters are aAvailable only if G/T is not specified in the antenna spec
-            antenna_temp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2),
-            system_temp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Station.systemTemp(Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2)),
-            ant_gain: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : downlinkStation.antenna.rxGain(downlinkFrequency).toFixed(2),
-            downlink_pointing_loss: downlinkPointingLoss.toFixed(2),
-            downlink_xpol_loss: downlinkXpolLoss.toFixed(2),
-            downlink_atmLoss: downlinkAtmLoss.toFixed(2),
-            downlink_eirp: carrierEirpDownAtLocation.toFixed(2),
-            saturated_eirp_at_loc: saturatedEirpDownAtLocation.toFixed(2),
-            downlink_gt: antGt.toFixed(2),
-            downlink_path_loss: downlinkPathLoss.toFixed(2),
-            downlink_condition: this.condition,
-            downlink_availability: this.downlinkAvailability.toFixed(2),
-            downlink_contour: downlinkContour,
-            downlink_location: downlinkStation.location,
+            antennaTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2),
+            systemTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Station.systemTemp(Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2)),
+            antGain: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : downlinkStation.antenna.rxGain(downlinkFrequency).toFixed(2),
+            downlinkPointingLoss: downlinkPointingLoss.toFixed(2),
+            downlinkXpolLoss: downlinkXpolLoss.toFixed(2),
+            downlinkAtmLoss: downlinkAtmLoss.toFixed(2),
+            downlinkEirp: carrierEirpDownAtLocation.toFixed(2),
+            saturatedEirpAtLoc: saturatedEirpDownAtLocation.toFixed(2),
+            downlinkGt: antGt.toFixed(2),
+            downlinkPathLoss: downlinkPathLoss.toFixed(2),
+            downlinkCondition: this.condition,
+            downlinkAvailability: this.downlinkAvailability.toFixed(2),
+            downlinkContour: downlinkContour,
+            downlinkLocation: downlinkStation.location,
             cn_downlink: cnDownlink.toFixed(2),
             // interferences
-            ci_uplink_intermod: ciUplinkIntermod.toFixed(2),
-            ci_uplink_adj_sat: ciUplinkAdjacentSatellite.toFixed(2),
-            ci_uplink_xpol: ciUplinkXpol.toFixed(2),
-            ci_uplink_xcells: ciUplinkXCells.toFixed(2),
-            ci_downlink_adj_sat: ciDownlinkAdjacentSatellite.toFixed(2),
-            ci_downlink_adj_sat_obj: ciDownlinkAdjacentSatelliteObject,
-            ci_downlink_intermod: ciDownlinkIntermod.toFixed(2),
-            ci_downlink_xpol: ciDownlinkXpol.toFixed(2),
-            ci_downlink_xcells: ciDownlinkXcells.toFixed(2),
-            ci_uplink: ciUplink.toFixed(2),
-            ci_downlink: ciDownlink.toFixed(2),
+            ciUplinkIntermod: ciUplinkIntermod.toFixed(2),
+            ciUplink_adj_sat: ciUplinkAdjacentSatellite.toFixed(2),
+            ciUplink_xpol: ciUplinkXpol.toFixed(2),
+            ciUplink_xcells: ciUplinkXCells.toFixed(2),
+            ciDownlink_adj_sat: ciDownlinkAdjacentSatellite.toFixed(2),
+            ciDownlink_adj_sat_obj: ciDownlinkAdjacentSatelliteObject,
+            ciDownlink_intermod: ciDownlinkIntermod.toFixed(2),
+            ciDownlink_xpol: ciDownlinkXpol.toFixed(2),
+            ciDownlink_xcells: ciDownlinkXcells.toFixed(2),
+            ciUplink: ciUplink.toFixed(2),
+            ciDownlink: ciDownlink.toFixed(2),
             // total
-            cn_total: cnTotal.toFixed(2),
-            link_margin: linkMargin.toFixed(2),
-            required_margin: this.requiredMargin,
+            cnTotal: cnTotal.toFixed(2),
+            linkMargin: linkMargin.toFixed(2),
+            requiredMargin: this.requiredMargin,
             passed: passed,
-            link_availability: linkAvailability.toFixed(2),
+            linkAvailability: linkAvailability.toFixed(2),
             mcg: this.mcg,
-            occupied_bandwidth: this.occupiedBandwidth.toFixed(2),
-            noise_bandwidth: noiseBandwidth.toFixed(2),
-            roundup_bandwidth: roundupBandwidth.toFixed(2),
+            occupiedBandwidth: this.occupiedBandwidth.toFixed(2),
+            noiseBandwidth: noiseBandwidth.toFixed(2),
+            roundupBandwidth: roundupBandwidth.toFixed(2),
             guardband: guardband,
-            data_rate: dataRate.toFixed(2),
-            power_util_percent: powerUtilPercent.toFixed(2),
-            roll_off_factor: this.application.roll_off_factor
+            dataRate: dataRate.toFixed(2),
+            powerUtilPercent: powerUtilPercent.toFixed(2),
+            rollOffFactor: this.application.roll_off_factor
         });
 
         console.log('-----------')
