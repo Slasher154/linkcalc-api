@@ -60,18 +60,20 @@ class LinkBudget {
             })
         } else {
             // Otherwise, combine selected transponders with remote stations into objects
-            // console.log(`Combining transponders with remote stations`)
-            // this.remoteStations.forEach(station => {
-            //     console.log(`Looping stations ${station.antenna.name}`)
-            //     this.transponders.forEach(transponder => {
-            //         console.log(`Looping transponders ${transponder.name}`)
-            //         station.transponder = transponder
-            //     })
-            // })
+            console.log(`Combining transponders with remote stations`)
+            this.remoteStations.forEach(station => {
+                console.log(`Looping stations ${station.antenna.name}`)
+                this.transponders.forEach(transponder => {
+                    console.log(`Looping transponders ${transponder.name}`)
+                    station.transponder = transponder
+                })
+            })
             // console.log(this.remoteStations)
         }
 
         // Run the link budget
+        this.forwardLinkResults = []
+        this.returnLinkResults = []
         this.linkBudgetResults = []
         console.log('Start running link budgets')
         //this.runLinkBudget()
@@ -101,14 +103,17 @@ class LinkBudget {
                     let forwardLinkResult = {}
                     let returnLinkResult = {}
 
+                    await this.runLinkByPath('forward')
+                    await this.runLinkByPath('return')
+
                     // forwardLinkResult = await this.runLinkByPath('forward')
-                    returnLinkResult = await this.runLinkByPath('return')
-                    // Record cases
-                    console.log('Recording results')
-                    this.linkBudgetResults.push({
-                        forwardLink: forwardLinkResult,
-                        returnLink: returnLinkResult
-                    })
+                    // returnLinkResult = await this.runLinkByPath('return')
+                    // // Record cases
+                    // console.log('Recording results')
+                    // this.linkBudgetResults.push({
+                    //     forwardLink: forwardLinkResult,
+                    //     returnLink: returnLinkResult
+                    // })
                     // })
                     // this.runLinkByPath('forward').then(result => {
                     //     console.log(`Forward Result : ${result}`)
@@ -138,15 +143,20 @@ class LinkBudget {
                 }
             }
         }
-        return this.linkBudgetResults
+        // return this.linkBudgetResults
+        return {
+            forwardLinkResults: this.forwardLinkResults,
+            returnLinkResults: this.returnLinkResults
+        }
     }
 
     async runLinkByPath(path) {
 
-        let linkResult = {
-            forwardResult: {},
-            returnResult: {}
-        }
+        // let linkResult = {
+        //     forwardResult: {},
+        //     returnResult: {}
+        // }
+        let linkResult = {}
 
         // Set uplink and downlink station
         // console.log(this.remoteStation)
@@ -276,7 +286,23 @@ class LinkBudget {
                 // If no, set parameters and then run a clear sky link and record the result
                 console.log(`Max contour option is not selected`)
                 console.log(`Running clear sky link`)
-                linkResult[path + 'Result']['clearSky'] = await this.runClearSkyLink()
+                // linkResult[path + 'Result']['clearSky'] = await this.runClearSkyLink()
+                linkResult.clearSky = await this.runClearSkyLink()
+
+                // Run the rain fade link
+                // Set clear sky result to instance of an object so it can get referred in rain fade case
+                // this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
+                this.currentClearSkyResult = linkResult.clearSky
+                try {
+                    // linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
+                    linkResult.rainFade = await this.runRainFadeLink()
+                } catch (e) {
+                    console.log(e)
+                }
+
+                // Push the result into link results instance
+                this[`${path}LinkResults`].push({ linkResult })
+
             }
         } else {
             console.log(`Fixed MCG is not selected`)
@@ -317,26 +343,33 @@ class LinkBudget {
             }
             console.log(`Searching for best MCG finished, answer is ${answer.name}`)
             console.log('Saving clear sky result')
-            linkResult[path + 'Result']['clearSky'] = resultAnswer
+            // linkResult[path + 'Result']['clearSky'] = resultAnswer
+            linkResult.clearSky = resultAnswer
+
+            // Run the rain fade link
+            // Set clear sky result to instance of an object so it can get referred in rain fade case
+            // this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
+            this.currentClearSkyResult = linkResult.clearSky
+
+            try {
+                // linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
+                linkResult.rainFade = await this.runRainFadeLink()
+
+            } catch (e) {
+                console.log(e)
+            }
+
+            // Push the result into link results instance
+            this[`${path}LinkResults`].push({ linkResult })
         }
 
-        // Set clear sky result to instance of an object so it can get referred in rain fade case
-        this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
-
         console.log('--------')
         console.log('--------')
         console.log('--------')
         console.log('--------')
         console.log('--------')
 
-        // Run a rain fade link
-        try {
-            linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
-        } catch (e) {
-            console.log(e)
-        }
-
-        // Concatenate both clear sky and rain fade link objects and return results
+        // Return results
         return linkResult
 
     }
@@ -375,10 +408,10 @@ class LinkBudget {
         let mcgClearSky = this.currentClearSkyResult.mcg
         console.log(`MCG at clear sky is ${mcgClearSky.name}`)
 
-        // Check if modem has ACM function and dynamic channel function
+        // Check if modem has ACM function and dynamic channel function and also user selects finding best MCG (utilizing the ACM feature)
 
         // If yes-yes, perform normal search over looping MCG and available symbol rates
-        if (this.application.acm && this.application.dynamic_channels) {
+        if (this.application.acm && this.application.dynamic_channels && this.modem.findBestMcg) {
             console.log('This app has ACM and dynamic channels')
             let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
             let lowerBandwidthPool = this.findLowerBandwidthPool()
@@ -410,7 +443,7 @@ class LinkBudget {
         }
 
         // If yes-no, perform binary search over looping MCG
-        else if (this.application.acm) {
+        else if (this.application.acm && this.modem.findBestMcg) {
             console.log('This app has ACM (no dynamic channels)')
             let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
             console.log(lowerMcgs)
