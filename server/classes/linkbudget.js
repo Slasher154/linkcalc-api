@@ -36,6 +36,7 @@ class LinkBudget {
 
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
+            console.log(`This app is using defualt gateway`)
             this.gatewayStations.push({name: 'defaultGateway'})
         }
 
@@ -79,14 +80,14 @@ class LinkBudget {
     async runLinkBudget() {
 
         // Start looping remote stations
+        console.log(this.remoteStations.length)
         for (let station of this.remoteStations) {
             // console.log(station)
 
             this.remoteStation = new RemoteStation(station)
-            // console.log(this.remoteStation)
             this.remoteStation.print()
 
-            // Start looping gateway/hub stations
+            // Start looping gateway/ hub stations
             for (let gateway of this.gatewayStations) {
 
                 // Start looping platform
@@ -100,8 +101,8 @@ class LinkBudget {
                     let forwardLinkResult = {}
                     let returnLinkResult = {}
 
-                    forwardLinkResult = await this.runLinkByPath('forward')
-                    // returnLinkResult = await this.runLinkByPath('return')
+                    // forwardLinkResult = await this.runLinkByPath('forward')
+                    returnLinkResult = await this.runLinkByPath('return')
                     // Record cases
                     console.log('Recording results')
                     this.linkBudgetResults.push({
@@ -163,9 +164,6 @@ class LinkBudget {
         console.log()
         console.log()
 
-
-        this.path = path
-
         // Set bandwidth value and unit
         this.bandwidthValue = this.remoteStation.bandwidth[path]
         this.bandwidthUnit = this.remoteStation.bandwidth.unit
@@ -195,7 +193,7 @@ class LinkBudget {
         }
 
         // Find application by path
-        this.application = this.findApplicationByPath(this.modem, path)
+        this.application = this.findApplicationByPath(path)
         console.log(`Set application name to ${this.application.name}`)
 
         // Set uplink and downlink station
@@ -214,7 +212,7 @@ class LinkBudget {
         this.downlinkAvailability = this.downlinkStation.remote_availability ||  99.5
 
         // Check if this platform is MCG fixed
-        if (!this.modem.findBestMcg) {
+        if (!this.modem.findBestMcg) {``
             console.log(`This modem is MCG fixed`)
 
 
@@ -540,6 +538,8 @@ class LinkBudget {
         let uplinkSpreadingLoss = Utils.spreadingLoss(uplinkSlantRange);
         let uplinkContour = uplinkStation.contour;
 
+        console.log(`Uplink contour = ${uplinkStation.contour} dB`)
+
         let gainVariation = 0;
         let gainVariationDiff = 0;
 
@@ -637,6 +637,7 @@ class LinkBudget {
             // so, we find PFD at designed deepin first, then derive for EIRP up
             // the derived EIRP up will need to compensate spreading loss, pointing, xpol and atmoshperic loss
             else {
+                console.log(`Number of carriers in channel = ${numCarriersInChannel}`)
                 operatingPfdPerCarrier = operatingPfd - transponder.dynamic_range + transponder.designed_deepin - numCarriersInChannel;
                 eirpUp = operatingPfdPerCarrier + uplinkSpreadingLoss + uplinkOtherLoss + uplinkAtmLoss;
             }

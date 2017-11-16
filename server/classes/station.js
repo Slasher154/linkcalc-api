@@ -28,28 +28,16 @@ class Station {
         }
 
         if (stationObject.transponder) {
+            console.log(`Creating new transponder`)
             this.transponder = new Transponder(stationObject.transponder)
-
-            // If location type is defined contours, use the transponder lat/lon to represent this remote station location
-            if (this.location && this.location.type === 'definedContours' && this.transponder.lat && this.transponder.lon) {
-                this.location.lat = this.transponder.lat
-                this.location.lon = this.transponder.lon
-
-                // Set the station contour to the contour value
-                let contourValue = this.location.name.replace('%', '') // Remove % signs from 50% value
+            if (this.location.type === 'definedContours') {
+                let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
                 this.contour = this.transponder[`contour_${contourValue}`]
             }
+
         } else {
             this.contour = 0
         }
-    }
-
-    static get ifl () {
-        return 0.3
-    }
-
-    static get lnaNoise () {
-        return 60
     }
 
     gt(freq, attenuation, condition) {
@@ -70,6 +58,15 @@ class Station {
             return antGt
         }
 
+    }
+
+
+    static get ifl () {
+        return 0.3
+    }
+
+    static get lnaNoise () {
+        return 60
     }
 
     static systemTemp(antennaTemp) {
