@@ -158,7 +158,7 @@ class LinkBudget {
         console.log()
         console.log()
         console.log('--------------------------------------------')
-        console.log(`----------Start running ${path} link-----------`.toUpperCase())
+        console.log(`----------Start running a ${path} link-----------`.toUpperCase())
         console.log('--------------------------------------------')
         console.log()
         console.log()
@@ -168,13 +168,18 @@ class LinkBudget {
         this.bandwidthValue = this.remoteStation.bandwidth[path]
         this.bandwidthUnit = this.remoteStation.bandwidth.unit
 
-        // Find transponder by path
-        console.log(`Searching the correct transponder for ${this.remoteStation.transponder.name} on ${this.remoteStation.transponder.satellite} for ${path}`)
+        // If path = return, find the correct transponder for this station. (the remote station is equipped with forward transponder by default)
+        if (path === 'return') {
+            // Find transponder by path
+            console.log(`Searching the return transponder for ${this.remoteStation.forwardTransponder.name} on ${this.remoteStation.forwardTransponder.satellite}`)
+            let tp = await this.findTransponderByPath(this.remoteStation.forwardTransponder, path)
+            this.remoteStation.setTransponder('return', tp)
+        }
 
-        let tp = await this.findTransponderByPath(this.remoteStation.transponder, path)
-        this.transponder = new Transponder(tp)
-        console.log('TP Name = ' + tp.name)
-        // console.log(this.transponder)
+        this.transponder = this.remoteStation[`${path}Transponder`]
+
+        // Seek the contour for this remote station
+        this.remoteStation.seekDefinedContoursAndCoordinates(this.transponder)
 
         // Find and set satellite
         let sat = this.findSatellite(this.transponder)

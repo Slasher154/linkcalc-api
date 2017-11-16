@@ -28,16 +28,9 @@ class Station {
         }
 
         if (stationObject.transponder) {
-            console.log(`Creating new transponder`)
-            this.transponder = new Transponder(stationObject.transponder)
-            if (this.location.type === 'definedContours') {
-                let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
-                this.contour = this.transponder[`contour_${contourValue}`]
-            }
-
-        } else {
-            this.contour = 0
+            this.setTransponder('forward', stationObject.transponder)
         }
+
     }
 
     gt(freq, attenuation, condition) {
@@ -58,6 +51,21 @@ class Station {
             return antGt
         }
 
+    }
+
+    seekDefinedContoursAndCoordinates (transponder) {
+        if (this.location.type === 'definedContours') {
+            let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
+            this.contour = transponder[`contour_${contourValue}`]
+
+            // Set lat/lon
+            this.location.lat = transponder.lat
+            this.location.lon = transponder.lon
+        }
+    }
+
+    setTransponder(path, transponder) {
+        this[`${path}Transponder`] = new Transponder(transponder)
     }
 
 
