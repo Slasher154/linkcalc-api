@@ -603,8 +603,8 @@ class LinkBudget {
 
         let channelPfd, channelDeepin
 
-        // For IPSTAR satellite, applies gain variation
-        if (this.satellite.name == "IPSTAR" && _.includes(["return"], transponder.type)) {
+        // For IPSTAR satellite, applies gain variation, except it's Max Mode
+        if (this.satellite.name == "IPSTAR" && _.includes(["return"], transponder.type) && !this.maxMode) {
             if (_.includes(["328", "514", "608"], transponder.uplink_beam)) { // shape beam
                 gainVariation = -0.0015 * Math.pow(uplinkContour, 3) - 0.0163 * Math.pow(uplinkContour, 2) + 0.1827 * uplinkContour - 0.1737;
             }
@@ -615,6 +615,12 @@ class LinkBudget {
         }
 
         let uplinkGt = transponder.gt_peak + uplinkContour + gainVariationDiff;
+
+        // If this is Max Mode for IPSTAR satellite, add 1.7 dB constantly (from P'Nong 17 Nov 2017)
+        if (this.satellite.name == "IPSTAR" && this.maxMode) {
+            console.log(`Max mode is activated, increase uplink G/T by 1.7 dB`)
+            uplinkGt += 1.7
+        }
 
         let operatingPfd = 0, operatingPfdPerCarrier = 0, eirpUp = 0, carrierPfd = 0, carrierOutputBackoff = 0;
 
@@ -816,8 +822,16 @@ class LinkBudget {
         let saturatedEirpDownAtLocation = transponder.saturated_eirp_peak + downlinkContour;
         console.log(`Saturated EIRP down at location = ${saturatedEirpDownAtLocation} dBW`)
 
-        // For IPSTAR satellite, applies gain variation
-        if (this.satellite.name == "IPSTAR" && _.includes(["forward", "broadcast"], transponder.type)) {
+        // If max mode is used, the saturated EIRP is increased by Delta to Max (it is reduced before due to thermal distortion and stuff)
+        // In addition, add a constant 1.4 dB to EIRP down (from P'Nong 17 Nov 2017)
+        if (this.maxMode && transponder.delta_eirp_down) {
+            console.log(`Max mode is activated, increase downlink EIRP by 1.4 dB plus the Delta EIRP down data (see the PSR Payload Excel file`)
+            saturatedEirpDownAtLocation += transponder.delta_eirp_down
+            saturatedEirpDownAtLocation += 1.4
+        }
+
+        // For IPSTAR satellite, applies gain variation, except it's Max Mode
+        if (this.satellite.name == "IPSTAR" && _.includes(["forward", "broadcast"], transponder.type) && !this.maxMode) {
             if (_.includes(["328", "514", "608"], transponder.downlink_beam)) { // shape beam
                 gainVariation = -0.0022 * Math.pow(downlinkContour, 3) - 0.0383 * Math.pow(downlinkContour, 2) - 0.0196 * downlinkContour - 0.2043;
             }

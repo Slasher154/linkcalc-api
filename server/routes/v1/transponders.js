@@ -43,4 +43,23 @@ transponderRouter.post('/transponders', (req, res) => {
     });
 })
 
+transponderRouter.post('/update-eirp', (req, res) => {
+    let tpData = req.body.tpData
+    tpData.forEach(data => {
+        console.log(`Updating data of beam ${data.beam} - ${data.path} with value ${data.delta}`)
+        Transponders.findOneAndUpdate({
+            name: data.beam,
+            type: data.path
+        }, {
+            $set: {
+                delta_eirp_down: data.delta
+            }
+        }).then((result) => {
+            console.log(JSON.stringify(result, undefined, 2))
+        }).catch(e => {
+            res.status(404).send(e)
+        })
+    })
+})
+
 module.exports = transponderRouter;
