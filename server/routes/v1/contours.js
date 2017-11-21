@@ -3,6 +3,8 @@
  */
 
 const _ = require('lodash');
+const turf = require('@turf/turf')
+const geojsonArea = require('@mapbox/geojson-area');
 const contourRouter = require('express').Router();
 const Contour = require('../../classes/contour')
 
@@ -59,6 +61,99 @@ contourRouter.post('/get-bestbeam', (req, res) => {
     }).catch(e => {
         res.status(404).send(e)
     })
+})
+
+contourRouter.post('/find-matching-return-contour', (req, res) => {
+    let {satellite, beam, contourValue} = req.body;
+    console.log(`Satellite = ${satellite}, Beam = ${beam}, Contour Value = ${contourValue}`)
+    let forwardContourQuery = {
+        'properties.name': beam,
+        'properties.satellite': satellite,
+        'properties.path': 'forward',
+        'properties.relativeGain': contourValue
+
+    }
+    let returnContourQuery = {
+        'properties.name': beam,
+        'properties.satellite': satellite,
+        'properties.path': 'return'
+    }
+    let forwardPolygon
+    Contours2.find(forwardContourQuery).then(forwardResults => {
+        console.log(`Found ${forwardResults.length} polygon(s)`)
+
+        // var poly1 = {
+        //     "type": "Feature",
+        //     "geometry": {
+        //         "type": "Polygon",
+        //         "coordinates": [[
+        //             [-122.801742, 45.48565],
+        //             [-122.801742, 45.60491],
+        //             [-122.584762, 45.60491],
+        //             [-122.584762, 45.48565],
+        //             [-122.801742, 45.48565]
+        //         ]]
+        //     }
+        // }
+        // var poly2 = {
+        //     "type": "Feature",
+        //     "geometry": {
+        //         "type": "Polygon",
+        //         "coordinates": [[
+        //             [-122.520217, 45.535693],
+        //             [-122.64038, 45.553967],
+        //             [-122.720031, 45.526554],
+        //             [-122.669906, 45.507309],
+        //             [-122.723464, 45.446643],
+        //             [-122.532577, 45.408574],
+        //             [-122.487258, 45.477466],
+        //             [-122.520217, 45.535693]
+        //         ]]
+        //     }
+        // }
+        //
+        // var intersection = turf.intersect(poly1, poly2);
+        // console.log(`Intersection = ${JSON.stringify(intersection, undefined, 2)}`)
+        // var area = turf.area(intersection);
+        // console.log(`Area = ${area}`)
+
+        // forwardPolygon = turf.polygon([forwardResults[0].geometry.coordinates])
+        // console.log(`Forward Polygon = ${forwardPolygon}`)
+        forwardPolygon = forwardResults[0]
+        return Contours2.find(returnContourQuery)
+    }).then(returnResults => {
+        // We will get every single contour lines of return beam here
+        console.log(`Return results has ${returnResults.length} lines`)
+        // Find the intersection of the forward
+        let bestMatch = {}
+        let leastDifferenceArea = 0
+        returnResults.forEach(returnPolygon => {
+            // let returnPolygon = turf.polygon([polygon.geometry.coordinates])
+            // console.log(`Return Polygon = ${returnPolygon}`)
+            let difference = turf.difference(forwardPolygon, returnPolygon);
+            if (difference) {
+                var area = turf.area(difference);
+                if (leastDifferenceArea === 0 || area < leastDifferenceArea) {
+                    leastDifferenceArea = area
+                    bestMatch = returnPolygon
+                }
+                console.log(`The difference between forward ${contourValue} dB and return ${returnPolygon.properties.relativeGain} dB is ${area} sq.m.`)
+            } else {
+                // console.log(`Can't find area difference`)
+            }
+            // console.log(`Intersection = ${JSON.stringify(difference, undefined, 2)}`)
+
+            // console.log(`Area = ${area}`)
+
+        })
+
+        console.log(`The matching return contour is ${bestMatch.properties.relativeGain} dB`)
+        res.status(200).json({ bestMatch: bestMatch.properties.relativeGain})
+
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+
 })
 
 module.exports = contourRouter;

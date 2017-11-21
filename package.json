@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@mapbox/geojson-area": "^0.2.2",
+    "@turf/turf": "^5.0.4",
     "body-parser": "^1.18.0",
     "cors": "^2.8.4",
     "express": "^4.15.4",

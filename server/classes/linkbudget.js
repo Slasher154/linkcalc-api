@@ -103,7 +103,7 @@ class LinkBudget {
                     let forwardLinkResult = {}
                     let returnLinkResult = {}
 
-                    // await this.runLinkByPath('forward')
+                    await this.runLinkByPath('forward')
                     await this.runLinkByPath('return')
 
                     // forwardLinkResult = await this.runLinkByPath('forward')
@@ -1053,7 +1053,7 @@ class LinkBudget {
             uplinkLocation: uplinkStation.location,
             uplinkContour: uplinkContour,
             operatingHpaPower: operatingHpaPower.toFixed(2),
-            cn_uplink: cnUplink.toFixed(2),
+            cnUplink: cnUplink.toFixed(2),
             // downlink
             downlinkAntenna: downlinkStation.antenna,
             // Following 3 parameters are aAvailable only if G/T is not specified in the antenna spec
@@ -1071,7 +1071,7 @@ class LinkBudget {
             downlinkAvailability: this.downlinkAvailability.toFixed(2),
             downlinkContour: downlinkContour,
             downlinkLocation: downlinkStation.location,
-            cn_downlink: cnDownlink.toFixed(2),
+            cnDownlink: cnDownlink.toFixed(2),
             // interferences
             ciUplinkIntermod: ciUplinkIntermod.toFixed(2),
             ciUplink_adj_sat: ciUplinkAdjacentSatellite.toFixed(2),
@@ -1322,7 +1322,7 @@ class LinkBudget {
                 // (if farther from EOC, C/I is worse)
                 else {
                     console.log('Location is farther than EOC')
-                    ci = channel.ci_uplink_adj_cell_eoc - (station.contour - channel.contour_eoc);
+                    ci = channel.ci_uplink_adj_cell_eoc + (station.contour - channel.contour_eoc);
                 }
             }
             else {
