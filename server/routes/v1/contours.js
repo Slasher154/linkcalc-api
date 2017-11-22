@@ -130,7 +130,8 @@ contourRouter.post('/find-matching-return-contour', (req, res) => {
         returnResults.forEach(returnPolygon => {
             // let returnPolygon = turf.polygon([polygon.geometry.coordinates])
             // console.log(`Return Polygon = ${returnPolygon}`)
-            let difference = turf.difference(forwardPolygon, returnPolygon);
+            // let difference = turf.difference(forwardPolygon, returnPolygon);
+            let difference = turf.difference(returnPolygon, forwardPolygon);
             if (difference) {
                 var area = turf.area(difference);
                 if (leastDifferenceArea === 0 || area < leastDifferenceArea) {

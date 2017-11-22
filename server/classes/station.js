@@ -56,7 +56,14 @@ class Station {
     seekDefinedContoursAndCoordinates (transponder) {
         if (this.location.type === 'definedContours') {
             let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
-            this.contour = transponder[`contour_${contourValue}`]
+
+            if (contourValue === 'eoc-2') {
+                this.contour = transponder[`contour_eoc`] - 2
+            } else if (contourValue === 'peak') {
+                this.contour = 0
+            } else {
+                this.contour = transponder[`contour_${contourValue}`]
+            }
 
             // Set lat/lon
             this.location.lat = transponder.lat

@@ -83,11 +83,13 @@ class LinkBudget {
 
         // Start looping remote stations
         console.log(this.remoteStations.length)
-        for (let station of this.remoteStations) {
+        for (let [index,station] of this.remoteStations.entries()) {
             // console.log(station)
 
             this.remoteStation = new RemoteStation(station)
             this.remoteStation.print()
+
+            this.remoteStation.id = index
 
             // Start looping gateway/ hub stations
             for (let gateway of this.gatewayStations) {
@@ -312,10 +314,7 @@ class LinkBudget {
                 // console.log(`Link result clearsky shows MCG as ${linkResult.clearSky.mcg.name}`)
                 // console.log(`Link result rainfade shows MCG as ${linkResult.rainFade.mcg.name}`)
                 // this[path + 'LinkResults'].push({ linkResult })
-                this[path + 'LinkResults'].push({
-                    clearSky: linkResult.clearSky,
-                    rainFade: linkResult.rainFade
-                })
+                this.pushResult(linkResult, path)
                 // this.forwardLinkResults.push(`${linkResult.clearSky.mcg.name}`)
 
             }
@@ -375,10 +374,8 @@ class LinkBudget {
             }
 
             // Push the result into link results instance
-            this[path + 'LinkResults'].push({
-                clearSky: linkResult.clearSky,
-                rainFade: linkResult.rainFade
-            })
+            this.pushResult(linkResult, path)
+
         }
 
         console.log('--------')
@@ -1074,14 +1071,14 @@ class LinkBudget {
             cnDownlink: cnDownlink.toFixed(2),
             // interferences
             ciUplinkIntermod: ciUplinkIntermod.toFixed(2),
-            ciUplink_adj_sat: ciUplinkAdjacentSatellite.toFixed(2),
-            ciUplink_xpol: ciUplinkXpol.toFixed(2),
-            ciUplink_xcells: ciUplinkXCells.toFixed(2),
-            ciDownlink_adj_sat: ciDownlinkAdjacentSatellite.toFixed(2),
-            ciDownlink_adj_sat_obj: ciDownlinkAdjacentSatelliteObject,
-            ciDownlink_intermod: ciDownlinkIntermod.toFixed(2),
-            ciDownlink_xpol: ciDownlinkXpol.toFixed(2),
-            ciDownlink_xcells: ciDownlinkXcells.toFixed(2),
+            ciUplinkAdjSat: ciUplinkAdjacentSatellite.toFixed(2),
+            ciUplinkXpol: ciUplinkXpol.toFixed(2),
+            ciUplinkXcells: ciUplinkXCells.toFixed(2),
+            ciDownlinkAdjSat: ciDownlinkAdjacentSatellite.toFixed(2),
+            ciDownlinkAdjSatObj: ciDownlinkAdjacentSatelliteObject,
+            ciDownlinkIntermod: ciDownlinkIntermod.toFixed(2),
+            ciDownlinkXpol: ciDownlinkXpol.toFixed(2),
+            ciDownlinkXcells: ciDownlinkXcells.toFixed(2),
             ciUplink: ciUplink.toFixed(2),
             ciDownlink: ciDownlink.toFixed(2),
             // total
@@ -1466,6 +1463,22 @@ class LinkBudget {
 
     logTitle(string) {
         console.log('---------------------- ' + string + ' ----------------------');
+    }
+
+    pushResult(result, path) {
+        let assumptions = {
+            remoteStation: this.remoteStation,
+            gateway: this.gateway,
+            satellite: this.satellite,
+            findBestTransponders: this.findBestTransponders,
+            findMaxCoverage: this.findMaxCoverage,
+            maxMode: this.maxMode
+        };
+        this[path + 'LinkResults'].push({
+            assumptions,
+            clearSky: result.clearSky,
+            rainFade: result.rainFade
+        })
     }
 
     // Copied from old program
