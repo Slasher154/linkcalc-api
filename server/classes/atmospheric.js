@@ -7,20 +7,20 @@ const {RainData} = require('../models/raindata');
 
 class Atmospheric {
     constructor (data) {
-        
+        this.debugLevel = data.debugLevel || 5
     }
     
     async calculateLoss (data) {
-        console.log(data)
+        this.logMessage(data)
         let ele_angle = Utils.elevationAngle(data.location, data.orbitalSlot);
         let gas = this.gasAtten(data.freq, ele_angle);
         let cloud = this.cloudAtten(data.freq, ele_angle);
         let scin = this.scinAtten(data.freq, ele_angle, data.diameter, data.availability);
-        console.log("-------------Attenuation-----------");
-        console.log("Elevation angle: " + ele_angle + " deg");
-        console.log("Gas Atten: " + gas + " dB");
-        console.log("Cloud Atten: " + cloud + " dB");
-        console.log("Scin Atten: " + scin + " dB");
+        this.logMessage("-------------Attenuation-----------");
+        this.logMessage("Elevation angle: " + ele_angle + " deg");
+        this.logMessage("Gas Atten: " + gas + " dB");
+        this.logMessage("Cloud Atten: " + cloud + " dB");
+        this.logMessage("Scin Atten: " + scin + " dB");
         if (data.condition === "clear") {
 
             if (ele_angle > 10) {
@@ -32,7 +32,7 @@ class Atmospheric {
         }
         else {
             let rain = await this.rainAtten(data.location, data.freq, data.orbitalSlot, data.polarization, data.availability);
-            console.log("Rain Atten: " + rain + " dB");
+            this.logMessage("Rain Atten: " + rain + " dB");
             return gas + Math.sqrt(Math.pow((rain + cloud), 2) + Math.pow(scin, 2));
         }
     }
@@ -57,16 +57,16 @@ class Atmospheric {
         let nue = (2 + ep_p) / ep_pp;
         let kl = 0.819 * freq / (ep_pp * (1 + Math.pow(nue, 2)));
 
-        //console.log('fp = ' + fp);
-        //console.log('fs = ' + fs);
-        //console.log('ep0 = ' + ep0);
-        //console.log('ep2 = ' + ep2);
-        //console.log('ep_p = ' + ep_p);
-        //console.log('ep_pp = ' + ep_pp);
-        //console.log('nue = ' + nue);
-        //console.log('kl = ' + kl);
+        //this.logMessage('fp = ' + fp);
+        //this.logMessage('fs = ' + fs);
+        //this.logMessage('ep0 = ' + ep0);
+        //this.logMessage('ep2 = ' + ep2);
+        //this.logMessage('ep_p = ' + ep_p);
+        //this.logMessage('ep_pp = ' + ep_pp);
+        //this.logMessage('nue = ' + nue);
+        //this.logMessage('kl = ' + kl);
         let cloud = l1pct * kl / (Math.sin(elevation * Math.PI / 180));
-        //console.log('cloud atten = ' + cloud);
+        //this.logMessage('cloud atten = ' + cloud);
 
         // This is valid for elevation angle from 5 degree to 90 degree
         return l1pct * kl / (Math.sin(elevation * Math.PI / 180));
@@ -91,9 +91,9 @@ class Atmospheric {
         let ps = 206.43 * Math.exp(0.0354 * ((9.0 * surface_temp / 5) + 32));
         let rho = (humidity / 100.0) * ps / (0.461 * (surface_temp + 273));
 
-        //console.log('Surface temp: ' + surface_temp);
-        //console.log('ps = ' + ps);
-        //console.log('rho = ' + rho);
+        //this.logMessage('Surface temp: ' + surface_temp);
+        //this.logMessage('ps = ' + ps);
+        //this.logMessage('rho = ' + rho);
 
         // Specific attenuation for dry air for altitude up to 5Km
         let hpa = 1013.0;  // dry air pressure in hPa at sea level
@@ -106,14 +106,14 @@ class Atmospheric {
         let gamma_op54 = 2.128 * Math.pow(r_p, 1.4954) * Math.pow(r_t, -1.6032) * Math.exp(-2.528 * (1 - r_t));
         let gamma_o = ((7.34 * Math.pow(r_p, 2) * Math.pow(r_t, 2) / (Math.pow(freq, 2) + 0.36 * Math.pow(r_p, 2) * Math.pow(r_t, 2))) + (0.3429 * b_fact * gamma_op54 / (Math.pow((54 - freq), a_fact) + b_fact))) * Math.pow(freq, 2) * Math.pow(10, -3);
 
-        //console.log('r_t = ' + r_t);
-        //console.log('r_p = ' + r_p);
-        //console.log('nue_1 = ' + nue_1);
-        //console.log('nue_2 = ' + nue_2);
-        //console.log('a_fact = ' + a_fact);
-        //console.log('b_fact = ' + b_fact);
-        //console.log('gamma_op54 = ' + gamma_op54);
-        //console.log('gamm_o = ' + gamma_o);
+        //this.logMessage('r_t = ' + r_t);
+        //this.logMessage('r_p = ' + r_p);
+        //this.logMessage('nue_1 = ' + nue_1);
+        //this.logMessage('nue_2 = ' + nue_2);
+        //this.logMessage('a_fact = ' + a_fact);
+        //this.logMessage('b_fact = ' + b_fact);
+        //this.logMessage('gamma_op54 = ' + gamma_op54);
+        //this.logMessage('gamm_o = ' + gamma_o);
 
         // Specific attenuation for water vapour
         let sw1 = 0.9544 * r_p * Math.pow(r_t, 0.69) + 0.0061 * rho;
@@ -134,13 +134,13 @@ class Atmospheric {
         let tm8 = 302.6 * sw5 * g752 * Math.exp(0.41 * (1 - r_t)) / Math.pow((freq - 752), 2);
         let sum_tm = tm1 + tm2 + tm3 + tm4 + tm5 + tm6 + tm7 + tm8;
 
-        //console.log('sw1 = ' + sw1 + ' sw2 = ' + sw2 + ' sw3 = ' + sw3);
-        //console.log('sw4 = ' + sw4 + ' sw5 = ' + sw5);
-        //console.log('g22 = ' + g22 + ' g557 = ' + g557 + ' g752 = ' + g752);
-        //console.log('tm1 = ' + tm1 + ' tm2 = ' + tm2 + ' tm3 = ' + tm3);
-        //console.log('tm4 = ' + tm4 + ' tm5 = ' + tm5 + ' tm6 = ' + tm6);
-        //console.log('tm7 = ' + tm7 + ' tm8 = ' + tm8);
-        //console.log('sum_tm = ' + sum_tm);
+        //this.logMessage('sw1 = ' + sw1 + ' sw2 = ' + sw2 + ' sw3 = ' + sw3);
+        //this.logMessage('sw4 = ' + sw4 + ' sw5 = ' + sw5);
+        //this.logMessage('g22 = ' + g22 + ' g557 = ' + g557 + ' g752 = ' + g752);
+        //this.logMessage('tm1 = ' + tm1 + ' tm2 = ' + tm2 + ' tm3 = ' + tm3);
+        //this.logMessage('tm4 = ' + tm4 + ' tm5 = ' + tm5 + ' tm6 = ' + tm6);
+        //this.logMessage('tm7 = ' + tm7 + ' tm8 = ' + tm8);
+        //this.logMessage('sum_tm = ' + sum_tm);
 
 
         let gamma_w = (0.0313 * r_p * Math.pow(r_t, 2) + 0.00176 * rho * Math.pow(r_t, 8.5) + Math.pow(r_t, 2.5) * sum_tm) * Math.pow(freq, 2) * rho * Math.pow(10, -4);
@@ -154,8 +154,8 @@ class Atmospheric {
         // Water vapor equivalent height
         let hw = 1.65 * (1 + (1.61 / ((Math.pow((freq - 22.23), 2)) + 2.91)) + (3.33 / (Math.pow((freq - 183.3), 2) + 4.58)) + (1.9 / (Math.pow((freq - 325.1), 2) + 3.34)));
 
-        //console.log('gamma_w =' + gamma_w);
-        //console.log('hw = ' + hw);
+        //this.logMessage('gamma_w =' + gamma_w);
+        //this.logMessage('hw = ' + hw);
 
         if (elevation > 10) {
             return (gamma_o * ho + gamma_w * hw) / Math.sin(elevation * Math.PI / 180);
@@ -190,42 +190,42 @@ class Atmospheric {
         let b = 17.502;
         let c = 240.97;
         let es = a * Math.exp(b * temp / (temp + c));
-        //console.log('es = ' + es);
+        //this.logMessage('es = ' + es);
 
         // Step-2: Calculates radio refractivity, Nwet
         let eh = humidity * es / 100.0;
         let nwet = 77.6 * ((press * 1013.25) + (4810.0 * eh / (273.0 + temp))) / (273 + temp);
-        //console.log('eh = ' + eh + ' nwet = ' + nwet);
+        //this.logMessage('eh = ' + eh + ' nwet = ' + nwet);
 
         // Step-3: Calculate standard deviation of signal amplitude, sigma_ref
         let sigma_ref = 3.6 * Math.pow(10, -3) + nwet * Math.pow(10, -4);
-        //console.log('sigma_ref = ' + sigma_ref);
+        //this.logMessage('sigma_ref = ' + sigma_ref);
 
         // Step-4: Calculate effective path length
         // hL=height of turbulent layer = 1000m
         let hl = 1000;
         let sin_elevation = Math.sin(elevation * Math.PI / 180);
         let length = 2 * hl / (Math.sqrt(Math.pow(sin_elevation, 2) + (2.35 * Math.pow(10, -4))) + sin_elevation);
-        //console.log('sin_elev = ' + sin_elevation + ' length = ' + length);
+        //this.logMessage('sin_elev = ' + sin_elevation + ' length = ' + length);
 
         // Step-5: estimate effective antenna diameter
         let deff = Math.sqrt(eff) * diameter;
-        //console.log('deff = ' + deff);
+        //this.logMessage('deff = ' + deff);
 
         // Step-6: Calculate antenna averaging factor.
         let x_val = 1.22 * (freq / length) * Math.pow(deff, 2);
         let gx = Math.sqrt((3.86 * Math.pow((Math.pow(x_val, 2) + 1), (11.0 / 12))) * Math.sin((11.0 / 6) * Math.atan(1 / x_val)) - (7.08 * Math.pow(x_val, (5.0 / 6))));
-        //console.log('x_val =' + x_val + ' gx = ' + gx);
+        //this.logMessage('x_val =' + x_val + ' gx = ' + gx);
 
         // Step-7: Calculate standard deviation
         let sigma = sigma_ref * Math.pow(freq, (7 / 12.0)) * gx / Math.pow(sin_elevation, 1.2);
-        //console.log('sigma = ' + sigma);
+        //this.logMessage('sigma = ' + sigma);
 
         // Step-8: Calculate time percentage factor for the value of unavailability
         let unavailability = 100 - availability;
         let a_p = -0.061 * Math.pow(Utils.log10(unavailability), 3) + 0.072 * Math.pow(Utils.log10(unavailability), 2) - 1.71 * Utils.log10(unavailability) + 3;
-        //console.log('unavailability = ' + unavailability);
-        //console.log('a_p = ' + a_p);
+        //this.logMessage('unavailability = ' + unavailability);
+        //this.logMessage('a_p = ' + a_p);
 
         // Step-9: Calculation scintillation fade depth
         return a_p * sigma;
@@ -266,19 +266,19 @@ class Atmospheric {
         let r_100;
 
         // Meteor.apply('get_rain_points', [stat_lat, stat_lon], {wait: true}, function (error, value) {
-        //     console.log('-------------------Get rain points is called -----------')
+        //     this.logMessage('-------------------Get rain points is called -----------')
         //     if (error) {
         //         logError(error.reason);
         //         return false;
         //     }
         //     else {
-        //         console.log('Rain rate = ' + value);
+        //         this.logMessage('Rain rate = ' + value);
         //         r_100 = value;
         //     }
         // });
         // check if lat,lon is valid
         if (stat_lat > 90 || stat_lat < -90 || stat_lon > 180 || stat_lon < -180) {
-            console.log('Lat/lon is not valid')
+            this.logMessage('Lat/lon is not valid')
             return false
         }
         // the database grid contains lat/lon at 1.5 degree step, so find the 2 lat and 2 lons which are closest to the given point
@@ -288,7 +288,7 @@ class Atmospheric {
         let y2 = (x_lat + 1) * 1.5;
         let x1 = x_lon * 1.5;
         let x2 = (x_lon + 1) * 1.5;
-        console.log(y1 + " , " + y2 + " , " + x1 + " , " + x2);
+        this.logMessage(y1 + " , " + y2 + " , " + x1 + " , " + x2);
         
         let rainPoints = await RainData.find({ lat: { $in: [y1, y2] }, lon: { $in: [x1, x2]}})
         let f11 = this.findRainValueAtPoint(rainPoints, x1, y1),
@@ -306,8 +306,8 @@ class Atmospheric {
         // Linear interpolation fxy1,fxy2 in the y-axis
         let rain = Utils.linearInterpolation(stat_lat, y1, y2, fxy1, fxy2);
 
-        console.log('topLeft = ' + f12 + ' topRight = ' + f22 + ' bottomLeft = ' + f11 + ' bottomRight = ' + f21);
-        console.log('Rain 001 inside rainAtten001 function = ' + rain);
+        this.logMessage('topLeft = ' + f12 + ' topRight = ' + f22 + ' bottomLeft = ' + f11 + ' bottomRight = ' + f21);
+        this.logMessage('Rain 001 inside rainAtten001 function = ' + rain);
         r_100 = rain;
 
 
@@ -476,10 +476,10 @@ class Atmospheric {
         else {
             beta = -0.005 * (Math.abs(stat_lat) - 36) + 1.8 - 4.25 * Math.sin(ele_rad);
         }
-        console.log('Beta = ' + beta);
-        console.log('Rain 001 =' + rain_001);
-        console.log('Unavailability = ' + unavailability);
-        console.log('Ele_rad = ' + ele_rad);
+        this.logMessage('Beta = ' + beta);
+        this.logMessage('Rain 001 =' + rain_001);
+        this.logMessage('Unavailability = ' + unavailability);
+        this.logMessage('Ele_rad = ' + ele_rad);
         return rain_001 * Math.pow((unavailability / 0.01), -(0.655 + 0.033 * Math.log(unavailability) - 0.045 * Math.log(rain_001) - beta * (1 - unavailability) * Math.sin(ele_rad)));
     
     }
@@ -498,6 +498,12 @@ class Atmospheric {
 
     findRainValueAtPoint(points, lon, lat) {
         return points.find(p => p.lat === lat && p.lon === lon).value;
+    }
+
+    logMessage(message, level = 5) {
+        if (this.debugLevel >= level) {
+            this.logMessage(message)
+        }
     }
     
 }

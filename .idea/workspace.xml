@@ -3,10 +3,10 @@
   <component name="ChangeListManager">
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/atmospheric.js" afterPath="$PROJECT_DIR$/server/classes/atmospheric.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/remoteStation.js" afterPath="$PROJECT_DIR$/server/classes/remoteStation.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/station.js" afterPath="$PROJECT_DIR$/server/classes/station.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/contours.js" afterPath="$PROJECT_DIR$/server/routes/v1/contours.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/satellites.js" afterPath="$PROJECT_DIR$/server/routes/v1/satellites.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -22,6 +22,16 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="antenna.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/antenna.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="2610">
+              <caret line="174" column="59" lean-forward="false" selection-start-line="174" selection-start-column="59" selection-end-line="174" selection-end-column="59" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/routes/v1/index.js">
           <provider selected="true" editor-type-id="text-editor">
@@ -35,13 +45,39 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="344">
-              <caret line="288" column="55" lean-forward="false" selection-start-line="288" selection-start-column="55" selection-end-line="288" selection-end-column="55" />
-              <folding>
-                <element signature="n#!!block;n#runRainFadeLink#0;n#LinkBudget#0" expanded="false" />
-                <element signature="n#!!block;n#ciAdjacentSatellite#0;n#LinkBudget#0" expanded="false" />
-                <element signature="n#!!block;n#ciCrossCells#0;n#LinkBudget#0" expanded="false" />
-              </folding>
+            <state relative-caret-position="513">
+              <caret line="79" column="51" lean-forward="true" selection-start-line="79" selection-start-column="51" selection-end-line="79" selection-end-column="51" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="remoteStation.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="modem.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/modem.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="21" lean-forward="false" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="atmospheric.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/atmospheric.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="240">
+              <caret line="16" column="45" lean-forward="false" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -66,21 +102,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="315">
-              <caret line="21" column="0" lean-forward="false" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="station.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/station.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="253">
-              <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+            <state relative-caret-position="-452">
+              <caret line="11" column="4" lean-forward="false" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -91,16 +117,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="180">
               <caret line="12" column="16" lean-forward="false" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="remoteStation.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -117,36 +133,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Power op</find>
-      <find>relative</find>
-      <find>seekCo</find>
-      <find>START</find>
-      <find>findBest</find>
-      <find>this.mcg</find>
-      <find>MaxCo</find>
-      <find>Setting upl</find>
-      <find>ci_</find>
-      <find>ci_d</find>
-      <find>gainv</find>
-      <find>cn_up</find>
-      <find>cn_do</find>
-      <find>ciCros</find>
-      <find>this[path + 'LinkResults']</find>
-      <find>findBestT</find>
-      <find>findMax</find>
-      <find>findM</find>
-      <find>asy</find>
-      <find>async fetch</find>
-      <find>async fetc</find>
-      <find>async f</find>
-      <find>async</find>
-      <find>async</find>
-      <find>async fet</find>
-      <find>async fe</find>
-      <find>maxMod</find>
-      <find>Uplink contour =</find>
-      <find>_adj_sat</find>
-      <find>guad</find>
+      <find>thi</find>
+      <find>this.log</find>
+      <find>this.logMes</find>
+      <find>this.logMessage(</find>
+      <find>this.logMessage('Ante</find>
+      <find>this.logMessage('Anten</find>
+      <find>S</find>
+      <find>System</find>
+      <find>System te</find>
+      <find>System t</find>
+      <find>System T</find>
+      <find>System Te</find>
+      <find>System Temp</find>
+      <find>System Temp:</find>
+      <find>BU</find>
+      <find>BUC si</find>
+      <find>M</find>
+      <find>Modem:</find>
+      <find>hp</find>
+      <find>hpa =</find>
+      <find>hpa</find>
+      <find>hpa</find>
+      <find>o</find>
+      <find>OP Po</find>
+      <find>OP Poe</find>
+      <find>OP Power</find>
+      <find>for</find>
+      <find>forward</find>
+      <find>forwardTr</find>
+      <find>Start runni</find>
     </findStrings>
     <replaceStrings>
       <replace>locationRouter</replace>
@@ -175,6 +191,7 @@
       <replace>this.lambda</replace>
       <replace>ci</replace>
       <replace>ciD</replace>
+      <replace>this.logMessage</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -219,9 +236,7 @@
         <option value="$PROJECT_DIR$/server/routes/v1/linkbudget2.js" />
         <option value="$PROJECT_DIR$/server/classes/gatewayStation.js" />
         <option value="$PROJECT_DIR$/server/classes/antenna.js" />
-        <option value="$PROJECT_DIR$/server/classes/remoteStation.js" />
         <option value="$PROJECT_DIR$/server/classes/utils.js" />
-        <option value="$PROJECT_DIR$/server/classes/atmospheric.js" />
         <option value="$PROJECT_DIR$/server/models/contours.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/index.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/contourMigration.js" />
@@ -232,8 +247,10 @@
         <option value="$PROJECT_DIR$/package.json" />
         <option value="$PROJECT_DIR$/server/routes/v1/contours.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/satellites.js" />
-        <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
+        <option value="$PROJECT_DIR$/server/classes/atmospheric.js" />
         <option value="$PROJECT_DIR$/server/classes/station.js" />
+        <option value="$PROJECT_DIR$/server/classes/remoteStation.js" />
+        <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
       </list>
     </option>
   </component>
@@ -289,6 +306,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -515,7 +533,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -643,7 +660,8 @@
       <workItem from="1509699451045" duration="64235000" />
       <workItem from="1510718358346" duration="33632000" />
       <workItem from="1511021360162" duration="147000" />
-      <workItem from="1511105160850" duration="15620000" />
+      <workItem from="1511105160850" duration="18405000" />
+      <workItem from="1511771831744" duration="1463000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -848,11 +866,18 @@
       <option name="project" value="LOCAL" />
       <updated>1511265433751</updated>
     </task>
-    <option name="localTasksCounter" value="30" />
+    <task id="LOCAL-00030" summary="Start creating the result page">
+      <created>1511347916728</created>
+      <option name="number" value="00030" />
+      <option name="presentableId" value="LOCAL-00030" />
+      <option name="project" value="LOCAL" />
+      <updated>1511347916728</updated>
+    </task>
+    <option name="localTasksCounter" value="31" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="171180000" />
+    <option name="totallyTimeSpent" value="175428000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -861,15 +886,15 @@
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Debug Logs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.48136315" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.15495208" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3397231" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.157082" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32871288" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
-      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Salesforce" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
@@ -907,7 +932,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add satellite and beams API" />
     <MESSAGE value="Add transponders, modems, location and rain points API" />
     <MESSAGE value="Update readme to include API docs" />
     <MESSAGE value="Enable CORS" />
@@ -932,7 +956,8 @@
     <MESSAGE value="Rename result properties to use camel case" />
     <MESSAGE value="Implement Max Mode Option" />
     <MESSAGE value="Test Turf difference and area to find the matching return contour from the given forward contour" />
-    <option name="LAST_COMMIT_MESSAGE" value="Test Turf difference and area to find the matching return contour from the given forward contour" />
+    <MESSAGE value="Start creating the result page" />
+    <option name="LAST_COMMIT_MESSAGE" value="Start creating the result page" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -993,17 +1018,17 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
-        </state>
-      </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
           <first_editor relative-caret-position="372">
             <caret line="394" column="22" lean-forward="false" selection-start-line="394" selection-start-column="22" selection-end-line="394" selection-end-column="22" />
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="17" lean-forward="true" selection-start-line="12" selection-start-column="17" selection-end-line="12" selection-end-column="17" />
         </state>
       </provider>
     </entry>
@@ -1085,13 +1110,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/modem.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="11" column="4" lean-forward="false" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/package-lock.json">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-2381">
@@ -1149,24 +1167,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/atmospheric.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="5370">
-          <caret line="360" column="65" lean-forward="false" selection-start-line="360" selection-start-column="61" selection-end-line="360" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/antennas.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="4" column="0" lean-forward="true" selection-start-line="4" selection-start-column="0" selection-end-line="21" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/models/antennas.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" column="0" lean-forward="false" selection-start-line="4" selection-start-column="0" selection-end-line="27" selection-end-column="28" />
         </state>
       </provider>
     </entry>
@@ -1195,14 +1199,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="60">
           <caret line="6" column="63" lean-forward="true" selection-start-line="6" selection-start-column="63" selection-end-line="6" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/antenna.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1242,7 +1238,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1035">
           <caret line="69" column="15" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="32" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1250,7 +1245,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="30" lean-forward="false" selection-start-line="7" selection-start-column="30" selection-end-line="7" selection-end-column="30" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1266,10 +1260,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding>
-            <marker date="1511263065534" expanded="true" signature="0:596" ph="{&quot;name&quot;: &quot;linkcalc-api&quot;...}" />
-            <marker date="1511263065534" expanded="true" signature="266:569" ph="{&quot;@turf/turf&quot;: &quot;^5.0.4&quot;...}" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1289,6 +1279,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/models/antennas.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="28" column="0" lean-forward="true" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/atmospheric.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="45" lean-forward="false" selection-start-line="16" selection-start-column="45" selection-end-line="16" selection-end-column="45" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/antenna.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="2610">
+          <caret line="174" column="59" lean-forward="false" selection-start-line="174" selection-start-column="59" selection-end-line="174" selection-end-column="59" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/bandwidth.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
@@ -1297,31 +1310,35 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/modem.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="21" lean-forward="false" selection-start-line="12" selection-start-column="21" selection-end-line="12" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="135">
+          <caret line="9" column="12" lean-forward="false" selection-start-line="9" selection-start-column="12" selection-end-line="9" selection-end-column="12" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/station.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="253">
-          <caret line="41" column="0" lean-forward="true" selection-start-line="41" selection-start-column="0" selection-end-line="41" selection-end-column="0" />
+        <state relative-caret-position="-452">
+          <caret line="11" column="4" lean-forward="false" selection-start-line="11" selection-start-column="4" selection-end-line="11" selection-end-column="4" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="288" column="55" lean-forward="false" selection-start-line="288" selection-start-column="55" selection-end-line="288" selection-end-column="55" />
-          <folding>
-            <element signature="n#!!block;n#runRainFadeLink#0;n#LinkBudget#0" expanded="false" />
-            <element signature="n#!!block;n#ciAdjacentSatellite#0;n#LinkBudget#0" expanded="false" />
-            <element signature="n#!!block;n#ciCrossCells#0;n#LinkBudget#0" expanded="false" />
-          </folding>
+        <state relative-caret-position="513">
+          <caret line="79" column="51" lean-forward="true" selection-start-line="79" selection-start-column="51" selection-end-line="79" selection-end-column="51" />
+          <folding />
         </state>
       </provider>
     </entry>

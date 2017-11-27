@@ -33,10 +33,12 @@ class LinkBudget {
 
     // Prepare parameters for link budget
     init() {
-
+        
+        this.debugLevel = 2
+        
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
-            console.log(`This app is using defualt gateway`)
+            this.logMessage(`This app is using defualt gateway`, 1)
             this.gatewayStations.push({name: 'defaultGateway'})
         }
 
@@ -60,34 +62,42 @@ class LinkBudget {
             })
         } else {
             // Otherwise, combine selected transponders with remote stations into objects
-            console.log(`Combining transponders with remote stations`)
+            this.logMessage(`Combining transponders with remote stations`, 1)
+            let stations = []
             this.remoteStations.forEach(station => {
-                console.log(`Looping stations ${station.antenna.name}`)
+                this.logMessage(`Looping stations with antenna =  ${station.antenna.name}, BUC = ${station.buc.name}, Location = ${station.location.name}, Bandwidth = ${station.bandwidth.forward}/${station.bandwidth.return} ${station.bandwidth.unit}`, 1)
                 this.transponders.forEach(transponder => {
-                    console.log(`Looping transponders ${transponder.name}`)
+                    this.logMessage(`Looping transponders ${transponder.name}`, 1)
                     station.transponder = transponder
+                    stations.push(_.cloneDeep(station))
                 })
             })
-            // console.log(this.remoteStations)
+            // Set the combined array back to remote stations object
+            this.remoteStations = stations
+            this.logMessage(`Remote Stations total length = ${this.remoteStations.length}`, 1)
+
+
+            // this.logMessage(this.remoteStations)
         }
 
         // Run the link budget
         this.forwardLinkResults = []
         this.returnLinkResults = []
         this.linkBudgetResults = []
-        console.log('Start running link budgets')
+        this.logMessage('Start running link budgets', 1)
         //this.runLinkBudget()
     }
 
     async runLinkBudget() {
 
         // Start looping remote stations
-        console.log(this.remoteStations.length)
+        this.logMessage(this.remoteStations.length)
         for (let [index,station] of this.remoteStations.entries()) {
-            // console.log(station)
+            // this.logMessage(station)
 
             this.remoteStation = new RemoteStation(station)
             this.remoteStation.print()
+
 
             this.remoteStation.id = index
 
@@ -101,7 +111,7 @@ class LinkBudget {
                     this.modem.print()
 
                     // Run forward link
-                    console.log('Running forward link')
+                    this.logMessage('Running forward link', 1)
                     let forwardLinkResult = {}
                     let returnLinkResult = {}
 
@@ -111,23 +121,23 @@ class LinkBudget {
                     // forwardLinkResult = await this.runLinkByPath('forward')
                     // returnLinkResult = await this.runLinkByPath('return')
                     // // Record cases
-                    // console.log('Recording results')
+                    // this.logMessage('Recording results')
                     // this.linkBudgetResults.push({
                     //     forwardLink: forwardLinkResult,
                     //     returnLink: returnLinkResult
                     // })
                     // })
                     // this.runLinkByPath('forward').then(result => {
-                    //     console.log(`Forward Result : ${result}`)
+                    //     this.logMessage(`Forward Result : ${result}`)
                     //     forwardLinkResult = result
-                    //     console.log('Running return link')
+                    //     this.logMessage('Running return link')
                     //     return this.runLinkByPath('return')
                     // }).then(result => {
-                    //     console.log(`Return Result : ${result}`)
+                    //     this.logMessage(`Return Result : ${result}`)
                     //     returnLinkResult = result
                     //
                     //     // Record cases
-                    //     console.log('Recording results')
+                    //     this.logMessage('Recording results')
                     //     this.linkBudgetResults.push({
                     //         forwardLink: forwardLinkResult,
                     //         returnLink: returnLinkResult
@@ -135,7 +145,7 @@ class LinkBudget {
                     // })
 
                     // Run return link
-                    // console.log('Running return link')
+                    // this.logMessage('Running return link')
                     // let returnLinkResult
                     // this.runLinkByPath('return').then(result => {
                     //     returnLinkResult = result
@@ -146,7 +156,7 @@ class LinkBudget {
             }
         }
         // return this.linkBudgetResults
-        // console.log(JSON.stringify(this.forwardLinkResults, undefined, 2))
+        // this.logMessage(JSON.stringify(this.forwardLinkResults, undefined, 2))
         return {
             forwardLinkResults: this.forwardLinkResults,
             returnLinkResults: this.returnLinkResults
@@ -162,21 +172,21 @@ class LinkBudget {
         let linkResult = {}
 
         // Set uplink and downlink station
-        // console.log(this.remoteStation)
+        // this.logMessage(this.remoteStation)
 
 
-        // console.log(this.downlinkStation)
+        // this.logMessage(this.downlinkStation)
         this.path = path
 
-        console.log()
-        console.log()
-        console.log()
-        console.log('--------------------------------------------')
-        console.log(`----------Start running a ${path} link-----------`.toUpperCase())
-        console.log('--------------------------------------------')
-        console.log()
-        console.log()
-        console.log()
+        this.logMessage()
+        this.logMessage()
+        this.logMessage()
+        this.logMessage('--------------------------------------------')
+        this.logMessage(`----------Start running a ${path} link-----------`.toUpperCase())
+        this.logMessage('--------------------------------------------')
+        this.logMessage()
+        this.logMessage()
+        this.logMessage()
 
         // Set bandwidth value and unit
         this.bandwidthValue = this.remoteStation.bandwidth[path]
@@ -185,12 +195,14 @@ class LinkBudget {
         // If path = return, find the correct transponder for this station. (the remote station is equipped with forward transponder by default)
         if (path === 'return') {
             // Find transponder by path
-            console.log(`Searching the return transponder for ${this.remoteStation.forwardTransponder.name} on ${this.remoteStation.forwardTransponder.satellite}`)
+            this.logMessage(`Searching the return transponder for ${this.remoteStation.forwardTransponder.name} on ${this.remoteStation.forwardTransponder.satellite}`, 2)
             let tp = await this.findTransponderByPath(this.remoteStation.forwardTransponder, path)
             this.remoteStation.setTransponder('return', tp)
         }
 
         this.transponder = this.remoteStation[`${path}Transponder`]
+
+        this.logMessage(`Transponder = ${this.transponder.name} - ${path}`, 1)
 
         // Seek the contour for this remote station
         this.remoteStation.seekDefinedContoursAndCoordinates(this.transponder)
@@ -198,12 +210,12 @@ class LinkBudget {
         // Find and set satellite
         let sat = this.findSatellite(this.transponder)
         this.satellite = new Satellite(sat)
-        console.log(`Set satellite object to ${this.satellite.name}`)
+        this.logMessage(`Set satellite object to ${this.satellite.name}`, 2)
         let gw = await this.findGateway(this.transponder)
 
         // Find appropriate gateway
         this.gateway = new GatewayStation(gw)
-        // console.log(this.gateway)
+        // this.logMessage(this.gateway)
         this.gateway.print()
 
         // Set uplink contour of gateway if default gateway is used
@@ -213,7 +225,7 @@ class LinkBudget {
 
         // Find application by path
         this.application = this.findApplicationByPath(path)
-        console.log(`Set application name to ${this.application.name}`)
+        this.logMessage(`Set application name to ${this.application.name}`, 2)
 
         // Set uplink and downlink station
         if (path === 'forward') {
@@ -224,7 +236,7 @@ class LinkBudget {
             this.uplinkStation = this.remoteStation
             this.downlinkStation = this.gateway
         } else {
-            console.log(`${path} is not a valid path`)
+            this.logMessage(`${path} is not a valid path`, 2)
         }
 
         // Set default link availability and site diversity based on the given stations
@@ -233,7 +245,7 @@ class LinkBudget {
 
         // Check if this platform is MCG fixed
         if (!this.modem.findBestMcg) {``
-            console.log(`This modem is MCG fixed`)
+            this.logMessage(`This modem is MCG fixed`, 2)
 
 
             // If yes, set MCGs = all MCG given in the modem application
@@ -243,16 +255,16 @@ class LinkBudget {
 
                 // Set MCG
                 this.mcg = mcg
-                console.log(`Setting MCG to ${this.mcg.name}`)
+                this.logMessage(`Setting MCG to ${this.mcg.name}`, 2)
 
 
                 // Check if max contour is selected
                 if (this.findMaxCoverage) {
-                    console.log(`Max coverage selected, performing binary search`)
+                    this.logMessage(`Max coverage selected, performing binary search`, 2)
 
                     // If yes, perform a binary search over a minimum and maximum contour range (running clear sky link)
                     let contourRange = this.findContourRange()
-                    console.log(`Contour range of this this transponder is ${contourRange.min} to ${contourRange.max} dB`)
+                    this.logMessage(`Contour range of this this transponder is ${contourRange.min} to ${contourRange.max} dB`, 2)
                     let contourRangeArray = _.range(contourRange.min, contourRange.max, 0.1)
 
                     let minIndex = 0
@@ -273,27 +285,27 @@ class LinkBudget {
                         } else {
                             this.uplinkStation.contour = currentElement
                         }
-                        console.log(`Setting contour to ${currentElement} dB`)
-                        console.log(`Running clear sky link`)
+                        this.logMessage(`Setting contour to ${currentElement} dB`, 3)
+                        this.logMessage(`Running clear sky link`, 3)
                         result = await this.runClearSkyLink()
 
                         if (!result.passed) { // not pass => step to higher index of array (= narrower contour)
                             minIndex = currentIndex + 1
-                            console.log(`Contour ${currentElement} dB doesn't passes the condition`)
+                            this.logMessage(`Contour ${currentElement} dB doesn't passes the condition` ,3)
                             answer = currentElement
                         } else { // pass => step to lower index of array (= wider contour)
                             maxIndex = currentIndex - 1
-                            console.log(`Contour ${currentElement} dB pass the condition`)
+                            this.logMessage(`Contour ${currentElement} dB pass the condition`, 3)
                         }
                     }
-                    console.log(`Searching for max contour finished, answer is ${currentElement} dB`)
-                    console.log('Saving clear sky result')
+                    this.logMessage(`Searching for max contour finished, answer is ${currentElement} dB`, 2)
+                    this.logMessage('Saving clear sky result', 2)
                     linkResult.clearSky = result
 
                 } else {
                     // If no, set parameters and then run a clear sky link and record the result
-                    console.log(`Max contour option is not selected`)
-                    console.log(`Running clear sky link`)
+                    this.logMessage(`Max contour option is not selected`, 2)
+                    this.logMessage(`Running clear sky link`, 2)
                     // linkResult[path + 'Result']['clearSky'] = await this.runClearSkyLink()
                     linkResult.clearSky = await this.runClearSkyLink()
                 }
@@ -307,19 +319,19 @@ class LinkBudget {
                     // linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
                     linkResult.rainFade = await this.runRainFadeLink()
                 } catch (e) {
-                    console.log(e)
+                    this.logMessage(e)
                 }
 
                 // Push the result into link results instance
-                // console.log(`Link result clearsky shows MCG as ${linkResult.clearSky.mcg.name}`)
-                // console.log(`Link result rainfade shows MCG as ${linkResult.rainFade.mcg.name}`)
+                // this.logMessage(`Link result clearsky shows MCG as ${linkResult.clearSky.mcg.name}`)
+                // this.logMessage(`Link result rainfade shows MCG as ${linkResult.rainFade.mcg.name}`)
                 // this[path + 'LinkResults'].push({ linkResult })
                 this.pushResult(linkResult, path)
                 // this.forwardLinkResults.push(`${linkResult.clearSky.mcg.name}`)
 
             }
         } else {
-            console.log(`Fixed MCG is not selected`)
+            this.logMessage(`Fixed MCG is not selected`, 2)
 
             // If no, (not fix MCG), set MCGs = all MCG given in the modem application
             // Perform a binary search over a minimum and maximum available MCGs (running clear sky link)
@@ -336,27 +348,27 @@ class LinkBudget {
 
                 // Set mcg to this value
                 this.mcg = currentElement
-                console.log(`Setting current MCG to ${this.mcg.name}`)
-                console.log(`Running clear sky link`)
+                this.logMessage(`Setting current MCG to ${this.mcg.name}`, 3)
+                this.logMessage(`Running clear sky link`, 3)
 
                 try {
                     result = await this.runClearSkyLink()
                 } catch (e) {
-                    console.log(e)
+                    this.logMessage(e)
                 }
 
                 if (result.passed) { // pass
                     minIndex = currentIndex + 1
-                    console.log(`${currentElement} passes the condition`)
+                    this.logMessage(`${currentElement} passes the condition`, 3)
                     answer = currentElement
                     resultAnswer = result
                 } else { // not pass
                     maxIndex = currentIndex - 1
-                    console.log(`${currentElement} doesn't pass the condition`)
+                    this.logMessage(`${currentElement} doesn't pass the condition`, 3)
                 }
             }
-            console.log(`Searching for best MCG finished, answer is ${answer.name}`)
-            console.log('Saving clear sky result')
+            this.logMessage(`Searching for best MCG finished, answer is ${answer.name}`, 2)
+            this.logMessage('Saving clear sky result')
             // linkResult[path + 'Result']['clearSky'] = resultAnswer
             linkResult.clearSky = resultAnswer
 
@@ -370,7 +382,7 @@ class LinkBudget {
                 linkResult.rainFade = await this.runRainFadeLink()
 
             } catch (e) {
-                console.log(e)
+                this.logMessage(e)
             }
 
             // Push the result into link results instance
@@ -378,11 +390,11 @@ class LinkBudget {
 
         }
 
-        console.log('--------')
-        console.log('--------')
-        console.log('--------')
-        console.log('--------')
-        console.log('--------')
+        this.logMessage('--------')
+        this.logMessage('--------')
+        this.logMessage('--------')
+        this.logMessage('--------')
+        this.logMessage('--------')
 
         // Return results
         return linkResult
@@ -392,18 +404,18 @@ class LinkBudget {
 
     async runClearSkyLink() {
 
-        console.log('Setting conditions for CLEAR SKY')
+        this.logMessage('Setting conditions for CLEAR SKY')
         this.condition = 'clear'
         this.requiredMargin = this.application.link_margin
-        console.log(`Setting link margin to ${this.requiredMargin} dB`)
+        this.logMessage(`Setting link margin to ${this.requiredMargin} dB`, 2)
 
         // Run link and return result
         try {
             let clearSkyResult = await this.runLink()
-            console.log(`Clear sky result shows MCG = ${clearSkyResult.mcg.name}`)
+            this.logMessage(`Clear sky result shows MCG = ${clearSkyResult.mcg.name}`, 2)
             return clearSkyResult
         } catch(e) {
-            console.log(e)
+            this.logMessage(e)
         }
 
 
@@ -411,10 +423,10 @@ class LinkBudget {
 
     async runRainFadeLink() {
 
-        console.log('Setting conditions for RAIN FADE')
+        this.logMessage('Setting conditions for RAIN FADE', 2)
         this.condition = 'rain'
         this.requiredMargin = 0
-        console.log(`Setting link margin to ${this.requiredMargin}`)
+        this.logMessage(`Setting link margin to ${this.requiredMargin}`, 2)
 
         // TODO: Find the rain fade value here
 
@@ -422,13 +434,13 @@ class LinkBudget {
 
         // Check MCG at clear sky result object
         let mcgClearSky = this.currentClearSkyResult.mcg
-        console.log(`MCG at clear sky is ${mcgClearSky.name}`)
+        this.logMessage(`MCG at clear sky is ${mcgClearSky.name}`, 2)
 
         // Check if modem has ACM function and dynamic channel function and also user selects finding best MCG (utilizing the ACM feature)
 
         // If yes-yes, perform normal search over looping MCG and available symbol rates
         if (this.application.acm && this.application.dynamic_channels && this.modem.findBestMcg) {
-            console.log('This app has ACM and dynamic channels')
+            this.logMessage('This app has ACM and dynamic channels', 2)
             let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
             let lowerBandwidthPool = this.findLowerBandwidthPool()
 
@@ -445,7 +457,7 @@ class LinkBudget {
                         let result = await this.runLink()
                         results.push(result)
                     } catch (e) {
-                        console.log(e)
+                        this.logMessage(e)
                     }
 
 
@@ -460,9 +472,9 @@ class LinkBudget {
 
         // If yes-no, perform binary search over looping MCG
         else if (this.application.acm && this.modem.findBestMcg) {
-            console.log('This app has ACM (no dynamic channels)')
+            this.logMessage('This app has ACM (no dynamic channels)', 2)
             let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
-            console.log(lowerMcgs)
+            this.logMessage(lowerMcgs)
             let minIndex = 0
             let maxIndex = lowerMcgs.length - 1
             let currentIndex
@@ -476,40 +488,40 @@ class LinkBudget {
 
                 // Set mcg to this value
                 this.mcg = currentElement
-                console.log(`Setting MCG to ${currentElement.name}`)
+                this.logMessage(`Setting MCG to ${currentElement.name}`, 3)
                 try {
                     result = await this.runLink()
                 } catch(e) {
-                    console.log(e)
+                    this.logMessage(e)
                 }
 
                 if (result.passed) { // pass
                     minIndex = currentIndex + 1
-                    console.log(`${currentElement.name} passes the rain fade condition`)
+                    this.logMessage(`${currentElement.name} passes the rain fade condition`, 3)
                     answer = currentElement
                     resultAnswer = result
                 } else { // not pass
                     maxIndex = currentIndex - 1
-                    console.log(`${currentElement.name} doesn't pass the rain fade condition`)
+                    this.logMessage(`${currentElement.name} doesn't pass the rain fade condition`, 3)
                 }
             }
-            console.log(`Searching the best MCG for rain fade finished, answer is ${answer.name}`)
+            this.logMessage(`Searching the best MCG for rain fade finished, answer is ${answer.name}`, 2)
             rainFadeResult = resultAnswer
         } else {
-            console.log(`This app has no ACM`)
+            this.logMessage(`This app has no ACM`, 2)
             // If no-no, run link at the same code as clear sky case (there is no 'no-yes' case as dynamic channel always comes with ACM)
             this.mcg = mcgClearSky
-            console.log(`Running rain fade link`)
+            this.logMessage(`Running rain fade link`, 2)
             try {
                 rainFadeResult = await this.runLink()
 
             } catch (e) {
-                console.log(e)
+                this.logMessage(e)
             }
 
             // If the existing condition still does not pass, perform binary search over link availability to find max total link availability
             if (!rainFadeResult.passed) {
-                console.log(`Link does not pass at rain fade, find maximum link availability`)
+                this.logMessage(`Link does not pass at rain fade, find maximum link availability`, 2)
                 let linkAvailabilityRange = _.range(95, 99.5, 0.1)
                 let minIndex = 0
                 let maxIndex = linkAvailabilityRange.length - 1
@@ -524,25 +536,25 @@ class LinkBudget {
 
                     // Set uplink or downlink availability to new value (forward link changes downlink avail, return link changes uplink avail)
                     this.path === 'forward' ? this.downlinkAvailability = currentElement : this.uplinkAvailability = currentElement
-                    console.log(`Setting uplink availability to ${this.uplinkAvailability}% and downlink availability to ${this.downlinkAvailability}%`)
+                    this.logMessage(`Setting uplink availability to ${this.uplinkAvailability}% and downlink availability to ${this.downlinkAvailability}%`, 3)
 
                     try {
                         result = await this.runLink()
                     } catch(e) {
-                        console.log(e)
+                        this.logMessage(e)
                     }
 
                     if (result.passed) { // pass
                         minIndex = currentIndex + 1
-                        console.log(`${currentElement}% passes the condition`)
+                        this.logMessage(`${currentElement}% passes the condition`, 3)
                         answer = currentElement
                         resultAnswer = result
                     } else { // not pass
                         maxIndex = currentIndex - 1
-                        console.log(`${currentElement}% doesn't pass the condition`)
+                        this.logMessage(`${currentElement}% doesn't pass the condition`, 3)
                     }
                 }
-                console.log(`Searching the max link availability finished, answer is ${answer}%`)
+                this.logMessage(`Searching the max link availability finished, answer is ${answer}%`, 2)
                 rainFadeResult = resultAnswer
             }
 
@@ -559,7 +571,7 @@ class LinkBudget {
 
         // Seek the occupied bandwidth
         this.seekOccupiedBandwidth()
-        console.log('Seeking occupied bandwidth')
+        this.logMessage('Seeking occupied bandwidth')
 
         // Setup parameters
         let orbitalSlot = this.satellite.orbital_slot
@@ -579,21 +591,22 @@ class LinkBudget {
         // let uplink_elevation_angle = elevationAngle(uplink_station.location, orbitalSlot);
         let uplinkXpolLoss = Utils.xpolLoss(),
             uplink_pointingLoss = Utils.pointingLoss(uplinkFrequency, uplinkStation.antenna.size, skb);
-        console.log(`Calculating atmospheric loss`)
-        let uplinkAtmLoss = await new Atmospheric().calculateLoss({
+        this.logMessage(`Calculating atmospheric loss`)
+        let uplinkAtmLoss = await new Atmospheric({ debugLevel: this.debugLevel }).calculateLoss({
             condition: this.condition,
             location: uplinkStation.location,
             orbitalSlot: orbitalSlot,
             freq: uplinkFrequency,
             polarization: transponder.uplink_pol,
             diameter: uplinkStation.antenna.size,
-            availability: this.uplinkAvailability
+            availability: this.uplinkAvailability,
+            debugLevel: this.debugLevel
         });
         let uplinkOtherLoss = uplinkXpolLoss + uplink_pointingLoss;
         let uplinkSpreadingLoss = Utils.spreadingLoss(uplinkSlantRange);
         let uplinkContour = uplinkStation.contour;
 
-        console.log(`Uplink contour = ${uplinkStation.contour} dB`)
+        this.logMessage(`Uplink contour = ${uplinkStation.contour} dB`)
 
         let gainVariation = 0;
         let gainVariationDiff = 0;
@@ -615,7 +628,7 @@ class LinkBudget {
 
         // If this is Max Mode for IPSTAR satellite, add 1.7 dB constantly (from P'Nong 17 Nov 2017)
         if (this.satellite.name == "IPSTAR" && this.maxMode) {
-            console.log(`Max mode is activated, increase uplink G/T by 1.7 dB`)
+            this.logMessage(`Max mode is activated, increase uplink G/T by 1.7 dB`)
             uplinkGt += 1.7
         }
 
@@ -628,7 +641,7 @@ class LinkBudget {
             // Get the backoff settings (IBO, OBO, Intermod) from the database based on the default number of carriers ("One","Two","Multi") set in the database
             let numCarriers = transponder.current_num_carriers;
             let backoffSettings = transponder.backoff_settings.find(s => s.num_carriers === numCarriers);
-            console.log(backoffSettings)
+            this.logMessage(backoffSettings)
 
             // SFD in the database is the -X value of -X-G/T (derived from -(X+G/T)
             // Operating PFD = -(X + G/T) - (Atten.Range - defaultAtten) + TransponderIBO - Backoff from bandwidth
@@ -689,7 +702,7 @@ class LinkBudget {
 
             // For IPSTAR FWD Link, the data is stored in format fixed gateway EIRP Up
             if (transponder.eirp_up_channel) {
-                console.log(`EIRP Up channel = ${transponder.eirp_up_channel}, Num carriers in channel = ${numCarriersInChannel}`)
+                this.logMessage(`EIRP Up channel = ${transponder.eirp_up_channel}, Num carriers in channel = ${numCarriersInChannel}`)
                 eirpUp = transponder.eirp_up_channel - numCarriersInChannel;
                 operatingPfdPerCarrier = eirpUp - uplinkSpreadingLoss - uplinkOtherLoss;
             }
@@ -698,7 +711,7 @@ class LinkBudget {
             // so, we find PFD at designed deepin first, then derive for EIRP up
             // the derived EIRP up will need to compensate spreading loss, pointing, xpol and atmoshperic loss
             else {
-                console.log(`Number of carriers in channel = ${numCarriersInChannel}`)
+                this.logMessage(`Number of carriers in channel = ${numCarriersInChannel}`)
                 operatingPfdPerCarrier = operatingPfd - transponder.dynamic_range + transponder.designed_deepin - numCarriersInChannel;
                 eirpUp = operatingPfdPerCarrier + uplinkSpreadingLoss + uplinkOtherLoss + uplinkAtmLoss;
             }
@@ -714,26 +727,26 @@ class LinkBudget {
 
             // Check if the uplink HPA is BUC type. If yes, use the uplink power of that BUC (use 100% of BUC power instead of show the result of desired EIRP level)
             if (_.has(uplinkStation, 'buc')) {
-                console.log("This is BUC.")
+                this.logMessage("This is BUC.")
                 // check if eirp of this buc & antenna can reach the desired level
                 let eirpUpFromBuc = uplinkStation.eirpUplink(uplinkFrequency);
 
                 if (eirpUp > eirpUpFromBuc) {
-                    console.log("EIRP Up of " + eirpUp + " dBW is more than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
+                    this.logMessage("EIRP Up of " + eirpUp + " dBW is more than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
                     eirpUp = eirpUpFromBuc;
                 }
                 else {
-                    console.log("EIRP Up of " + eirpUp + " dBW is less than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
+                    this.logMessage("EIRP Up of " + eirpUp + " dBW is less than EIRP up from BUC which is " + eirpUpFromBuc + " dBW");
                 }
             }
             else {
-                console.log("This is not a BUC.")
+                this.logMessage("This is not a BUC.")
             }
 
             // Find carrier PFD. This may not equal to operating pfd in case of overused power or the BUC power is not enough to get to designed point
             carrierPfd = eirpUp - uplinkSpreadingLoss - uplinkOtherLoss - uplinkAtmLoss;
-            console.log('Uplink Spreading Loss = ' + uplinkSpreadingLoss + ' dB');
-            console.log('Uplink Other Loss = ' + uplinkOtherLoss + ' dB');
+            this.logMessage('Uplink Spreading Loss = ' + uplinkSpreadingLoss + ' dB');
+            this.logMessage('Uplink Other Loss = ' + uplinkOtherLoss + ' dB');
 
 
             // For ALC transponders, assume the transponder is full-loaded (always reach deep-in)
@@ -763,12 +776,12 @@ class LinkBudget {
 
         // Calculate required HPA power
         let operatingPowerAtHpaOutput = eirpUp - uplinkStation.antenna.txGain(uplinkFrequency);
-        console.log(`EIRP up = ${eirpUp}, Uplink Tx Gain = ${uplinkStation.antenna.txGain(uplinkFrequency)}`)
-        // console.log(uplinkStation)
+        this.logMessage(`EIRP up = ${eirpUp}, Uplink Tx Gain = ${uplinkStation.antenna.txGain(uplinkFrequency)}`)
+        // this.logMessage(uplinkStation)
         let hpaType = _.has(uplinkStation, 'buc') ? 'buc' : 'hpa'
-        console.log(`hpa type = ${hpaType}`)
-        this.logTitle(`${hpaType} = ${uplinkStation[hpaType]['ifl']} ${hpaType} OBO = ${uplinkStation[hpaType]['obo']} dB`);
-        this.logTitle('OP Power = ' + operatingPowerAtHpaOutput + ' dB');
+        this.logMessage(`hpa type = ${hpaType}`)
+        this.logMessage(`${hpaType} = ${uplinkStation[hpaType]['ifl']} ${hpaType} OBO = ${uplinkStation[hpaType]['obo']} dB`);
+        this.logMessage('OP Power = ' + operatingPowerAtHpaOutput + ' dB');
         let operatingHpaPower = Math.pow(10, (operatingPowerAtHpaOutput + uplinkStation[hpaType]['ifl']) / 10);
 
         // Calculate C/N Uplink
@@ -777,22 +790,22 @@ class LinkBudget {
         let uplinkPathLoss = Utils.pathLoss(uplinkSlantRange, uplinkFrequency);
         let cnUplink = Utils.carrierOverNoise(eirpUpAtSatellite, uplinkGt, uplinkPathLoss, noiseBandwidth);
 
-        console.log('-------Power optimization---------');
-        console.log('Operating SFD ' + operatingPfd + ' dBW/m^2');
-        console.log('Operating PFD ' + operatingPfdPerCarrier + ' dBW/m^2');
-        console.log('Channel PFD ' + channelPfd + ' dBW/m^2');
-        console.log('Carrier OBO ' + carrierOutputBackoff + ' dB');
-        console.log('Carrier PFD ' + carrierPfd + ' dBW/m^2');
-        console.log('Channel deepin ' + channelDeepin + ' dB');
+        this.logMessage('-------Power optimization---------');
+        this.logMessage('Operating SFD ' + operatingPfd + ' dBW/m^2');
+        this.logMessage('Operating PFD ' + operatingPfdPerCarrier + ' dBW/m^2');
+        this.logMessage('Channel PFD ' + channelPfd + ' dBW/m^2');
+        this.logMessage('Carrier OBO ' + carrierOutputBackoff + ' dB');
+        this.logMessage('Carrier PFD ' + carrierPfd + ' dBW/m^2');
+        this.logMessage('Channel deepin ' + channelDeepin + ' dB');
 
-        console.log('----Uplink-----');
-        console.log('Condition: ' + this.condition);
-        console.log('Atmoshperic Loss: ' + uplinkAtmLoss + " dB");
-        console.log('EIRP UP ' + eirpUp + ' dBW');
-        console.log('G/T ' + uplinkGt + ' dB/K');
-        console.log('Path Loss: ' + uplinkPathLoss + ' dB');
-        console.log('Noise BW: ' + noiseBandwidth + ' dB');
-        console.log('C/N uplink ' + cnUplink + ' dB');
+        this.logMessage('----Uplink-----');
+        this.logMessage('Condition: ' + this.condition);
+        this.logMessage('Atmoshperic Loss: ' + uplinkAtmLoss + " dB");
+        this.logMessage('EIRP UP ' + eirpUp + ' dBW');
+        this.logMessage('G/T ' + uplinkGt + ' dB/K');
+        this.logMessage('Path Loss: ' + uplinkPathLoss + ' dB');
+        this.logMessage('Noise BW: ' + noiseBandwidth + ' dB');
+        this.logMessage('C/N uplink ' + cnUplink + ' dB');
 
         // ---------------------------------- Downlink ---------------------------------------------
 
@@ -801,28 +814,28 @@ class LinkBudget {
         let downlinkSlantRange = Utils.slantRange(downlinkStation.location, orbitalSlot);
         let downlinkXpolLoss = Utils.xpolLoss(),
             downlinkPointingLoss = Utils.pointingLoss(downlinkFrequency, downlinkStation.antenna.size, skb);
-        console.log('Calculating downlink atm loss')
-        let downlinkAtmLoss = await new Atmospheric().calculateLoss({
+        this.logMessage('Calculating downlink atm loss')
+        let downlinkAtmLoss = await new Atmospheric({ debugLevel: this.debugLevel }).calculateLoss({
             condition: this.condition,
             location: downlinkStation.location,
             orbitalSlot: orbitalSlot,
             freq: downlinkFrequency,
             diameter: downlinkStation.antenna.size,
             polarization: transponder.downlink_pol,
-            availability: this.downlinkAvailability
+            availability: this.downlinkAvailability,
         });
         let downlinkOtherLoss = downlinkXpolLoss + downlinkPointingLoss;
         let downlinkContour = downlinkStation.contour;
-        console.log('Downlink contour = ' + downlinkContour + ' dB')
+        this.logMessage('Downlink contour = ' + downlinkContour + ' dB')
 
         // Find saturated EIRP at location for debug purpose (no backoff per carrier)
         let saturatedEirpDownAtLocation = transponder.saturated_eirp_peak + downlinkContour;
-        console.log(`Saturated EIRP down at location = ${saturatedEirpDownAtLocation} dBW`)
+        this.logMessage(`Saturated EIRP down at location = ${saturatedEirpDownAtLocation} dBW`)
 
         // If max mode is used, the saturated EIRP is increased by Delta to Max (it is reduced before due to thermal distortion and stuff)
         // In addition, add a constant 1.4 dB to EIRP down (from P'Nong 17 Nov 2017)
         if (this.maxMode && transponder.delta_eirp_down) {
-            console.log(`Max mode is activated, increase downlink EIRP by 1.4 dB plus the Delta EIRP down data (see the PSR Payload Excel file`)
+            this.logMessage(`Max mode is activated, increase downlink EIRP by 1.4 dB plus the Delta EIRP down data (see the PSR Payload Excel file`)
             saturatedEirpDownAtLocation += transponder.delta_eirp_down
             saturatedEirpDownAtLocation += 1.4
         }
@@ -837,11 +850,11 @@ class LinkBudget {
             }
             gainVariationDiff = gainVariation > -1.1 ? 0 : 1.1 + gainVariation;
         }
-        console.log(`Gain vairation diff = ${gainVariationDiff}`)
+        this.logMessage(`Gain vairation diff = ${gainVariationDiff}`)
 
         // Find driven EIRP at location = Saturated EIRP at peak + carrier OBO + Gain Variation + downlink relative contour
         let drivenEirpDownAtLocation = transponder.saturated_eirp_peak + carrierOutputBackoff + downlinkContour + gainVariationDiff;
-        console.log('Driven EIRP at loc = ' + drivenEirpDownAtLocation);
+        this.logMessage('Driven EIRP at loc = ' + drivenEirpDownAtLocation);
 
         // Find EIRP Down at location = Saturated EIRP at peak + carrier OBO + downlink relative contour + other losses (pointing, xpol) + atm loss
         let carrierEirpDownAtLocation = transponder.saturated_eirp_peak + carrierOutputBackoff + downlinkContour + gainVariationDiff - downlinkOtherLoss - downlinkAtmLoss;
@@ -853,15 +866,15 @@ class LinkBudget {
         let downlinkPathLoss = Utils.pathLoss(downlinkSlantRange, downlinkFrequency);
         let cnDownlink = Utils.carrierOverNoise(carrierEirpDownAtLocation, antGt, downlinkPathLoss, noiseBandwidth);
 
-        console.log('------Downlink-----');
-        console.log('Condition: ' + this.condition);
-        console.log('Pointing loss = ' + downlinkPointingLoss + ' dB , Xpol loss = ' + downlinkXpolLoss + ' dB');
-        console.log('Atmoshperic Loss: ' + downlinkAtmLoss + " dB");
-        console.log('EIRP Down: ' + carrierEirpDownAtLocation + ' dBW');
-        console.log('G/T ' + antGt + ' dB/K');
-        console.log('Path Loss ' + downlinkPathLoss + ' dB');
-        console.log('Noise BW ' + noiseBandwidth + ' dB');
-        console.log('C/N Downlink ' + cnDownlink + ' dB');
+        this.logMessage('------Downlink-----');
+        this.logMessage('Condition: ' + this.condition);
+        this.logMessage('Pointing loss = ' + downlinkPointingLoss + ' dB , Xpol loss = ' + downlinkXpolLoss + ' dB');
+        this.logMessage('Atmoshperic Loss: ' + downlinkAtmLoss + " dB");
+        this.logMessage('EIRP Down: ' + carrierEirpDownAtLocation + ' dBW');
+        this.logMessage('G/T ' + antGt + ' dB/K');
+        this.logMessage('Path Loss ' + downlinkPathLoss + ' dB');
+        this.logMessage('Noise BW ' + noiseBandwidth + ' dB');
+        this.logMessage('C/N Downlink ' + cnDownlink + ' dB');
 
         // ---------------------------------- Interferences ---------------------------------------------
 
@@ -932,17 +945,17 @@ class LinkBudget {
         // Total C/I downlink
         let ciDownlink = Utils.cnOperation(ciDownlinkIntermod, ciDownlinkAdjacentSatellite, ciDownlinkXpol, ciDownlinkXcells);
 
-        console.log('------Interferences------');
-        console.log('C/I Up X-pol = ' + ciUplinkXpol);
-        console.log('C/I Up Intermod = ' + ciUplinkIntermod);
-        console.log('C/I Up Adj. Sat = ' + ciUplinkAdjacentSatellite);
-        console.log('C/I Up Adj. Cells = ' + ciUplinkXCells);
-        console.log('C/I Down X-pol = ' + ciDownlinkXpol);
-        console.log('C/I Down Intermod = ' + ciDownlinkIntermod);
-        console.log('C/I Down Adj. Sat = ' + ciDownlinkAdjacentSatellite);
-        console.log('C/I Down Cross Cells = ' + ciDownlinkXcells);
-        console.log(`C/I Up Total = ${ciUplink} dB`)
-        console.log(`C/I Down Total = ${ciDownlink} dB`)
+        this.logMessage('------Interferences------');
+        this.logMessage('C/I Up X-pol = ' + ciUplinkXpol);
+        this.logMessage('C/I Up Intermod = ' + ciUplinkIntermod);
+        this.logMessage('C/I Up Adj. Sat = ' + ciUplinkAdjacentSatellite);
+        this.logMessage('C/I Up Adj. Cells = ' + ciUplinkXCells);
+        this.logMessage('C/I Down X-pol = ' + ciDownlinkXpol);
+        this.logMessage('C/I Down Intermod = ' + ciDownlinkIntermod);
+        this.logMessage('C/I Down Adj. Sat = ' + ciDownlinkAdjacentSatellite);
+        this.logMessage('C/I Down Cross Cells = ' + ciDownlinkXcells);
+        this.logMessage(`C/I Up Total = ${ciUplink} dB`)
+        this.logMessage(`C/I Down Total = ${ciDownlink} dB`)
 
         // ---------------------------------- C/N Total ---------------------------------------------
 
@@ -952,8 +965,8 @@ class LinkBudget {
         // if(application.name == "TOLL"){
         //     let numChannels = symbolRate(bandwidth, application) / 3.375;
         //     let warbleLoss = 10 * log10((Math.pow(10,2.2/10) + numChannels - 1) / numChannels);
-        //     console.log('This is TOLL. Warble loss = ' + warbleLoss + ' dB');
-        //     console.log('C/N Total before warble loss = ' + cnTotal + ' dB');
+        //     this.logMessage('This is TOLL. Warble loss = ' + warbleLoss + ' dB');
+        //     this.logMessage('C/N Total before warble loss = ' + cnTotal + ' dB');
         //     cnTotal -= warbleLoss;
         //     _.assign(result, {warble_loss: warbleLoss});
         // }
@@ -962,22 +975,22 @@ class LinkBudget {
         let linkMargin = cnTotal - this.mcg.es_no;
         let passed = linkMargin > this.requiredMargin;
 
-        console.log('-------Total---------');
-        console.log('C/N Total: ' + cnTotal + ' dB');
-        console.log('Link margin ' + linkMargin + ' dB');
-        console.log('Pass? ' + passed);
-        console.log('Total link availability: ' + linkAvailability);
+        this.logMessage('-------Total---------');
+        this.logMessage('C/N Total: ' + cnTotal + ' dB');
+        this.logMessage('Link margin ' + linkMargin + ' dB');
+        this.logMessage('Pass? ' + passed);
+        this.logMessage('Total link availability: ' + linkAvailability);
 
         // ---------------------------------- Data Rate ---------------------------------------------
 
         let dataRate = Utils.symbolRate(this.occupiedBandwidth, this.application) * this.mcg.spectral_efficiency;
-        console.log(`Data rate = ${dataRate} Mbps`)
-        console.log(`MCG = ${this.mcg.name}`)
-        console.log(`Occupied bandwidth = ${this.occupiedBandwidth} MHz`)
+        this.logMessage(`Data rate = ${dataRate} Mbps`)
+        this.logMessage(`MCG = ${this.mcg.name}`)
+        this.logMessage(`Occupied bandwidth = ${this.occupiedBandwidth} MHz`)
 
         // For TOLL, data_rate is a little complicated....
         // if (this.application.name == "TOLL") {
-        //     console.log('Find data rate for TOLL...');
+        //     this.logMessage('Find data rate for TOLL...');
         //     let bit_rate_channel_0 = 0;
         //     // if use code higher than QPSK 835, the bit rate channel 0 will be at most QPSK 835
         //     if (mcg.spectral_efficiency > 1.67) {
@@ -986,10 +999,10 @@ class LinkBudget {
         //     else {
         //         bit_rate_channel_0 = mcg.bit_rate_per_slot;
         //     }
-        //     console.log("Bit rate channel 0 = " + bit_rate_channel_0);
+        //     this.logMessage("Bit rate channel 0 = " + bit_rate_channel_0);
         //
         //     let num_channels = Utils.symbolRate(bandwidth, this.application) / 3.375;
-        //     console.log('Num of channels = ' + num_channels);
+        //     this.logMessage('Num of channels = ' + num_channels);
         //
         //     dataRate = ((num_channels - 1) * 252 * mcg.bit_rate_per_slot + 250 * bit_rate_channel_0) / 1000;
         //
@@ -998,7 +1011,7 @@ class LinkBudget {
         // }
         //
         // if (this.application.name == "STAR") {
-        //     console.log('Find data rate for STAR....');
+        //     this.logMessage('Find data rate for STAR....');
         //     // round down the normal data rate (from symbol rate x MBE) value to predefined values
         //     let bit_rates_without_header = [0, 0.1168, 0.1603, 0.2513, 0.3205, 0.5026, 0.6411, 1.0052, 1.2821, 2.0105, 2.5642, 4.021];
         //     let temp = 0;
@@ -1097,9 +1110,9 @@ class LinkBudget {
             rollOffFactor: this.application.roll_off_factor
         });
 
-        console.log('-----------')
-        console.log('***********')
-        console.log('-----------')
+        this.logMessage('-----------')
+        this.logMessage('***********')
+        this.logMessage('-----------')
 
         return result
 
@@ -1174,7 +1187,7 @@ class LinkBudget {
                     let grr = data.station.antenna.gainRejectionRatio(channel[path + '_cf'], deg_diff)
                     let gainImprovement = data.station.antenna.gainImprovment(deg_diff)
                     ci = data.eirp_density - channel['eirp_density_adjacent_satellite_' + path] + grr + gainImprovement;
-                    console.log('eirp den = ' + data.eirp_density + ' eirp_den_sat = ' + channel['eirp_density_adjacent_satellite_' + path] + ' grr = ' + grr + ' gain improve = ' + gainImprovement);
+                    this.logMessage('eirp den = ' + data.eirp_density + ' eirp_den_sat = ' + channel['eirp_density_adjacent_satellite_' + path] + ' grr = ' + grr + ' gain improve = ' + gainImprovement);
 
                     ci_objects.push({
                         interference: true,
@@ -1217,11 +1230,11 @@ class LinkBudget {
                         var intf_sat = Satellites.findOne({name: intf.satellite});
                         var deg_diff = (Math.abs((orbital_slot - intf_sat.orbital_slot)) - 0.15) * 1.1; // Topocentric Angle | from P'Oui, 8 July 2014
 
-                        console.log('Finding interferences from satellite ' + intf.satellite + ' channel: ' + intf.name + ' at ' + intf_sat.orbital_slot + ' degrees');
+                        this.logMessage('Finding interferences from satellite ' + intf.satellite + ' channel: ' + intf.name + ' at ' + intf_sat.orbital_slot + ' degrees');
 
                         // find the gain rejection ratio (relative gain)
                         var grr = data.station.antenna.gainRejectionRatio(channel[path + '_cf'], deg_diff);
-                        console.log('GRR of ' + data.station.antenna.size + ' m. antenna at ' + deg_diff + ' degrees = ' + grr + ' dB');
+                        this.logMessage('GRR of ' + data.station.antenna.size + ' m. antenna at ' + deg_diff + ' degrees = ' + grr + ' dB');
 
                         // find the EIRP of the location on that satellite from the database
                         var loc = Locations.findOne({name: location.name});
@@ -1237,7 +1250,7 @@ class LinkBudget {
                         // compare with EIRP down of adjacent satellite channels
                         if (path === "downlink") {
 
-                            console.log('The location ' + loc.name + ' has value on beam ' + loc_data.beam + ' = ' + loc_data.value);
+                            this.logMessage('The location ' + loc.name + ' has value on beam ' + loc_data.beam + ' = ' + loc_data.value);
 
                             // find the output backoff of the interfered channels
                             var intf_obo = intf.backoff_settings.find(s => s.num_carriers === intf.current_num_carriers).obo
@@ -1245,12 +1258,12 @@ class LinkBudget {
                             // find EIRP density of interfered channels at that location
                             var intf_eirp_density = loc_data.value + intf_obo - 10 * Utils.log10(intf.bandwidth * Math.pow(10, 6));
 
-                            console.log("EIRP density for " + intf.satellite + ' ' + intf.name + ' = ' + intf_eirp_density + ' dBW');
+                            this.logMessage("EIRP density for " + intf.satellite + ' ' + intf.name + ' = ' + intf_eirp_density + ' dBW');
 
                             // return C/I = our eirp density - intf eirp density + GRR + polarization improvement
                             var c_intf = eirp_density - intf_eirp_density + grr + polImprovement(channel[path + '_pol'], intf[path + '_pol']);
 
-                            console.log("C/I for " + channel.satellite + ' ' + channel.name + ' = ' + c_intf + ' dB');
+                            this.logMessage("C/I for " + channel.satellite + ' ' + channel.name + ' = ' + c_intf + ' dB');
 
                             ci_objects.push({
                                 interference: true,
@@ -1303,22 +1316,22 @@ class LinkBudget {
             else if (channel.ci_uplink_adj_cell_50 && channel.ci_uplink_adj_cell_eoc) {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
-                console.log('This is IPSTAR Ku-Uplink return')
+                this.logMessage('This is IPSTAR Ku-Uplink return')
                 if (station.contour >= channel.contour_50) {
-                    console.log('Location is between peak and 50%')
+                    this.logMessage('Location is between peak and 50%')
 
                     ci = channel.ci_uplink_adj_cell_50 + (station.contour - channel.contour_50);
                 }
                 // If location is between 50% and EOC, C/I = linear interpolation of C/I at 50% and C/I at EOC
                 else if (station.contour < channel.contour_50 && station.contour >= channel.contour_eoc) {
-                    console.log('Location is between 50% and EOC')
+                    this.logMessage('Location is between 50% and EOC')
 
                     ci = Utils.linearInterpolation(station.contour, channel.contour_50, channel.contour_eoc, channel.ci_uplink_adj_cell_50, channel.ci_uplink_adj_cell_eoc);
                 }
                 // If location is beyond EOC, C/I = C/I at EOC minus the distance between EOC and that location
                 // (if farther from EOC, C/I is worse)
                 else {
-                    console.log('Location is farther than EOC')
+                    this.logMessage('Location is farther than EOC')
                     ci = channel.ci_uplink_adj_cell_eoc + (station.contour - channel.contour_eoc);
                 }
             }
@@ -1335,18 +1348,18 @@ class LinkBudget {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
                 if (station.contour >= channel.contour_50) {
-                    console.log('Location is between peak and 50%')
+                    this.logMessage('Location is between peak and 50%')
                     ci = channel.ci_downlink_adj_cell_50 + (station.contour - channel.contour_50);
                 }
                 // If location is between 50% and EOC, C/I = linear interpolation of C/I at 50% and C/I at EOC
                 else if (station.contour < channel.contour_50 && station.contour >= channel.contour_eoc) {
-                    console.log('Location is between 50% and EOC')
+                    this.logMessage('Location is between 50% and EOC')
                     ci = Utils.linearInterpolation(station.contour, channel.contour_50, channel.contour_eoc, channel.ci_downlink_adj_cell_50, channel.ci_downlink_adj_cell_eoc);
                 }
                 // If location is beyond EOC, C/I = C/I at EOC minus the distance between EOC and that location
                 // (if farther from EOC, C/I is worse)
                 else {
-                    console.log('Location is farther than EOC')
+                    this.logMessage('Location is farther than EOC')
                     ci = channel.ci_downlink_adj_cell_eoc + (station.contour - channel.contour_eoc);
                 }
             }
@@ -1379,7 +1392,7 @@ class LinkBudget {
     // If default gateway is selected, get the gateway from the database
     async findGateway(transponder) {
         //return Gateways.findOne({ name: this.transponder.default_gateway })
-        console.log(`transponder default gateway is ${transponder.default_gateway}`)
+        this.logMessage(`transponder default gateway is ${transponder.default_gateway}`)
 
         if (this.useDefaultGateway) {
             let gw = await Gateways.findOne({name: transponder.default_gateway})
@@ -1394,7 +1407,7 @@ class LinkBudget {
 
         // Check the the application has array of available symbol rates
         if (!_.has(this.application, 'symbol_rates') || application.symbol_rates.length == 0) {
-            console.log("Cannot find list of available symbol rates.")
+            this.logMessage("Cannot find list of available symbol rates.")
             return false;
         }
         let symbolRate = _.filter(this.application.symbol_rates, sr => {
@@ -1422,11 +1435,11 @@ class LinkBudget {
         // return Satellites.findOne({name: transponder.satellite})
         try {
             let result = this.satellites.find(s => s.name === transponder.satellite)
-            // console.log(result)
+            // this.logMessage(result)
             return result;
 
         } catch (e) {
-            console.log(e)
+            this.logMessage(e)
             return null;
         }
     }
@@ -1440,25 +1453,25 @@ class LinkBudget {
         // return Transponders.findOne({satellite: transponder.satellite, type: {$in: [path, 'broadcast']}, name: transponder.name}).then(result => {
         //     return result
         // }).catch(err => {
-        //     console.log(err);
+        //     this.logMessage(err);
         // });
-        // console.log(`Finding transponders for: ${transponder.name}, ${path}`)
-        // // console.log(transponder)
+        // this.logMessage(`Finding transponders for: ${transponder.name}, ${path}`)
+        // // this.logMessage(transponder)
         // try {
         //     let result = await Transponders.findOne({satellite: transponder.satellite, type: {$in: [path, 'broadcast']}, name: transponder.name})
-        //     console.log(`Result transponder is ${result.name} at ${result.type}`)
+        //     this.logMessage(`Result transponder is ${result.name} at ${result.type}`)
         //     return result;
         //
         // } catch (e) {
-        //     console.log(e)
+        //     this.logMessage(e)
         //     return null;
         // }
     }
-
-    // Record the error message
-    logError(message) {
-        console.log(message);
-        this.errorMessage = message;
+    
+    logMessage(message, level = 5) {
+        if (this.debugLevel >= level) {
+            console.log(message)
+        }
     }
 
     logTitle(string) {
@@ -1487,8 +1500,8 @@ class LinkBudget {
         let app = this.application, bt = this.application.roll_off_factor, unit = this.bandwidthUnit, value = this.bandwidthValue,
             mcg = this.mcg
 
-        console.log('Calculate bandwidth from App ' + app.name + " mcg = " + mcg.name + " spec.eff = " + mcg.spectral_efficiency);
-        console.log('Bandwidth input = ' + value + " " + unit + " | BT = " + bt);
+        this.logMessage('Calculate bandwidth from App ' + app.name + " mcg = " + mcg.name + " spec.eff = " + mcg.spectral_efficiency);
+        this.logMessage('Bandwidth input = ' + value + " " + unit + " | BT = " + bt);
 
         // if user input data rate, find the bandwidth from data rate / current mcg ebe
         var sr = 0;
@@ -1506,21 +1519,21 @@ class LinkBudget {
             sr = unit === "Msps" ? value * 1000 : value;
         }
         else {
-            console.log("Unit of bandwidth error.");
+            this.logMessage("Unit of bandwidth error.");
             return false;
         }
-        console.log("Symbol rate = " + sr + " ksps");
+        this.logMessage("Symbol rate = " + sr + " ksps");
 
         // check if symbol rate is higher than the max symbol rate
         var sr_2 = 0;
         if (_.has(app, 'maximum_symbol_rate') && sr > app.maximum_symbol_rate) {
-            console.log('Symbol rate of ' + sr + ' ksps is higher than max symbol rate of this app (' + app.maximum_symbol_rate + ' ksps)');
+            this.logMessage('Symbol rate of ' + sr + ' ksps is higher than max symbol rate of this app (' + app.maximum_symbol_rate + ' ksps)');
             sr_2 = app.maximum_symbol_rate;
         }
 
         // check if symbol rate is lower than the min symbol rate
         else if (_.has(app, 'minimum_symbol_rate') && sr < app.minimum_symbol_rate) {
-            console.log('Symbol rate of ' + sr + ' ksps is lower than minimum symbol rate of this app (' + app.minimum_symbol_rate + ' ksps)');
+            this.logMessage('Symbol rate of ' + sr + ' ksps is lower than minimum symbol rate of this app (' + app.minimum_symbol_rate + ' ksps)');
             sr_2 = app.minimum_symbol_rate;
         }
 
@@ -1531,7 +1544,7 @@ class LinkBudget {
                 sr_2 = sr;
             }
             else if (_.includes(app.symbol_rates, sr)) {
-                console.log('The app contains symbol rate of ' + sr + " ksps");
+                this.logMessage('The app contains symbol rate of ' + sr + " ksps");
                 sr_2 = sr;
             }
             else {
@@ -1539,10 +1552,10 @@ class LinkBudget {
                 sr_2 = _.min(_.filter(app.symbol_rates, function (num) {
                     return num > sr;
                 }));
-                console.log('Symbol rate of ' + sr + ' ksps is not in the symbol rate pools of this app, so we find the closest one.')
+                this.logMessage('Symbol rate of ' + sr + ' ksps is not in the symbol rate pools of this app, so we find the closest one.')
             }
         }
-        console.log("Symbol rate after app limitation = " + sr_2 + " ksps");
+        this.logMessage("Symbol rate after app limitation = " + sr_2 + " ksps");
 
         // return the occupied bandwidth in MHz
 
@@ -1552,7 +1565,7 @@ class LinkBudget {
 
         if (app.name == "TOLL") { // add one channel to get occupied bandwidth
             occ_bw = (sr_2 / 1000) + 3.375;
-            console.log('TOLL. Add 1 channel from SR = ' + sr_2 + ' ksps to get bw = ' + occ_bw + ' MHz');
+            this.logMessage('TOLL. Add 1 channel from SR = ' + sr_2 + ' ksps to get bw = ' + occ_bw + ' MHz');
         }
 
         this.occupiedBandwidth = occ_bw;

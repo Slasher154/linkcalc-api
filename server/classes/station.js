@@ -43,10 +43,10 @@ class Station {
             let rxGain = this.antenna.rxGain(freq)
             let antGt = rxGain - 10 * Utils.log10(systemTemperature)
 
-            console.log("----------Antenna---------------");
-            console.log("Antenna Temp: " + antennaTemperature + " K");
-            console.log("System Temp: " + systemTemperature + " K");
-            console.log("Ant Gain: " + rxGain + "dBi");
+            // console.log("----------Antenna---------------");
+            // console.log("Antenna Temp: " + antennaTemperature + " K");
+            // console.log("System Temp: " + systemTemperature + " K");
+            // console.log("Ant Gain: " + rxGain + "dBi");
 
             return antGt
         }
