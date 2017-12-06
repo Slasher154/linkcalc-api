@@ -118,6 +118,12 @@ class Utils {
 
     }
 
+
+    static round(value, precision) {
+        var multiplier = Math.pow(10, precision || 0)
+        return Math.round(value * multiplier) / multiplier
+    }
+
     static slantRange(location, sat_lon) {
         // Constants
         let degrees_to_radians = Math.PI / 180;

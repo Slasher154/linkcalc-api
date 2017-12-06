@@ -7,6 +7,7 @@ const Antenna = require('./antenna')
 const Atmospheric = require('./atmospheric')
 const Bandwidth = require('./bandwidth')
 const Buc = require('./buc')
+const Contour = require('./contour')
 const GatewayStation = require('./gatewayStation')
 const Location = require('./location')
 const Modem = require('./modem')
@@ -33,9 +34,9 @@ class LinkBudget {
 
     // Prepare parameters for link budget
     init() {
-        
-        this.debugLevel = 2
-        
+
+        this.debugLevel = 3
+
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
             this.logMessage(`This app is using defualt gateway`, 1)
@@ -91,8 +92,8 @@ class LinkBudget {
     async runLinkBudget() {
 
         // Start looping remote stations
-        this.logMessage(this.remoteStations.length)
-        for (let [index,station] of this.remoteStations.entries()) {
+        // this.logMessage(this.remoteStations.length)
+        for (let [index, station] of this.remoteStations.entries()) {
             // this.logMessage(station)
 
             this.remoteStation = new RemoteStation(station)
@@ -110,13 +111,43 @@ class LinkBudget {
                     this.modem = new Modem(modem)
                     this.modem.print()
 
-                    // Run forward link
-                    this.logMessage('Running forward link', 1)
-                    let forwardLinkResult = {}
-                    let returnLinkResult = {}
+                    let targetedForwardLinkMargins = []
+                    let targetedReturnLinkMargins = []
+                    if (this.findMaxCoverage) {
+                        targetedForwardLinkMargins = this.forwardLinkMargins
+                    } else {
+                        targetedForwardLinkMargins.push(0)
+                    }
+                    if (this.findMaxCoverage && !this.findMatchingReturnCoverage) {
+                        targetedReturnLinkMargins = this.returnLinkMargins
+                    } else {
+                        targetedReturnLinkMargins.push(0)
+                    }
 
-                    await this.runLinkByPath('forward')
-                    await this.runLinkByPath('return')
+                    // Start looping forward link margin if any
+                    for (let forwardLinkMargin of targetedForwardLinkMargins) {
+
+                        this.forwardLinkMargin = forwardLinkMargin
+                        this.logMessage(`Looping forward link margin = ${forwardLinkMargin} dB`, 1)
+
+                        for (let returnLinkMargin of targetedReturnLinkMargins) {
+
+                            this.returnLinkMargin = returnLinkMargin
+                            this.logMessage(`Looping return link margin = ${returnLinkMargin} dB`, 1)
+
+
+                            let forwardLinkResult = {}
+                            let returnLinkResult = {}
+
+                            this.logMessage('Running forward link', 1)
+                            await this.runLinkByPath('forward')
+
+                            this.logMessage('Running return link', 1)
+                            await this.runLinkByPath('return')
+                            this.logMessage('----------------------------', 1)
+                        }
+
+                    }
 
                     // forwardLinkResult = await this.runLinkByPath('forward')
                     // returnLinkResult = await this.runLinkByPath('return')
@@ -178,15 +209,11 @@ class LinkBudget {
         // this.logMessage(this.downlinkStation)
         this.path = path
 
-        this.logMessage()
-        this.logMessage()
-        this.logMessage()
+
         this.logMessage('--------------------------------------------')
         this.logMessage(`----------Start running a ${path} link-----------`.toUpperCase())
         this.logMessage('--------------------------------------------')
-        this.logMessage()
-        this.logMessage()
-        this.logMessage()
+
 
         // Set bandwidth value and unit
         this.bandwidthValue = this.remoteStation.bandwidth[path]
@@ -241,10 +268,11 @@ class LinkBudget {
 
         // Set default link availability and site diversity based on the given stations
         this.uplinkAvailability = this.uplinkStation.gateway_availability || 99.5
-        this.downlinkAvailability = this.downlinkStation.gateway_availability ||  99.5
+        this.downlinkAvailability = this.downlinkStation.gateway_availability || 99.5
 
         // Check if this platform is MCG fixed
-        if (!this.modem.findBestMcg) {``
+        if (!this.modem.findBestMcg) {
+            ``
             this.logMessage(`This modem is MCG fixed`, 2)
 
 
@@ -258,8 +286,8 @@ class LinkBudget {
                 this.logMessage(`Setting MCG to ${this.mcg.name}`, 2)
 
 
-                // Check if max contour is selected
-                if (this.findMaxCoverage) {
+                // Check if max contour is selected, find the the max contour if, this is forward link or return with auto find return contour is not selected
+                if (this.findMaxCoverage && (path === 'forward' || !this.findMatchingReturnCoverage)) {
                     this.logMessage(`Max coverage selected, performing binary search`, 2)
 
                     // If yes, perform a binary search over a minimum and maximum contour range (running clear sky link)
@@ -276,7 +304,7 @@ class LinkBudget {
 
                     while (minIndex <= maxIndex) {
                         currentIndex = (minIndex + maxIndex) / 2 | 0
-                        currentElement = contourRangeArray[currentIndex]
+                        currentElement = Utils.round(contourRangeArray[currentIndex], 1)
 
                         // Set station relative contour to this value
                         // If this forward link, change the downlink station, if this is return link, change the uplink station
@@ -291,7 +319,7 @@ class LinkBudget {
 
                         if (!result.passed) { // not pass => step to higher index of array (= narrower contour)
                             minIndex = currentIndex + 1
-                            this.logMessage(`Contour ${currentElement} dB doesn't passes the condition` ,3)
+                            this.logMessage(`Contour ${currentElement} dB doesn't passes the condition`, 3)
                             answer = currentElement
                         } else { // pass => step to lower index of array (= wider contour)
                             maxIndex = currentIndex - 1
@@ -299,8 +327,18 @@ class LinkBudget {
                         }
                     }
                     this.logMessage(`Searching for max contour finished, answer is ${currentElement} dB`, 2)
+                    this.maxContour = currentElement
+
                     this.logMessage('Saving clear sky result', 2)
                     linkResult.clearSky = result
+
+                    // If this is forward link and find matching contour is selected, find the match contour for return link here
+                    if (path === 'forward' && this.findMatchingReturnCoverage) {
+                        let matchedContourObject = await this.findMatchingReturnContour(this.satellite.name, this.transponder.name, currentElement)
+                        this.logMessage(`Matched contour is ${JSON.stringify(matchedContourObject)}`, 3)
+                        this.matchingContour = matchedContourObject.bestMatch
+                        this.logMessage(`Searching for matching return contour of ${this.transponder.name}-FWD ${currentElement} dB, which is ${this.matchingContour} dB`)
+                    }
 
                 } else {
                     // If no, set parameters and then run a clear sky link and record the result
@@ -312,14 +350,15 @@ class LinkBudget {
 
                 // Run the rain fade link
                 // Set clear sky result to instance of an object so it can get referred in rain fade case
-                // If max contour is selected, the link will be run at that contour
-                // this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
                 this.currentClearSkyResult = linkResult.clearSky
-                try {
-                    // linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
-                    linkResult.rainFade = await this.runRainFadeLink()
-                } catch (e) {
-                    this.logMessage(e)
+
+                // If max contour is selected, do not run the rain fade link since we don't care the result at rain fade
+                if (!this.findMaxCoverage) {
+                    try {
+                        linkResult.rainFade = await this.runRainFadeLink()
+                    } catch (e) {
+                        this.logMessage(e)
+                    }
                 }
 
                 // Push the result into link results instance
@@ -377,12 +416,12 @@ class LinkBudget {
             // this.currentClearSkyResult = linkResult[path + 'Result']['clearSky']
             this.currentClearSkyResult = linkResult.clearSky
 
-            try {
-                // linkResult[path + 'Result']['rainFade'] = await this.runRainFadeLink()
-                linkResult.rainFade = await this.runRainFadeLink()
-
-            } catch (e) {
-                this.logMessage(e)
+            if (!this.findMaxCoverage) {
+                try {
+                    linkResult.rainFade = await this.runRainFadeLink()
+                } catch (e) {
+                    this.logMessage(e)
+                }
             }
 
             // Push the result into link results instance
@@ -406,15 +445,27 @@ class LinkBudget {
 
         this.logMessage('Setting conditions for CLEAR SKY')
         this.condition = 'clear'
-        this.requiredMargin = this.application.link_margin
-        this.logMessage(`Setting link margin to ${this.requiredMargin} dB`, 2)
+
+        // if finding max coverage, set link margin to the custom one
+        if (this.findMaxCoverage && this.path === 'forward') {
+            this.logMessage(`Finding max coverage on forward link`, 1)
+            this.requiredMargin = this.forwardLinkMargin
+        } else if (this.findMaxCoverage && !this.findMatchingReturnCoverage && this.path === 'return') {
+            this.logMessage(`Finding max coverage on return link using given link margin from user (not auto find matching contour with forward max contour`)
+            this.requiredMargin = this.returnLinkMargin
+        } else {
+            this.logMessage(`Set link margin to modem value`)
+            this.requiredMargin = this.application.link_margin
+        }
+
+        this.logMessage(`Setting link margin to ${this.requiredMargin} dB`, 1)
 
         // Run link and return result
         try {
             let clearSkyResult = await this.runLink()
             this.logMessage(`Clear sky result shows MCG = ${clearSkyResult.mcg.name}`, 2)
             return clearSkyResult
-        } catch(e) {
+        } catch (e) {
             this.logMessage(e)
         }
 
@@ -491,7 +542,7 @@ class LinkBudget {
                 this.logMessage(`Setting MCG to ${currentElement.name}`, 3)
                 try {
                     result = await this.runLink()
-                } catch(e) {
+                } catch (e) {
                     this.logMessage(e)
                 }
 
@@ -532,7 +583,7 @@ class LinkBudget {
 
                 while (minIndex <= maxIndex) {
                     currentIndex = (minIndex + maxIndex) / 2 | 0
-                    currentElement = linkAvailabilityRange[currentIndex]
+                    currentElement = Utils.round(linkAvailabilityRange[currentIndex],1)
 
                     // Set uplink or downlink availability to new value (forward link changes downlink avail, return link changes uplink avail)
                     this.path === 'forward' ? this.downlinkAvailability = currentElement : this.uplinkAvailability = currentElement
@@ -540,7 +591,7 @@ class LinkBudget {
 
                     try {
                         result = await this.runLink()
-                    } catch(e) {
+                    } catch (e) {
                         this.logMessage(e)
                     }
 
@@ -592,7 +643,7 @@ class LinkBudget {
         let uplinkXpolLoss = Utils.xpolLoss(),
             uplink_pointingLoss = Utils.pointingLoss(uplinkFrequency, uplinkStation.antenna.size, skb);
         this.logMessage(`Calculating atmospheric loss`)
-        let uplinkAtmLoss = await new Atmospheric({ debugLevel: this.debugLevel }).calculateLoss({
+        let uplinkAtmLoss = await new Atmospheric({debugLevel: this.debugLevel}).calculateLoss({
             condition: this.condition,
             location: uplinkStation.location,
             orbitalSlot: orbitalSlot,
@@ -604,17 +655,24 @@ class LinkBudget {
         });
         let uplinkOtherLoss = uplinkXpolLoss + uplink_pointingLoss;
         let uplinkSpreadingLoss = Utils.spreadingLoss(uplinkSlantRange);
-        let uplinkContour = uplinkStation.contour;
 
-        this.logMessage(`Uplink contour = ${uplinkStation.contour} dB`)
+        // Uplink contour can be set if this is find max coverage at return link with finding matching return contour enabled
+        let uplinkContour = 0
+        if (this.path === 'return' && this.findMaxCoverage && this.findMatchingReturnCoverage) {
+            uplinkContour = this.matchingContour
+            this.logMessage(`This is max mode, return with auto-find return contour. Setting return uplink contour to ${uplinkContour} dB`)
+        } else {
+            uplinkContour = uplinkStation.contour
+            this.logMessage(`Uplink contour = ${uplinkContour} dB`)
+        }
 
         let gainVariation = 0;
         let gainVariationDiff = 0;
 
         let channelPfd, channelDeepin
 
-        // For IPSTAR satellite, applies gain variation, except it's Max Mode
-        if (this.satellite.name == "IPSTAR" && _.includes(["return"], transponder.type) && !this.maxMode) {
+        // For Thaicom 4 satellite, applies gain variation, except it's Max Mode
+        if (this.satellite.name == "Thaicom 4" && _.includes(["return"], transponder.type) && !this.maxMode) {
             if (_.includes(["328", "514", "608"], transponder.uplink_beam)) { // shape beam
                 gainVariation = -0.0015 * Math.pow(uplinkContour, 3) - 0.0163 * Math.pow(uplinkContour, 2) + 0.1827 * uplinkContour - 0.1737;
             }
@@ -626,8 +684,8 @@ class LinkBudget {
 
         let uplinkGt = transponder.gt_peak + uplinkContour + gainVariationDiff;
 
-        // If this is Max Mode for IPSTAR satellite, add 1.7 dB constantly (from P'Nong 17 Nov 2017)
-        if (this.satellite.name == "IPSTAR" && this.maxMode) {
+        // If this is Max Mode for Thaicom 4 satellite, add 1.7 dB constantly (from P'Nong 17 Nov 2017)
+        if (this.satellite.name == "Thaicom 4" && this.maxMode) {
             this.logMessage(`Max mode is activated, increase uplink G/T by 1.7 dB`)
             uplinkGt += 1.7
         }
@@ -700,7 +758,7 @@ class LinkBudget {
             // Operating SFD is equal to SFD at uplink location (max)
             operatingPfd = transponder.sfd - uplinkGt;
 
-            // For IPSTAR FWD Link, the data is stored in format fixed gateway EIRP Up
+            // For Thaicom 4 FWD Link, the data is stored in format fixed gateway EIRP Up
             if (transponder.eirp_up_channel) {
                 this.logMessage(`EIRP Up channel = ${transponder.eirp_up_channel}, Num carriers in channel = ${numCarriersInChannel}`)
                 eirpUp = transponder.eirp_up_channel - numCarriersInChannel;
@@ -755,7 +813,7 @@ class LinkBudget {
             channelDeepin = channelPfd - (operatingPfd - transponder.dynamic_range);
 
             // set carrier output backoff to the OBO at backoff settings based on current load
-            // normally for Conventional Ku-ALC is single carrier and IPSTAR is multi carrier
+            // normally for Conventional Ku-ALC is single carrier and Thaicom 4 is multi carrier
             carrierOutputBackoff = transponder.backoff_settings.find(s => s.num_carriers === transponder.current_num_carriers).obo;
 
             // If the pfd not reach deep-in, output backoff is increased to that amount out of deepin
@@ -764,7 +822,7 @@ class LinkBudget {
 
             _.assign(result, {
                 channelOutputBackoff: transponder.backoff_settings.find(s => s.num_carriers === transponder.current_num_carriers).obo,
-                channelDeepin: channelDeepin.toFixed(2)
+                channelDeepin: Utils.round(channelDeepin, 2)
             });
 
         }
@@ -815,7 +873,7 @@ class LinkBudget {
         let downlinkXpolLoss = Utils.xpolLoss(),
             downlinkPointingLoss = Utils.pointingLoss(downlinkFrequency, downlinkStation.antenna.size, skb);
         this.logMessage('Calculating downlink atm loss')
-        let downlinkAtmLoss = await new Atmospheric({ debugLevel: this.debugLevel }).calculateLoss({
+        let downlinkAtmLoss = await new Atmospheric({debugLevel: this.debugLevel}).calculateLoss({
             condition: this.condition,
             location: downlinkStation.location,
             orbitalSlot: orbitalSlot,
@@ -840,8 +898,8 @@ class LinkBudget {
             saturatedEirpDownAtLocation += 1.4
         }
 
-        // For IPSTAR satellite, applies gain variation, except it's Max Mode
-        if (this.satellite.name == "IPSTAR" && _.includes(["forward", "broadcast"], transponder.type) && !this.maxMode) {
+        // For Thaicom 4 satellite, applies gain variation, except it's Max Mode
+        if (this.satellite.name == "Thaicom 4" && _.includes(["forward", "broadcast"], transponder.type) && !this.maxMode) {
             if (_.includes(["328", "514", "608"], transponder.downlink_beam)) { // shape beam
                 gainVariation = -0.0022 * Math.pow(downlinkContour, 3) - 0.0383 * Math.pow(downlinkContour, 2) - 0.0196 * downlinkContour - 0.2043;
             }
@@ -884,7 +942,7 @@ class LinkBudget {
         // If uplink HPA, do not have C/I intermod specified, assume it is 25
         let ciUplinkIntermod = _.has(uplinkStation.hpa, 'intermod') ? uplinkStation.hpa.intermod : 50;
 
-        // If the HPA has data for rain_fade use that value. (for IPSTAR gateways, this value will become 19 dB at rain fade.
+        // If the HPA has data for rain_fade use that value. (for Thaicom 4 gateways, this value will become 19 dB at rain fade.
         if (this.condition == "rain" && _.has(uplinkStation.hpa, 'intermod_rain')) {
             ciUplinkIntermod = uplinkStation.hpa.intermod_rain;
         }
@@ -1007,7 +1065,7 @@ class LinkBudget {
         //     dataRate = ((num_channels - 1) * 252 * mcg.bit_rate_per_slot + 250 * bit_rate_channel_0) / 1000;
         //
         //     let data_rate_ipstar_channel = dataRate / num_channels;
-        //     _.assign(result, {data_rate_ipstar_channel: data_rate_ipstar_channel.toFixed(2)});
+        //     _.assign(result, {data_rate_ipstar_channel: Utils.round(data_rate_ipstar_channel, 2) });
         // }
         //
         // if (this.application.name == "STAR") {
@@ -1034,7 +1092,7 @@ class LinkBudget {
         // Calculate guard band in percent for this carrier
         // Conventional result needs this as Sales team do not accept the bandwidth in decimal
         let roundupBandwidth = Math.ceil(this.occupiedBandwidth);
-        let guardband = ((roundupBandwidth - this.occupiedBandwidth) * 100 / this.occupiedBandwidth).toFixed(2);
+        let guardband = Utils.round(((roundupBandwidth - this.occupiedBandwidth) * 100 / this.occupiedBandwidth), 2);
 
 
         // Store the letiables in the result object.
@@ -1044,71 +1102,78 @@ class LinkBudget {
             // satellite
             channel: transponder.name,
             operatingMode: transponder.mode,
-            operatingSfd: operatingPfd.toFixed(2),
-            operatingPfdPerCarrier: operatingPfdPerCarrier.toFixed(2),
-            carrierPfd: carrierPfd.toFixed(2),
-            carrierObo: carrierOutputBackoff.toFixed(2),
-            gainVariation: gainVariation.toFixed(2),
+            operatingSfd: Utils.round(operatingPfd, 2),
+            operatingPfdPerCarrier: Utils.round(operatingPfdPerCarrier, 2),
+            carrierPfd: Utils.round(carrierPfd, 2),
+            carrierObo: Utils.round(carrierOutputBackoff, 2),
+            gainVariation: Utils.round(gainVariation, 2),
             // uplink
             uplinkAntenna: uplinkStation.antenna,
             uplinkHpa: uplinkStation.hpa,
-            uplinkPointingLoss: uplink_pointingLoss.toFixed(2),
-            uplinkXpolLoss: uplinkXpolLoss.toFixed(2),
-            uplinkAtmLoss: uplinkAtmLoss.toFixed(2),
-            uplinkEirp: eirpUp.toFixed(2),
-            uplinkGt: uplinkGt.toFixed(2),
-            uplinkPathLoss: uplinkPathLoss.toFixed(2),
+            uplinkPointingLoss: Utils.round(uplink_pointingLoss, 2),
+            uplinkXpolLoss: Utils.round(uplinkXpolLoss, 2),
+            uplinkAtmLoss: Utils.round(uplinkAtmLoss, 2),
+            uplinkEirp: Utils.round(eirpUp, 2),
+            uplinkGt: Utils.round(uplinkGt, 2),
+            uplinkPathLoss: Utils.round(uplinkPathLoss, 2),
             uplinkCondition: this.condition,
-            uplinkAvailability: this.uplinkAvailability.toFixed(2),
+            uplinkAvailability: Utils.round(this.uplinkAvailability, 2),
             uplinkLocation: uplinkStation.location,
             uplinkContour: uplinkContour,
-            operatingHpaPower: operatingHpaPower.toFixed(2),
-            cnUplink: cnUplink.toFixed(2),
+            operatingHpaPower: Utils.round(operatingHpaPower, 2),
+            cnUplink: Utils.round(cnUplink, 2),
             // downlink
             downlinkAntenna: downlinkStation.antenna,
             // Following 3 parameters are aAvailable only if G/T is not specified in the antenna spec
-            antennaTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2),
-            systemTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Station.systemTemp(Antenna.temp(downlinkAtmLoss, this.condition).toFixed(2)),
-            antGain: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : downlinkStation.antenna.rxGain(downlinkFrequency).toFixed(2),
-            downlinkPointingLoss: downlinkPointingLoss.toFixed(2),
-            downlinkXpolLoss: downlinkXpolLoss.toFixed(2),
-            downlinkAtmLoss: downlinkAtmLoss.toFixed(2),
-            downlinkEirp: carrierEirpDownAtLocation.toFixed(2),
-            saturatedEirpAtLoc: saturatedEirpDownAtLocation.toFixed(2),
-            downlinkGt: antGt.toFixed(2),
-            downlinkPathLoss: downlinkPathLoss.toFixed(2),
+            antennaTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Utils.round(Antenna.temp(downlinkAtmLoss, this.condition), 2),
+            systemTemp: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Utils.round(Station.systemTemp(Antenna.temp(downlinkAtmLoss, this.condition)), 2),
+            antGain: _.has(downlinkStation.antenna, 'gt') ? 'N/A' : Utils.round(downlinkStation.antenna.rxGain(downlinkFrequency), 2),
+            downlinkPointingLoss: Utils.round(downlinkPointingLoss, 2),
+            downlinkXpolLoss: Utils.round(downlinkXpolLoss, 2),
+            downlinkAtmLoss: Utils.round(downlinkAtmLoss, 2),
+            downlinkEirp: Utils.round(carrierEirpDownAtLocation, 2),
+            saturatedEirpAtLoc: Utils.round(saturatedEirpDownAtLocation, 2),
+            downlinkGt: Utils.round(antGt, 2),
+            downlinkPathLoss: Utils.round(downlinkPathLoss, 2),
             downlinkCondition: this.condition,
-            downlinkAvailability: this.downlinkAvailability.toFixed(2),
+            downlinkAvailability: Utils.round(this.downlinkAvailability, 2),
             downlinkContour: downlinkContour,
             downlinkLocation: downlinkStation.location,
-            cnDownlink: cnDownlink.toFixed(2),
+            cnDownlink: Utils.round(cnDownlink, 2),
             // interferences
-            ciUplinkIntermod: ciUplinkIntermod.toFixed(2),
-            ciUplinkAdjSat: ciUplinkAdjacentSatellite.toFixed(2),
-            ciUplinkXpol: ciUplinkXpol.toFixed(2),
-            ciUplinkXcells: ciUplinkXCells.toFixed(2),
-            ciDownlinkAdjSat: ciDownlinkAdjacentSatellite.toFixed(2),
+            ciUplinkIntermod: Utils.round(ciUplinkIntermod, 2),
+            ciUplinkAdjSat: Utils.round(ciUplinkAdjacentSatellite, 2),
+            ciUplinkXpol: Utils.round(ciUplinkXpol, 2),
+            ciUplinkXcells: Utils.round(ciUplinkXCells, 2),
+            ciDownlinkAdjSat: Utils.round(ciDownlinkAdjacentSatellite, 2),
             ciDownlinkAdjSatObj: ciDownlinkAdjacentSatelliteObject,
-            ciDownlinkIntermod: ciDownlinkIntermod.toFixed(2),
-            ciDownlinkXpol: ciDownlinkXpol.toFixed(2),
-            ciDownlinkXcells: ciDownlinkXcells.toFixed(2),
-            ciUplink: ciUplink.toFixed(2),
-            ciDownlink: ciDownlink.toFixed(2),
+            ciDownlinkIntermod: Utils.round(ciDownlinkIntermod, 2),
+            ciDownlinkXpol: Utils.round(ciDownlinkXpol, 2),
+            ciDownlinkXcells: Utils.round(ciDownlinkXcells, 2),
+            ciUplink: Utils.round(ciUplink, 2),
+            ciDownlink: Utils.round(ciDownlink, 2),
             // total
-            cnTotal: cnTotal.toFixed(2),
-            linkMargin: linkMargin.toFixed(2),
+            cnTotal: Utils.round(cnTotal, 2),
+            linkMargin: Utils.round(linkMargin, 2),
             requiredMargin: this.requiredMargin,
             passed: passed,
-            linkAvailability: linkAvailability.toFixed(2),
+            passedText: passed ? 'Yes' : 'No',
+            linkAvailability: Utils.round(linkAvailability, 2),
             mcg: this.mcg,
-            occupiedBandwidth: this.occupiedBandwidth.toFixed(2),
-            noiseBandwidth: noiseBandwidth.toFixed(2),
-            roundupBandwidth: roundupBandwidth.toFixed(2),
+            occupiedBandwidth: Utils.round(this.occupiedBandwidth, 2),
+            noiseBandwidth: Utils.round(noiseBandwidth, 2),
+            roundupBandwidth: Utils.round(roundupBandwidth, 2),
             guardband: guardband,
-            dataRate: dataRate.toFixed(2),
-            powerUtilPercent: powerUtilPercent.toFixed(2),
+            dataRate: Utils.round(dataRate, 2),
+            powerUtilPercent: Utils.round(powerUtilPercent, 2),
             rollOffFactor: this.application.roll_off_factor
         });
+
+        if (this.findMaxCoverage) {
+            _.assign(result, {
+                maxContour: this.maxContour
+            })
+        }
 
         this.logMessage('-----------')
         this.logMessage('***********')
@@ -1146,7 +1211,6 @@ class LinkBudget {
         // // Return result
 
 
-
     }
 
     // return C/I Adjacent satellites from the given channel, path and location
@@ -1159,7 +1223,7 @@ class LinkBudget {
             location = data.location;
         var ci = 30; //default value
 
-        //if the channel database specifies this value (IPSTAR Forward Ka uplink and IPSTAR Return Ka downlink)
+        //if the channel database specifies this value (Thaicom 4 Forward Ka uplink and Thaicom 4 Return Ka downlink)
         if (_.has(channel, 'ci_' + path + '_adj_sat')) {
             ci = channel['ci_' + path + '_adj_sat'];
             ci_objects.push({
@@ -1169,7 +1233,7 @@ class LinkBudget {
             });
         }
 
-        // ------------------------------ Separate by IPSTAR and Conventional --------------------------
+        // ------------------------------ Separate by Thaicom 4 and Conventional --------------------------
 
         else if (this.satellite.isBroadband) {
             if (_.has(channel, 'eirp_density_adjacent_satellite_' + path)) {
@@ -1192,7 +1256,7 @@ class LinkBudget {
                     ci_objects.push({
                         interference: true,
                         name: "Interference from slot " + channel.adjacent_satellite_orbital_slot,
-                        value: ci.toFixed(2)
+                        value: Utils.round(ci, 2)
                     });
                 }
 
@@ -1268,7 +1332,7 @@ class LinkBudget {
                             ci_objects.push({
                                 interference: true,
                                 name: intf.satellite + " " + intf.name,
-                                value: c_intf.toFixed(2),
+                                value: Utils.round(c_intf, 2),
                                 satellite: intf.satellite,
                                 channel: intf.name
                             });
@@ -1308,15 +1372,15 @@ class LinkBudget {
     ciCrossCells(channel, path, station) {
         var ci = 50 // default value for C/I
         if (path == "uplink") {
-            // For IPSTAR forward channels KA-uplink (or Ku for BC)
+            // For Thaicom 4 forward channels KA-uplink (or Ku for BC)
             if (channel.ci_uplink_adj_cell) {
                 ci = channel.ci_uplink_adj_cell;
             }
-            // For IPSTAR return channels Ku-uplink
+            // For Thaicom 4 return channels Ku-uplink
             else if (channel.ci_uplink_adj_cell_50 && channel.ci_uplink_adj_cell_eoc) {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
-                this.logMessage('This is IPSTAR Ku-Uplink return')
+                this.logMessage('This is Thaicom 4 Ku-Uplink return')
                 if (station.contour >= channel.contour_50) {
                     this.logMessage('Location is between peak and 50%')
 
@@ -1339,11 +1403,11 @@ class LinkBudget {
             }
         }
         else { // downlink
-            // For IPSTAR return channels KA-downlink
+            // For Thaicom 4 return channels KA-downlink
             if (channel.ci_downlink_adj_cell) {
                 ci = channel.ci_downlink_adj_cell;
             }
-            // For IPSTAR forward channels Ku-downlink
+            // For Thaicom 4 forward channels Ku-downlink
             else if (channel.ci_downlink_adj_cell_50 && channel.ci_downlink_adj_cell_eoc) {
                 // If location is between peak and 50%, C/I = C/I at 50% plus the distance between 50% and that location
                 // (if closer to peak, C/I is better)
@@ -1431,6 +1495,10 @@ class LinkBudget {
         })
     }
 
+    async findMatchingReturnContour(satellite, beam, contourValue) {
+        return await Contour.getMatchingReturnContour({satellite, beam, contourValue})
+    }
+
     findSatellite(transponder) {
         // return Satellites.findOne({name: transponder.satellite})
         try {
@@ -1467,7 +1535,7 @@ class LinkBudget {
         //     return null;
         // }
     }
-    
+
     logMessage(message, level = 5) {
         if (this.debugLevel >= level) {
             console.log(message)
@@ -1497,7 +1565,8 @@ class LinkBudget {
     // Copied from old program
     seekOccupiedBandwidth() {
 
-        let app = this.application, bt = this.application.roll_off_factor, unit = this.bandwidthUnit, value = this.bandwidthValue,
+        let app = this.application, bt = this.application.roll_off_factor, unit = this.bandwidthUnit,
+            value = this.bandwidthValue,
             mcg = this.mcg
 
         this.logMessage('Calculate bandwidth from App ' + app.name + " mcg = " + mcg.name + " spec.eff = " + mcg.spectral_efficiency);

@@ -61,14 +61,19 @@ class Station {
                 this.contour = transponder[`contour_eoc`] - 2
             } else if (contourValue === 'peak') {
                 this.contour = 0
+            } else if (contourValue === 'maxcontour') {
+                // do nothing here
             } else {
                 this.contour = transponder[`contour_${contourValue}`]
             }
-
-            // Set lat/lon
-            this.location.lat = transponder.lat
-            this.location.lon = transponder.lon
+            this.setLatLon(transponder)
         }
+    }
+
+    setLatLon (transponder) {
+        // Set lat/lon
+        this.location.lat = transponder.lat
+        this.location.lon = transponder.lon
     }
 
     setTransponder(path, transponder) {

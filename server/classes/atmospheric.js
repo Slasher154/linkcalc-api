@@ -502,7 +502,7 @@ class Atmospheric {
 
     logMessage(message, level = 5) {
         if (this.debugLevel >= level) {
-            this.logMessage(message)
+            console.log(message)
         }
     }
     
