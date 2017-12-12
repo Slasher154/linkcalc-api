@@ -327,7 +327,9 @@ class LinkBudget {
                         }
                     }
                     this.logMessage(`Searching for max contour finished, answer is ${currentElement} dB`, 2)
-                    this.maxContour = currentElement
+
+                    // Record max contour into this result
+                    result.maxContour = currentElement
 
                     this.logMessage('Saving clear sky result', 2)
                     linkResult.clearSky = result
@@ -1168,12 +1170,6 @@ class LinkBudget {
             powerUtilPercent: Utils.round(powerUtilPercent, 2),
             rollOffFactor: this.application.roll_off_factor
         });
-
-        if (this.findMaxCoverage) {
-            _.assign(result, {
-                maxContour: this.maxContour
-            })
-        }
 
         this.logMessage('-----------')
         this.logMessage('***********')

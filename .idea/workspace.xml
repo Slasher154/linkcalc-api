@@ -1,13 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
+    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="Add finding maximum coverage">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/atmospheric.js" afterPath="$PROJECT_DIR$/server/classes/atmospheric.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/contour.js" afterPath="$PROJECT_DIR$/server/classes/contour.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/station.js" afterPath="$PROJECT_DIR$/server/classes/station.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/utils.js" afterPath="$PROJECT_DIR$/server/classes/utils.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/contours.js" afterPath="$PROJECT_DIR$/server/routes/v1/contours.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
@@ -54,11 +51,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
-              <caret line="339" column="44" lean-forward="true" selection-start-line="339" selection-start-column="44" selection-end-line="339" selection-end-column="44" />
+            <state relative-caret-position="430">
+              <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -74,11 +71,23 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="contour.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="contour.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="161">
-              <caret line="83" column="0" lean-forward="true" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+            <state relative-caret-position="466">
+              <caret line="77" column="101" lean-forward="true" selection-start-line="77" selection-start-column="101" selection-end-line="77" selection-end-column="101" />
+              <folding>
+                <element signature="n#!!block;n#getMatchingReturnContour#0;n#Contour#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="contours.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="706">
+              <caret line="74" column="20" lean-forward="false" selection-start-line="74" selection-start-column="20" selection-end-line="74" selection-end-column="20" />
               <folding />
             </state>
           </provider>
@@ -98,7 +107,7 @@
         <entry file="file://$PROJECT_DIR$/server/classes/utils.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="381">
-              <caret line="117" column="0" lean-forward="true" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
+              <caret line="117" column="0" lean-forward="false" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -108,17 +117,7 @@
         <entry file="file://$PROJECT_DIR$/server/classes/station.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="305">
-              <caret line="53" column="5" lean-forward="true" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="bandwidth.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/classes/bandwidth.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="16" lean-forward="false" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
+              <caret line="53" column="5" lean-forward="false" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
               <folding />
             </state>
           </provider>
@@ -135,7 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>seekDef</find>
       <find>seekDefi</find>
       <find>seekDefin</find>
       <find>seekDefine</find>
@@ -165,6 +163,7 @@
       <find>runRainFadeLink</find>
       <find>toFixed</find>
       <find>match</find>
+      <find>maxContour</find>
     </findStrings>
     <replaceStrings>
       <replace>locationRouter</replace>
@@ -195,6 +194,7 @@
       <replace>ciD</replace>
       <replace>this.logMessage</replace>
       <replace>Thaicom 4</replace>
+      <replace>, 2)</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -248,12 +248,12 @@
         <option value="$PROJECT_DIR$/server/routes/v1/satellites.js" />
         <option value="$PROJECT_DIR$/server/classes/remoteStation.js" />
         <option value="$PROJECT_DIR$/server/controllers/contours.js" />
-        <option value="$PROJECT_DIR$/server/routes/v1/contours.js" />
         <option value="$PROJECT_DIR$/server/classes/station.js" />
         <option value="$PROJECT_DIR$/server/classes/atmospheric.js" />
-        <option value="$PROJECT_DIR$/server/classes/contour.js" />
         <option value="$PROJECT_DIR$/server/classes/utils.js" />
         <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
+        <option value="$PROJECT_DIR$/server/routes/v1/contours.js" />
+        <option value="$PROJECT_DIR$/server/classes/contour.js" />
       </list>
     </option>
   </component>
@@ -350,6 +350,28 @@
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
             <PATH_ELEMENT USER_OBJECT="routes">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT USER_OBJECT="Root">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="linkcalc-api">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="server">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="routes">
+              <option name="myItemId" value="" />
+              <option name="myItemType" value="" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT USER_OBJECT="v1">
               <option name="myItemId" value="" />
               <option name="myItemType" value="" />
             </PATH_ELEMENT>
@@ -710,7 +732,7 @@
       <workItem from="1511105160850" duration="18405000" />
       <workItem from="1511771831744" duration="5526000" />
       <workItem from="1511944803409" duration="2569000" />
-      <workItem from="1512125560426" duration="18310000" />
+      <workItem from="1512125560426" duration="24362000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -929,14 +951,21 @@
       <option name="project" value="LOCAL" />
       <updated>1511778847417</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Add finding maximum coverage">
+      <created>1512558111522</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1512558111522</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="200370000" />
+    <option name="totallyTimeSpent" value="206422000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="1280" y="0" width="1920" height="1080" extended-state="6" />
+    <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -945,7 +974,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.37486687" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44728434" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.13099042" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32871288" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -988,7 +1017,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Update readme to include API docs" />
     <MESSAGE value="Enable CORS" />
     <MESSAGE value="Add all transponders API" />
     <MESSAGE value="Add all gateways API" />
@@ -1013,7 +1041,8 @@
     <MESSAGE value="Test Turf difference and area to find the matching return contour from the given forward contour" />
     <MESSAGE value="Start creating the result page" />
     <MESSAGE value="Fix the array of remote stations and transponders not being combined" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix the array of remote stations and transponders not being combined" />
+    <MESSAGE value="Add finding maximum coverage" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add finding maximum coverage" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1284,14 +1313,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="568">
-          <caret line="54" column="2" lean-forward="true" selection-start-line="54" selection-start-column="2" selection-end-line="54" selection-end-column="2" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -1311,7 +1332,7 @@
     <entry file="file://$PROJECT_DIR$/server/classes/station.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="305">
-          <caret line="53" column="5" lean-forward="true" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
+          <caret line="53" column="5" lean-forward="false" selection-start-line="53" selection-start-column="5" selection-end-line="53" selection-end-column="5" />
           <folding />
         </state>
       </provider>
@@ -1383,24 +1404,34 @@
     <entry file="file://$PROJECT_DIR$/server/classes/utils.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="381">
-          <caret line="117" column="0" lean-forward="true" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="161">
-          <caret line="83" column="0" lean-forward="true" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <caret line="117" column="0" lean-forward="false" selection-start-line="117" selection-start-column="0" selection-end-line="117" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
-          <caret line="339" column="44" lean-forward="true" selection-start-line="339" selection-start-column="44" selection-end-line="339" selection-end-column="44" />
+        <state relative-caret-position="430">
+          <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
           <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="706">
+          <caret line="74" column="20" lean-forward="false" selection-start-line="74" selection-start-column="20" selection-end-line="74" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="466">
+          <caret line="77" column="101" lean-forward="true" selection-start-line="77" selection-start-column="101" selection-end-line="77" selection-end-column="101" />
+          <folding>
+            <element signature="n#!!block;n#getMatchingReturnContour#0;n#Contour#0" expanded="false" />
+          </folding>
         </state>
       </provider>
     </entry>

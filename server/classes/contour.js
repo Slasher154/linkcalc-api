@@ -73,6 +73,30 @@ class Contour {
         }
     }
 
+    static async getMultipleContourLines(arrayOfRequestObjects) {
+        try {
+            let arrayOfQueries = arrayOfRequestObjects.map(convertContourRequestObjectToGeojsonQuery)
+            // Merge request with $or
+            console.log(`Queries = ${JSON.stringify(arrayOfQueries)}`)
+            let returnResults = await Contours2.find({ $or: arrayOfQueries })
+            // return { contours: returnResults.map(c => {
+            //     return {
+            //         beam: c.properties.name,
+            //         coords: c.geometry.coordinates[0].map(ring => {
+            //             return {
+            //                 lat: ring[1],
+            //                 lng: ring[0]
+            //             }
+            //         })
+            //     }
+            // })}
+            return { contours: returnResults }
+        } catch (e) {
+            console.log(e)
+            return false
+        }
+    }
+
     static async getMatchingReturnContour({satellite, beam, contourValue}) {
         let roundedValue = Math.round( contourValue * 10) / 10
         console.log(`Satellite = ${satellite}, Beam = ${beam}, Contour Value = ${roundedValue}`)
@@ -124,11 +148,54 @@ class Contour {
             console.log(e)
             return false
         }
-
-
-
     }
 
+}
+
+// Return object in this format
+// { "properties.name": "206",
+//   "properties.relativeGain": -0.1,
+//   "properties.path": "forward",
+//   "properties.parameter": "eirp" },
+function convertContourRequestObjectToGeojsonQuery(object) {
+    if (!(object.name && object.contourValue && object.satellite)) {
+        return false
+    }
+    // If no satellite type given, assumes it is broadband by default
+    let satelliteType = object.satelliteType || 'Broadband'
+    // If path is not given, assumes it's forward by default
+    let path = object.path || 'forward'
+    // If parameter to query is not given, assume it's EIRP by default
+    let parameterToQuery = object.parameter || 'eirp'
+    // If this is broadband satellite, set parameter name to 'relativeGain', otherwise, set it to parameter to Query in case of conventional
+    // This is how database stores the data name
+    let parameterName = parameterToQuery
+    if (satelliteType === 'Broadband') {
+        parameterName = 'relativeGain'
+    }
+    // If isGateway beam is not given, assume it is false by default
+    let isGatewayBeam = object.isGatewayBeam || false
+    // If this is broadband satellite, set parameter to query to either eirp or gt
+    if (satelliteType === 'Broadband' && path === 'forward' && !isGatewayBeam) { // Forward, user beam => EIRP contour
+        parameterToQuery = 'eirp'
+    } else if (satelliteType === 'Broadband' && path === 'return' && !isGatewayBeam) { // Return, user beam => G/T contour
+        parameterToQuery = 'gt'
+    } else if (satelliteType === 'Broadband' && path === 'forward' && isGatewayBeam) { // Forward, Gateway Beam => G/T contour
+        parameterToQuery = 'gt'
+    } else if (satelliteType === 'Broadband' && path === 'return' && isGatewayBeam) { // Return, Gateway Beam => EIRP contour
+        parameterToQuery = 'eirp'
+    } else {
+
+    }
+    // Construct Query
+    let query = {}
+    query['properties.satellite'] = object.satellite
+    query['properties.name'] = object.name
+    query['properties.parameter'] = parameterToQuery
+    query['properties.' + parameterName] = object.contourValue
+    query['properties.path'] = path
+    console.log(`Query = ${JSON.stringify(query)}`)
+    return query
 }
 
 module.exports = Contour

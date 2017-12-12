@@ -20,14 +20,12 @@ contourRouter.post('/get-contour', (req, res) => {
     console.log(`Parameter: ${parameter}`)
     let query = {
         geometry: {
-            $geoIntersects:
-                {
-                    $geometry:
-                        {
-                            type: 'Point',
-                            coordinates: [location.lon,location.lat]
-                        }
+            $geoIntersects: {
+                $geometry: {
+                    type: 'Point',
+                    coordinates: [location.lon, location.lat]
                 }
+            }
         },
         'properties.name': beam,
         'properties.satellite': satellite,
@@ -56,7 +54,7 @@ contourRouter.post('/get-contour', (req, res) => {
 
 contourRouter.post('/get-bestbeam', (req, res) => {
     let {location, satellite, path, parameter} = req.body;
-    Contour.getBestBeam({ location, satellite, path, parameter }).then(result => {
+    Contour.getBestBeam({location, satellite, path, parameter}).then(result => {
         res.status(200).send(result)
     }).catch(e => {
         res.status(404).send(e)
@@ -65,7 +63,16 @@ contourRouter.post('/get-bestbeam', (req, res) => {
 
 contourRouter.post('/find-matching-return-contour', (req, res) => {
     let {satellite, beam, contourValue} = req.body;
-    Contour.getMatchingReturnContour({ satellite, beam, contourValue }).then(result => {
+    Contour.getMatchingReturnContour({satellite, beam, contourValue}).then(result => {
+        res.status(200).send(result)
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
+contourRouter.post('/get-contour-lines', (req, res) => {
+    let {contourObjects} = req.body // Array of objects which specifies contour properties to query
+    Contour.getMultipleContourLines(contourObjects).then(result => {
         res.status(200).send(result)
     }).catch(e => {
         res.status(404).send(e)
