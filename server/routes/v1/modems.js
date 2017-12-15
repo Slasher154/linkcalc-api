@@ -39,4 +39,14 @@ modemRouter.post('/modems/findByName', (req, res) => {
     });
 });
 
+modemRouter.post('/modems/add', (req, res) => {
+    const modem = req.body.modem;
+
+    Modems.insertMany([modem]).then(m => {
+        res.status(200).send();
+    }).catch((e) => {
+        res.status(404).send(e);
+    });
+})
+
 module.exports = modemRouter;

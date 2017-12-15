@@ -1121,7 +1121,7 @@ class LinkBudget {
             uplinkCondition: this.condition,
             uplinkAvailability: Utils.round(this.uplinkAvailability, 2),
             uplinkLocation: uplinkStation.location,
-            uplinkContour: uplinkContour,
+            uplinkContour: Utils.round(uplinkContour, 1),
             operatingHpaPower: Utils.round(operatingHpaPower, 2),
             cnUplink: Utils.round(cnUplink, 2),
             // downlink
@@ -1139,7 +1139,7 @@ class LinkBudget {
             downlinkPathLoss: Utils.round(downlinkPathLoss, 2),
             downlinkCondition: this.condition,
             downlinkAvailability: Utils.round(this.downlinkAvailability, 2),
-            downlinkContour: downlinkContour,
+            downlinkContour: Utils.round(downlinkContour, 1),
             downlinkLocation: downlinkStation.location,
             cnDownlink: Utils.round(cnDownlink, 2),
             // interferences

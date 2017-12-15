@@ -41,6 +41,10 @@ v1routes.use(version, bucRoutes);
 const modemRoutes = require('./modems');
 v1routes.use(version, modemRoutes);
 
+// Modemv vendor routes
+const modemVendorRoutes = require('./modem-vendors');
+v1routes.use(version, modemVendorRoutes);
+
 // Location routes
 const locationRoutes = require('./locations');
 v1routes.use(version, locationRoutes);

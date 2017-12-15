@@ -5,6 +5,7 @@
 const _ = require('lodash')
 var {Contours2} = require('../models/contours');
 const turf = require('@turf/turf')
+const Utils = require('./utils')
 
 class Contour {
     constructor(contourObject) {
@@ -192,7 +193,7 @@ function convertContourRequestObjectToGeojsonQuery(object) {
     query['properties.satellite'] = object.satellite
     query['properties.name'] = object.name
     query['properties.parameter'] = parameterToQuery
-    query['properties.' + parameterName] = object.contourValue
+    query['properties.' + parameterName] = Utils.round(object.contourValue, 1)
     query['properties.path'] = path
     console.log(`Query = ${JSON.stringify(query)}`)
     return query
