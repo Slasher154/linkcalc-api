@@ -22,6 +22,15 @@ var Antennas = mongoose.model('antennas', new mongoose.Schema({
         type: Number,
         required: true
     },
+    tx_gain: {
+        type: Object
+    },
+    rx_gain: {
+        type: Object
+    },
+    gt: {
+        type: Number
+    }
 
 }));
 
