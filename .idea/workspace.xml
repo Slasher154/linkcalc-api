@@ -3,7 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/bucs.js" afterPath="$PROJECT_DIR$/server/routes/v1/bucs.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/antenna-vendors.js" afterPath="$PROJECT_DIR$/server/routes/v1/antenna-vendors.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/modem-vendors.js" afterPath="$PROJECT_DIR$/server/routes/v1/modem-vendors.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -29,8 +30,38 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="bucs.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="bucs.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/routes/v1/bucs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="533">
+              <caret line="49" column="50" lean-forward="false" selection-start-line="49" selection-start-column="4" selection-end-line="49" selection-end-column="50" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="antenna-vendors.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/models/antenna-vendors.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="modem-vendors.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/models/modem-vendors.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="antenna-vendors.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/antenna-vendors.js">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="495">
               <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />
@@ -39,11 +70,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="antennas.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/routes/v1/antennas.js">
+      <file leaf-file-name="modem-vendors.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/modem-vendors.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="360">
+              <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
               <folding />
             </state>
           </provider>
@@ -60,7 +91,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>Location:</find>
       <find>R</find>
       <find>Return re</find>
       <find>Return res</find>
@@ -90,9 +120,9 @@
       <find>inser</find>
       <find>insert</find>
       <find>Antenna</find>
+      <find>antenna</find>
     </findStrings>
     <replaceStrings>
-      <replace>locationRouter</replace>
       <replace>Locations</replace>
       <replace>buc</replace>
       <replace>B</replace>
@@ -122,6 +152,7 @@
       <replace>Thaicom 4</replace>
       <replace>, 2)</replace>
       <replace>Buc</replace>
+      <replace>modem</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -173,14 +204,14 @@
         <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
         <option value="$PROJECT_DIR$/server/models/modems.js" />
         <option value="$PROJECT_DIR$/server/models/antenna-vendors.js" />
-        <option value="$PROJECT_DIR$/server/routes/v1/antenna-vendors.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/index.js" />
         <option value="$PROJECT_DIR$/server/models/modem-vendors.js" />
-        <option value="$PROJECT_DIR$/server/routes/v1/modem-vendors.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/modems.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/antennas.js" />
         <option value="$PROJECT_DIR$/server/models/antennas.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/bucs.js" />
+        <option value="$PROJECT_DIR$/server/routes/v1/antenna-vendors.js" />
+        <option value="$PROJECT_DIR$/server/routes/v1/modem-vendors.js" />
       </list>
     </option>
   </component>
@@ -671,7 +702,7 @@
       <workItem from="1513438508869" duration="558000" />
       <workItem from="1513649975791" duration="4618000" />
       <workItem from="1513768737388" duration="78000" />
-      <workItem from="1514035669726" duration="11138000" />
+      <workItem from="1514035669726" duration="12449000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -932,11 +963,18 @@
       <option name="project" value="LOCAL" />
       <updated>1514449628537</updated>
     </task>
-    <option name="localTasksCounter" value="38" />
+    <task id="LOCAL-00038" summary="Add BUC CRUD API">
+      <created>1514450789404</created>
+      <option name="number" value="00038" />
+      <option name="presentableId" value="LOCAL-00038" />
+      <option name="project" value="LOCAL" />
+      <updated>1514450789404</updated>
+    </task>
+    <option name="localTasksCounter" value="39" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="230715000" />
+    <option name="totallyTimeSpent" value="232026000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -991,7 +1029,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Adding linkbudget classes" />
     <MESSAGE value="Adding functions to show calculation flows" />
     <MESSAGE value="Copy over the run_link from old code and rename some variables to camel case" />
     <MESSAGE value="Rewrite codes in run_link method" />
@@ -1016,7 +1053,8 @@
     <MESSAGE value="Add Edit and Delete modem API" />
     <MESSAGE value="Add Create, Edit and Delete antenna API" />
     <MESSAGE value="Add schema to cover custom antenna gain" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add schema to cover custom antenna gain" />
+    <MESSAGE value="Add BUC CRUD API" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add BUC CRUD API" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1301,14 +1339,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/models/modem-vendors.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="4" lean-forward="true" selection-start-line="16" selection-start-column="4" selection-end-line="16" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/modems.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1329,14 +1359,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/models/antenna-vendors.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="32" lean-forward="false" selection-start-line="18" selection-start-column="32" selection-end-line="18" selection-end-column="32" />
           <folding />
         </state>
       </provider>
@@ -1365,22 +1387,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/modem-vendors.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/antenna-vendors.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/models/bucs.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1398,6 +1404,38 @@
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/bucs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="533">
+          <caret line="49" column="50" lean-forward="false" selection-start-line="49" selection-start-column="4" selection-end-line="49" selection-end-column="50" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/models/antenna-vendors.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/models/modem-vendors.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/modem-vendors.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="17" lean-forward="false" selection-start-line="24" selection-start-column="17" selection-end-line="24" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/antenna-vendors.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="495">
           <caret line="33" column="0" lean-forward="true" selection-start-line="33" selection-start-column="0" selection-end-line="33" selection-end-column="0" />

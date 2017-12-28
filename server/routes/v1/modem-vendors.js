@@ -3,6 +3,7 @@
  */
 
 const _ = require('lodash');
+const mongoose = require('mongoose')
 const modemVendorRouter = require('express').Router();
 
 var {ModemVendors} = require('../../models/modem-vendors');
@@ -16,5 +17,17 @@ modemVendorRouter.get('/modem-vendors', (req, res) => {
         res.status(404).send(e);
     });
 });
+
+// add modem vendor
+
+modemVendorRouter.post('/modem-vendors/add', (req, res) => {
+    const modemVendor = { name: req.body.name }
+    modemVendor._id = mongoose.Types.ObjectId().toString()
+    ModemVendors.insertMany([modemVendor]).then(vendor => {
+        res.status(200).send({modemVendor: vendor[0]});
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
 
 module.exports = modemVendorRouter;
