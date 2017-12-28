@@ -29,9 +29,13 @@ v1routes.use(version, transponderRoutes);
 const gatewayRoutes = require('./gateways');
 v1routes.use(version, gatewayRoutes);
 
-// Buc routes
+// Antenna routes
 const antennaRoutes = require('./antennas');
 v1routes.use(version, antennaRoutes);
+
+// Antenna vendor routes
+const antennaVendorRoutes = require('./antenna-vendors');
+v1routes.use(version, antennaVendorRoutes);
 
 // Buc routes
 const bucRoutes = require('./bucs');
@@ -41,7 +45,7 @@ v1routes.use(version, bucRoutes);
 const modemRoutes = require('./modems');
 v1routes.use(version, modemRoutes);
 
-// Modemv vendor routes
+// Modem vendor routes
 const modemVendorRoutes = require('./modem-vendors');
 v1routes.use(version, modemVendorRoutes);
 

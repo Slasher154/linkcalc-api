@@ -68,16 +68,19 @@ modemRouter.post('/modems/edit', (req, res) => {
     })
 })
 
+// add modem
+
 modemRouter.post('/modems/add', (req, res) => {
     const modem = req.body.modem;
     modem._id = mongoose.Types.ObjectId().toString() // Generate the Object ID in String format
-
     Modems.insertMany([modem]).then(modem => {
         res.status(200).send({modem: modem[0]});
     }).catch((e) => {
         res.status(404).send(e);
     });
 })
+
+// delete modem
 
 modemRouter.post('/modems/delete', (req, res) => {
     const modemId = req.body.modemId;
