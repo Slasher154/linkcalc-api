@@ -57,6 +57,10 @@ v1routes.use(version, locationRoutes);
 const rainDataRoutes = require('./raindata');
 v1routes.use(version, rainDataRoutes);
 
+// Saved Requests routes
+const savedRequestRoutes = require('./saved-requests');
+v1routes.use(version, savedRequestRoutes);
+
 // Contour routes
 const contourRoutes = require('./contours');
 v1routes.use(version, contourRoutes);
@@ -64,5 +68,6 @@ v1routes.use(version, contourRoutes);
 // Contours migration routes
 const contourMigrationRoutes = require('./contourMigration');
 v1routes.use(version, contourMigrationRoutes);
+
 
 module.exports = v1routes;
