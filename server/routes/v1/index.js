@@ -66,8 +66,8 @@ const contourRoutes = require('./contours');
 v1routes.use(version, contourRoutes);
 
 // Contours migration routes
-const contourMigrationRoutes = require('./contourMigration');
-v1routes.use(version, contourMigrationRoutes);
+// const contourMigrationRoutes = require('./contourMigration');
+// v1routes.use(version, contourMigrationRoutes);
 
 
 module.exports = v1routes;
