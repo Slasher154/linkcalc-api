@@ -36,7 +36,7 @@ antennaRouter.post('/antennas/find-by-id', (req, res) => {
 
 antennaRouter.post('/antennas/edit', (req, res) => {
     const antenna = req.body.antenna
-    Antennas.findOneAndUpdate({ _id: antenna._id}, antenna).then(antenna => {
+    Antennas.findOneAndUpdate({ _id: antenna._id}, { $set: antenna }).then(antenna => {
         res.status(200).send({antenna})
     }).catch(e => {
         res.status(404).send(e)
@@ -60,6 +60,17 @@ antennaRouter.post('/antennas/add', (req, res) => {
 antennaRouter.post('/antennas/delete', (req, res) => {
     const antennaId = req.body.antennaId;
     Antennas.findByIdAndRemove(antennaId).then(antenna => {
+        res.status(200).send({antenna})
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
+// update patterns
+
+antennaRouter.post('/antenna-pattern/save', (req, res) => {
+    const { _id, patterns } = req.body
+    Antennas.findOneAndUpdate({ _id: _id}, { $set: patterns }).then(antenna => {
         res.status(200).send({antenna})
     }).catch(e => {
         res.status(404).send(e)
