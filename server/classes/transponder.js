@@ -11,6 +11,11 @@ class Transponder {
     print () {
         console.log(`Transponder: ${this.name} - ${this.type}`)
     }
+    static searchByBeamAndPath(transponders, beam, path) {
+        return transponders.find(tp => {
+            return tp.name === beam && tp.type === path
+        })
+    }
 
 
 }

@@ -3,7 +3,9 @@
  */
 
 const _ = require('lodash')
-var {Contours2} = require('../models/contours');
+const {Contours2} = require('../models/contours');
+const {Transponders} = require('../models/transponders');
+const Transponder = require('../classes/transponder');
 const turf = require('@turf/turf')
 const Utils = require('./utils')
 
@@ -21,7 +23,7 @@ class Contour {
             path,
             parameter
         })
-        return bestContour
+        return {bestContour, location}
     }
 
     static async getContour({location, satellite, beam, path, parameter}) {
@@ -44,24 +46,77 @@ class Contour {
             'properties.parameter': parameter
         }
         if (beam) {
-            query['properties'][name] = beam
+            query['properties.name'] = beam
         }
         // console.log(`Query: ${JSON.stringify(query, undefined, 2)}`)
         try {
             let results = await Contours2.find(query)
-            console.log(`The query returns ${results.length} results`)
-            if (results) {
+            console.log(`The query for ${location.lat},${location.lon} returns ${results.length} results`)
+            if (results.length > 0) {
                 let valueIndicator = results[0][parameter] ? parameter : 'relativeGain'
                 console.log(`Value indicator is ${valueIndicator}`)
                 // The best contour is contour with maximum value indicator (gain, eirp, g/t) unless it's only beam
                 let filteredResults = results
                 if (results.length > 1) {
                     filteredResults = _.remove(results, re => {
+                        // Not include Broadcast beam contours
                         return !re.properties.name.startsWith('BC')
                     })
                 }
-                let bestContour = _.min(filteredResults, (re) => {
-                    return re['properties'][valueIndicator]
+
+                // Query the channels to get its EIRP. In order to compare the best beam, we need to also take beam EIRP
+                // into account not just only relative contour. (Otherwise, -0.5 dB contour of shape beam will have be
+                // returned as answer instead of -4 dB contour of spot beam despite shape beam has total less EIRP down than spot)
+                let beamNames = filteredResults.map(r => r.properties.name)
+                let transponders = await Transponders.find({
+                    type: path,
+                    name: { $in: beamNames },
+                    satellite
+                })
+
+                // Find the absolute EIRP or G/T value of that contour
+                filteredResults.forEach(r => {
+                    let absoluteValue = 0
+                    if (valueIndicator === 'relativeGain') {
+                        // Search for the corresponding beam
+                        let tp = Transponder.searchByBeamAndPath(transponders, r.properties.name, r.properties.path)
+                        // Calculate EIRP density of this beam in case of eirp
+
+                        if (parameter === 'eirp') {
+                            absoluteValue = tp.saturated_eirp_peak - 10 * Math.log10(tp.bandwidth * Math.pow(10,6))
+                        }
+                        // Otherwise find G/T
+                        else if (parameter === 'gt') {
+                            absoluteValue = tp.gt_peak
+                        }
+                        else {}
+                        // Add absolute value properties of EIRP or G/T (use this value to find the best beam)
+                        // which equals to EIRPden or G/T at peak combines with relative contour value
+                        absoluteValue = absoluteValue + r.properties.relativeGain
+                    } else {
+                        // absolute value just equal to value returned from the database
+                        absoluteValue = r.properties[valueIndicator]
+                    }
+                    r.absoluteValue = absoluteValue
+                })
+
+                // let bestContour = _.min(filteredResults, (re) => {
+                //     return re['properties'][valueIndicator]
+                // })
+                // Obtain the best result, which is the one with highest absolute value (highest EIRP or G/T)
+                // filteredResults.forEach(f => console.log(`Beam: ${f.properties.name}, ${f.properties.relativeGain} => ${f.absoluteValue} `))
+                // let bestContour = _.max(filteredResults, (re) => {
+                //     return re.absoluteValue
+                // })
+                // return bestContour
+                let bestContour = {}
+                let maxValue = -9999
+                filteredResults.forEach(f => {
+                    if (f.absoluteValue > maxValue) {
+                        bestContour = f
+                        maxValue = f.absoluteValue
+                        console.log(`Best Beam is Beam: ${f.properties.name}, ${f.properties.relativeGain} => ${f.absoluteValue} `)
+                    }
                 })
                 return bestContour
             } else {

@@ -3,12 +3,14 @@
  */
 
 const _ = require('lodash');
+const Q = require('q');
 const turf = require('@turf/turf')
 const geojsonArea = require('@mapbox/geojson-area');
 const contourRouter = require('express').Router();
 const Contour = require('../../classes/contour')
 
 var {Contours2} = require('../../models/contours');
+let {Grids} = require('../../models/grids')
 
 // Return relative contour in number
 contourRouter.post('/get-contour', (req, res) => {
@@ -77,6 +79,60 @@ contourRouter.post('/get-contour-lines', (req, res) => {
     }).catch(e => {
         res.status(404).send(e)
     })
+})
+
+contourRouter.post('/generate-grid', (req, res) => {
+    console.log('Generating grid')
+    let promises = []
+    // Object containing properties to create the grid
+    console.log(JSON.stringify(req.body))
+    let {topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude, latitudeStep, longitudeStep, satellite, parameter, path} = req.body
+    if (topLeftLatitude <= bottomRightLatitude || topLeftLongitude >= bottomRightLongitude) {
+        res.status(403).send()
+    }
+    for (let i = topLeftLatitude; i >= bottomRightLatitude; i -= latitudeStep) {
+        for (let j = topLeftLongitude; j <= bottomRightLongitude; j += longitudeStep) {
+            promises.push(Contour.getBestBeam({
+                location: {
+                    lat: i,
+                    lon: j
+                },
+                satellite,
+                parameter,
+                path
+            }))
+        }
+    }
+    // Resolve all find best beam promises
+    Q.all(promises).then(results => {
+        let gridInsertPromises = []
+        results.forEach(result => {
+            let contour = result.valueOf()
+            // If contour.bestContour does not return false, there is a beam covering this location. Otherwise, location is out of
+            // not covered by any beam in our database
+            if (contour.bestContour) {
+                let grid = {
+                    lat: contour.location.lat,
+                    lon: contour.location.lon,
+                    properties: contour.bestContour.properties
+                }
+                gridInsertPromises.push(Grids.findOneAndUpdate({
+                    lat: grid.lat,
+                    lon: grid.lon
+                }, grid , { upsert: true }))
+            }
+
+        })
+        // Resolve all insert to database promises
+        return Q.all(gridInsertPromises)
+    }).then(results => {
+        console.log(`Insert completed`)
+        res.status(200).send()
+    }).catch(e => {
+        console.log(e)
+    })
+
+
 })
 
 module.exports = contourRouter;

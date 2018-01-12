@@ -3,6 +3,7 @@
  */
 const Antenna = require('./antenna')
 const Buc = require('./buc')
+const Contour = require('./contour')
 const Location = require('./location')
 const Bandwidth = require('./bandwidth')
 const Transponder = require('./transponder')
@@ -53,7 +54,12 @@ class Station {
 
     }
 
-    seekDefinedContoursAndCoordinates (transponder) {
+    printLocation () {
+        return `${this.location.lat}, ${this.location.lon}`
+    }
+
+    async seekContourAndCoordinates (transponder) {
+        console.log(`Finding contour of station with location ${this.printLocation()}, for Transponder ${transponder.name}-${transponder.type} `)
         if (this.location.type === 'definedContours') {
             let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
 
@@ -67,6 +73,23 @@ class Station {
                 this.contour = transponder[`contour_${contourValue}`]
             }
             this.setLatLon(transponder)
+        }
+        // If lat,lon is already given, seek the contour from the given transponder
+        else if (this.location.lat && this.location.lon) {
+            try {
+                let contour = await Contour.getContour({
+                    location: this.location,
+                    satellite: transponder.satellite,
+                    beam: transponder.name,
+                    path: transponder.type,
+                    parameter: transponder.type === 'forward' ? 'eirp' : 'gt'
+                })
+                this.contour = contour.properties.relativeGain
+                console.log(JSON.stringify(contour))
+            } catch (e) {
+                console.log(e)
+            }
+
         }
     }
 

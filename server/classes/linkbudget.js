@@ -35,7 +35,11 @@ class LinkBudget {
     // Prepare parameters for link budget
     init() {
 
-        this.debugLevel = 3
+    }
+
+    async runLinkBudget() {
+
+        this.debugLevel = 5
 
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
@@ -43,42 +47,59 @@ class LinkBudget {
             this.gatewayStations.push({name: 'defaultGateway'})
         }
 
-        // If finding best transponder is selected, extract unique locations out of remote stations and find the their respective best transponders
-        if (this.findBestTransponders) {
-            let uniqueLocations = this.extractUniqueRemoteLocations()
+        try {
+            // If finding best transponder is selected, extract unique locations out of remote stations and find the their respective best transponders
+            if (this.findBestTransponders) {
+                let uniqueLocations = this.extractUniqueRemoteLocations()
 
-            // Get the best transponders for each selected satellite
-            let locationWithBestTransponders = []
-            this.satellites.forEach(satellite => {
-                uniqueLocations.forEach(location => {
-                    let bestTransponder = this.findBestTransponderFromLocationAndSatellite({location, satellite})
-                    locationWithBestTransponders.push({location, transponder: bestTransponder})
+                this.logMessage(`There are ${uniqueLocations.length} unique locations`, 3)
+                this.logMessage(`There are ${this.satellites.length} satellites`, 3)
+
+                // Get the best transponders for each selected satellite
+                let locationWithBestTransponders = []
+
+
+                for (let satellite of this.satellites) {
+                    for (let location of uniqueLocations) {
+                        this.logMessage(`Finding best tp for ${location.lat}, ${location.lon}`, 1)
+                        let bestTransponder = await this.findBestTransponderFromLocationAndSatellite({
+                            location,
+                            satellite
+                        })
+                        locationWithBestTransponders.push({location, transponder: bestTransponder})
+                    }
+                }
+                this.logMessage('Location with Best TP is ' + JSON.stringify(locationWithBestTransponders), 1)
+
+                this.logMessage('Finish finding best TP', 1)
+                // Adding transponders to every remote stations
+                this.remoteStations.forEach(station => {
+                    let bestTransponder = locationWithBestTransponders.find(obj => obj.location.name === station.location.name)
+                    station.transponder = bestTransponder.transponder
                 })
-            })
 
-            // Adding transponders to every remote stations
-            this.remoteStations.forEach(station => {
-                let bestTransponder = locationWithBestTransponders.find(location => location.name === station.location.name).transponder
-                station.transponder = bestTransponder
-            })
-        } else {
-            // Otherwise, combine selected transponders with remote stations into objects
-            this.logMessage(`Combining transponders with remote stations`, 1)
-            let stations = []
-            this.remoteStations.forEach(station => {
-                this.logMessage(`Looping stations with antenna =  ${station.antenna.name}, BUC = ${station.buc.name}, Location = ${station.location.name}, Bandwidth = ${station.bandwidth.forward}/${station.bandwidth.return} ${station.bandwidth.unit}`, 1)
-                this.transponders.forEach(transponder => {
-                    this.logMessage(`Looping transponders ${transponder.name}`, 1)
-                    station.transponder = transponder
-                    stations.push(_.cloneDeep(station))
+            } else {
+                // Otherwise, combine selected transponders with remote stations into objects
+                this.logMessage(`Combining transponders with remote stations`, 1)
+                let stations = []
+                this.remoteStations.forEach(station => {
+                    this.logMessage(`Looping stations with antenna =  ${station.antenna.name}, BUC = ${station.buc.name}, Location = ${station.location.name}, Bandwidth = ${station.bandwidth.forward}/${station.bandwidth.return} ${station.bandwidth.unit}`, 1)
+                    this.transponders.forEach(transponder => {
+                        this.logMessage(`Looping transponders ${transponder.name}`, 1)
+                        station.transponder = transponder
+                        stations.push(_.cloneDeep(station))
+                    })
                 })
-            })
-            // Set the combined array back to remote stations object
-            this.remoteStations = stations
-            this.logMessage(`Remote Stations total length = ${this.remoteStations.length}`, 1)
+                // Set the combined array back to remote stations object
+                this.remoteStations = stations
+                this.logMessage(`Remote Stations total length = ${this.remoteStations.length}`, 1)
 
 
-            // this.logMessage(this.remoteStations)
+                // this.logMessage(this.remoteStations)
+            }
+
+        } catch (e) {
+            this.logMessage(e, 1)
         }
 
         // Run the link budget
@@ -87,9 +108,6 @@ class LinkBudget {
         this.linkBudgetResults = []
         this.logMessage('Start running link budgets', 1)
         //this.runLinkBudget()
-    }
-
-    async runLinkBudget() {
 
         // Start looping remote stations
         // this.logMessage(this.remoteStations.length)
@@ -232,7 +250,7 @@ class LinkBudget {
         this.logMessage(`Transponder = ${this.transponder.name} - ${path}`, 1)
 
         // Seek the contour for this remote station
-        this.remoteStation.seekDefinedContoursAndCoordinates(this.transponder)
+        await this.remoteStation.seekContourAndCoordinates(this.transponder)
 
         // Find and set satellite
         let sat = this.findSatellite(this.transponder)
@@ -400,17 +418,23 @@ class LinkBudget {
 
                 if (result.passed) { // pass
                     minIndex = currentIndex + 1
-                    this.logMessage(`${currentElement} passes the condition`, 3)
+                    this.logMessage(`${currentElement.name} passes the condition`, 3)
+                    answer = currentElement
+                    resultAnswer = result
+                }
+                else if (currentIndex === 0) { // this is the calculation of the 1st MCG (least code)
+                    maxIndex = currentIndex - 1
+                    this.logMessage(`Cannot find best MCG as the least MCG still does not close the link. Set MCG to the least one.`, 3)
                     answer = currentElement
                     resultAnswer = result
                 } else { // not pass
                     maxIndex = currentIndex - 1
-                    this.logMessage(`${currentElement} doesn't pass the condition`, 3)
+                    this.logMessage(`${currentElement.name} doesn't pass the condition`, 3)
                 }
             }
+            // If there is no answer, just set MCG to the least efficient MCG (first MCG)
             this.logMessage(`Searching for best MCG finished, answer is ${answer.name}`, 2)
             this.logMessage('Saving clear sky result')
-            // linkResult[path + 'Result']['clearSky'] = resultAnswer
             linkResult.clearSky = resultAnswer
 
             // Run the rain fade link
@@ -585,7 +609,7 @@ class LinkBudget {
 
                 while (minIndex <= maxIndex) {
                     currentIndex = (minIndex + maxIndex) / 2 | 0
-                    currentElement = Utils.round(linkAvailabilityRange[currentIndex],1)
+                    currentElement = Utils.round(linkAvailabilityRange[currentIndex], 1)
 
                     // Set uplink or downlink availability to new value (forward link changes downlink avail, return link changes uplink avail)
                     this.path === 'forward' ? this.downlinkAvailability = currentElement : this.uplinkAvailability = currentElement
@@ -1438,8 +1462,25 @@ class LinkBudget {
         return this.modem.applications.find(app => app.type === path || app.type === 'SCPC' || app.type === 'broadcast')
     }
 
-    findBestTransponderFromLocationAndSatellite({location, satellite}) {
-        return {}
+    async findBestTransponderFromLocationAndSatellite({location, satellite}) {
+        try {
+            let bestBeam = await Contour.getBestBeam({
+                location,
+                satellite: satellite.name,
+                path: 'forward',
+                parameter: 'eirp'
+            })
+            console.log('Best beam is ' + JSON.stringify(bestBeam))
+            let transponder = await Transponders.findOne({
+                name: bestBeam.bestContour.properties.name,
+                type: bestBeam.bestContour.properties.path,
+                satellite: bestBeam.bestContour.properties.satellite
+            })
+            return transponder
+        } catch (e) {
+            return null
+        }
+
     }
 
     findContourRange() {
