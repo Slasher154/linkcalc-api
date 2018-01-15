@@ -55,8 +55,8 @@ contourRouter.post('/get-contour', (req, res) => {
 })
 
 contourRouter.post('/get-bestbeam', (req, res) => {
-    let {location, satellite, path, parameter} = req.body;
-    Contour.getBestBeam({location, satellite, path, parameter}).then(result => {
+    let {location, satellite, path, parameter, countries} = req.body;
+    Contour.getBestBeam({location, satellite, path, parameter, countries}).then(result => {
         res.status(200).send(result)
     }).catch(e => {
         res.status(404).send(e)

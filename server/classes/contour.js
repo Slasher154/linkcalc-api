@@ -16,17 +16,27 @@ class Contour {
         }
     }
 
-    static async getBestBeam({location, satellite, path, parameter}) {
-        let bestContour = await this.getContour({
+    static async getBestBeam({location, satellite, countries, path, parameter}) {
+        let queryObject = {
             location,
             satellite,
             path,
             parameter
-        })
+        }
+        // Find all beam names from given country if given
+        if (countries && countries.length > 0) {
+            let transponders = await Transponders.find({ satellite, type: path})
+            let beamNames = transponders.filter(tp => {
+                return countries.includes(tp.country)
+            }).map(tp => tp.name)
+            console.log(`Beams in ${countries.join(',')} are ${beamNames.join(',')}`)
+            queryObject.beams = beamNames
+        }
+        let bestContour = await this.getContour(queryObject)
         return {bestContour, location}
     }
 
-    static async getContour({location, satellite, beam, path, parameter}) {
+    static async getContour({location, satellite, beam, beams, path, parameter}) {
         // This query will return all contours that covers the given point
         console.log(`Location: ${location.lat}, ${location.lon}`)
         console.log(`Satellite: ${satellite}`)
@@ -47,6 +57,14 @@ class Contour {
         }
         if (beam) {
             query['properties.name'] = beam
+        }
+        else if (beams) {
+            query['properties.name'] = {
+                $in: beams
+            }
+        }
+        else {
+
         }
         // console.log(`Query: ${JSON.stringify(query, undefined, 2)}`)
         try {

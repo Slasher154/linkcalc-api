@@ -1466,6 +1466,7 @@ class LinkBudget {
         try {
             let bestBeam = await Contour.getBestBeam({
                 location,
+                countries: this.countries,
                 satellite: satellite.name,
                 path: 'forward',
                 parameter: 'eirp'
