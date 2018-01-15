@@ -15,6 +15,12 @@ linkbudgetRouter.post('/linkbudget-request', (req, res) => {
     const requestObject = req.body.requestObject;
     let linkBudget = new LinkBudget(requestObject)
     linkBudget.runLinkBudget().then((results) => {
+        // if (_.has(results, 'error')) {
+        //     console.log('Error found ' + results.error)
+        //     res.status(404).send(results.error)
+        // } else {
+        //     res.status(200).send(results)
+        // }
         res.status(200).send(results)
     }).catch(e => {
         res.status(404).send(e)

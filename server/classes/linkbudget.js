@@ -66,6 +66,13 @@ class LinkBudget {
                             location,
                             satellite
                         })
+                        // If there is no best beam, it means the given location is not under the satellite coverage
+                        if (!bestTransponder) {
+                            console.log('No best beam!!')
+                            return {
+                                error: `Location ${location.name} (${location.lat},${location.lon}) is not covered by our ${satellite.name} database`
+                            }
+                        }
                         locationWithBestTransponders.push({location, transponder: bestTransponder})
                     }
                 }

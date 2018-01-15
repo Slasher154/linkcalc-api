@@ -3,9 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/contour.js" afterPath="$PROJECT_DIR$/server/classes/contour.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/classes/linkbudget.js" afterPath="$PROJECT_DIR$/server/classes/linkbudget.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/contours.js" afterPath="$PROJECT_DIR$/server/routes/v1/contours.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/linkbudget.js" afterPath="$PROJECT_DIR$/server/routes/v1/linkbudget.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -21,14 +20,25 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="522">
-              <caret line="1476" column="51" lean-forward="true" selection-start-line="1476" selection-start-column="51" selection-end-line="1476" selection-end-column="51" />
+            <state relative-caret-position="-196">
+              <caret line="73" column="29" lean-forward="true" selection-start-line="73" selection-start-column="29" selection-end-line="73" selection-end-column="29" />
               <folding>
-                <element signature="e#11851#17345#0" expanded="false" />
+                <element signature="e#5115#8963#0" expanded="false" />
+                <element signature="e#12317#17811#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="465">
+              <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -36,7 +46,7 @@
       <file leaf-file-name="station.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/station.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="430">
+            <state relative-caret-position="439">
               <caret line="69" column="55" lean-forward="true" selection-start-line="69" selection-start-column="55" selection-end-line="69" selection-end-column="55" />
               <folding />
             </state>
@@ -58,16 +68,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="527">
               <caret line="58" column="0" lean-forward="false" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -139,11 +139,11 @@
       <find>logMessage</find>
       <find>doesn't pass th</find>
       <find>seekDefinedContoursAndCoordinates</find>
-      <find>seekCon</find>
       <find>findGateway</find>
       <find>Searching for best MCG</find>
       <find>passed</find>
       <find>findBestTr</find>
+      <find>seekCon</find>
     </findStrings>
     <replaceStrings>
       <replace>buc</replace>
@@ -203,7 +203,6 @@
         <option value="$PROJECT_DIR$/server/classes/antenna.js" />
         <option value="$PROJECT_DIR$/server/models/contours.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/contourMigration.js" />
-        <option value="$PROJECT_DIR$/server/routes/v1/linkbudget.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/transponders.js" />
         <option value="$PROJECT_DIR$/server/models/transponders.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/satellites.js" />
@@ -235,6 +234,7 @@
         <option value="$PROJECT_DIR$/server/classes/contour.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/contours.js" />
         <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
+        <option value="$PROJECT_DIR$/server/routes/v1/linkbudget.js" />
       </list>
     </option>
   </component>
@@ -690,7 +690,7 @@
       <workItem from="1513649975791" duration="4618000" />
       <workItem from="1513768737388" duration="78000" />
       <workItem from="1514035669726" duration="31366000" />
-      <workItem from="1515470286476" duration="26637000" />
+      <workItem from="1515470286476" duration="29072000" />
     </task>
     <task id="LOCAL-00001" summary="Add a webpage to show 50 previous link budget requests">
       <created>1505290351903</created>
@@ -1007,11 +1007,18 @@
       <option name="project" value="LOCAL" />
       <updated>1515750381314</updated>
     </task>
-    <option name="localTasksCounter" value="46" />
+    <task id="LOCAL-00046" summary="Update API to add countries field into best beam finding (significantly improve query time)">
+      <created>1515989680041</created>
+      <option name="number" value="00046" />
+      <option name="presentableId" value="LOCAL-00046" />
+      <option name="project" value="LOCAL" />
+      <updated>1515989680041</updated>
+    </task>
+    <option name="localTasksCounter" value="47" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="277580000" />
+    <option name="totallyTimeSpent" value="280015000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -1066,7 +1073,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Start debugging return links" />
     <MESSAGE value="Separating forward and return transponder in remote stations" />
     <MESSAGE value="Finish validating forward and return links" />
     <MESSAGE value="Modify the results to completely separate forward and return results" />
@@ -1091,7 +1097,8 @@
     <MESSAGE value="Add back the require database call code in server.js" />
     <MESSAGE value="Add API to input Tx/Rx antenna pattern" />
     <MESSAGE value="Complete find best transponder option" />
-    <option name="LAST_COMMIT_MESSAGE" value="Complete find best transponder option" />
+    <MESSAGE value="Update API to add countries field into best beam finding (significantly improve query time)" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update API to add countries field into best beam finding (significantly improve query time)" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1416,14 +1423,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/remoteStation.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1436,14 +1435,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/station.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="430">
-          <caret line="69" column="55" lean-forward="true" selection-start-line="69" selection-start-column="55" selection-end-line="69" selection-end-column="55" />
           <folding />
         </state>
       </provider>
@@ -1464,13 +1455,30 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/station.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="439">
+          <caret line="69" column="55" lean-forward="true" selection-start-line="69" selection-start-column="55" selection-end-line="69" selection-end-column="55" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="522">
-          <caret line="1476" column="51" lean-forward="true" selection-start-line="1476" selection-start-column="51" selection-end-line="1476" selection-end-column="51" />
+        <state relative-caret-position="-196">
+          <caret line="73" column="29" lean-forward="true" selection-start-line="73" selection-start-column="29" selection-end-line="73" selection-end-column="29" />
           <folding>
-            <element signature="e#11851#17345#0" expanded="false" />
+            <element signature="e#5115#8963#0" expanded="false" />
+            <element signature="e#12317#17811#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="465">
+          <caret line="31" column="0" lean-forward="true" selection-start-line="31" selection-start-column="0" selection-end-line="31" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
