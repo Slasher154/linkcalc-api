@@ -81,6 +81,55 @@ contourRouter.post('/get-contour-lines', (req, res) => {
     })
 })
 
+// Return all EOC lines of given beam, path, or transponders
+contourRouter.post('/get-eoc-lines', (req, res) => {
+    let {transponders, beam, path} = req.body
+    if (transponders) {
+        // Create request objects
+        let requestObjects = transponders.map(tp => {
+            return {
+                name: tp.name,
+                path: tp.type,
+                parameter: tp.type === 'forward' ? 'eirp' : 'gt',
+                satellite: tp.satellite,
+                contourValue: _.has(tp, 'contour_eoc') ? tp.contour_eoc : 0
+            }
+        })
+        try {
+            Contour.getMultipleContourLines(requestObjects).then(result => {
+                res.status(200).send(result)
+            }).catch(e => {
+                res.status(404).send(e)
+            })
+        } catch (e) {
+            res.status(404).send(e)
+        }
+    } else {
+        res.status(404).send(e)
+    }
+})
+
+contourRouter.post('/get-farthest-database-contours', (req, res) => {
+    let {transponders} = req.body
+    if (transponders) {
+        let requestObjects = transponders.map(tp => {
+            return {
+                'properties.name': tp.name,
+                'properties.path': tp.type,
+                'properties.parameter': tp.type === 'forward' ? 'eirp' : 'gt',
+                'properties.satellite': tp.satellite,
+            }
+        })
+        try {
+            Contour.getMultipleFarthestDatabaseContourLines(requestObjects).then(result => {
+                res.status(200).send(result)
+            })
+        } catch (e) {
+            res.status(404).send(e)
+        }
+    }
+})
+
 contourRouter.post('/generate-grid', (req, res) => {
     console.log('Generating grid')
     let promises = []

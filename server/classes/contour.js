@@ -3,6 +3,7 @@
  */
 
 const _ = require('lodash')
+const {Satellites} = require('../models/satellites');
 const {Contours2} = require('../models/contours');
 const {Transponders} = require('../models/transponders');
 const Transponder = require('../classes/transponder');
@@ -171,6 +172,27 @@ class Contour {
         }
     }
 
+    static async getMultipleFarthestDatabaseContourLines(arrayOfRequestObjects) {
+        try {
+            console.log(JSON.stringify(arrayOfRequestObjects))
+            let results = []
+            for (let requestObject of arrayOfRequestObjects) {
+                console.log(`Request object is ${requestObject}`)
+                let contourResults = await Contours2.find(requestObject)
+                // To get the max contour line, find the minimum relative gain among all lines
+                let farthestLine = _.minBy(contourResults, re => {
+                    return re.properties.relativeGain
+                })
+                console.log('Minimum line is ' + farthestLine.properties.relativeGain)
+                results.push(farthestLine)
+            }
+            return { contours: results }
+        } catch(e) {
+            console.log(e)
+            return null
+        }
+    }
+
     static async getMatchingReturnContour({satellite, beam, contourValue}) {
         let roundedValue = Math.round( contourValue * 10) / 10
         console.log(`Satellite = ${satellite}, Beam = ${beam}, Contour Value = ${roundedValue}`)
@@ -231,16 +253,16 @@ class Contour {
 //   "properties.relativeGain": -0.1,
 //   "properties.path": "forward",
 //   "properties.parameter": "eirp" },
-function convertContourRequestObjectToGeojsonQuery(object) {
-    if (!(object.name && object.contourValue && object.satellite)) {
+function convertContourRequestObjectToGeojsonQuery({ name, contourValue, satellite, satelliteType, path, isGatewayBeam, parameter }) {
+    if (!(name && contourValue && satellite)) {
         return false
     }
     // If no satellite type given, assumes it is broadband by default
-    let satelliteType = object.satelliteType || 'Broadband'
+    satelliteType = satelliteType || 'Broadband'
     // If path is not given, assumes it's forward by default
-    let path = object.path || 'forward'
+    path = path || 'forward'
     // If parameter to query is not given, assume it's EIRP by default
-    let parameterToQuery = object.parameter || 'eirp'
+    let parameterToQuery = parameter || 'eirp'
     // If this is broadband satellite, set parameter name to 'relativeGain', otherwise, set it to parameter to Query in case of conventional
     // This is how database stores the data name
     let parameterName = parameterToQuery
@@ -248,7 +270,7 @@ function convertContourRequestObjectToGeojsonQuery(object) {
         parameterName = 'relativeGain'
     }
     // If isGateway beam is not given, assume it is false by default
-    let isGatewayBeam = object.isGatewayBeam || false
+    isGatewayBeam = isGatewayBeam || false
     // If this is broadband satellite, set parameter to query to either eirp or gt
     if (satelliteType === 'Broadband' && path === 'forward' && !isGatewayBeam) { // Forward, user beam => EIRP contour
         parameterToQuery = 'eirp'
@@ -263,10 +285,10 @@ function convertContourRequestObjectToGeojsonQuery(object) {
     }
     // Construct Query
     let query = {}
-    query['properties.satellite'] = object.satellite
-    query['properties.name'] = object.name
+    query['properties.satellite'] = satellite
+    query['properties.name'] = name
     query['properties.parameter'] = parameterToQuery
-    query['properties.' + parameterName] = Utils.round(object.contourValue, 1)
+    query['properties.' + parameterName] = Utils.round(contourValue, 1)
     query['properties.path'] = path
     console.log(`Query = ${JSON.stringify(query)}`)
     return query

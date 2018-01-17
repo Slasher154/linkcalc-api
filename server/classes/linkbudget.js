@@ -324,7 +324,8 @@ class LinkBudget {
                     let maxIndex = contourRangeArray.length - 1
                     let currentIndex
                     let currentElement
-                    let answer = 0
+                    let linkMarginAnswer = 0
+                    let correctResult = null
                     let result
 
                     while (minIndex <= maxIndex) {
@@ -345,19 +346,20 @@ class LinkBudget {
                         if (!result.passed) { // not pass => step to higher index of array (= narrower contour)
                             minIndex = currentIndex + 1
                             this.logMessage(`Contour ${currentElement} dB doesn't passes the condition`, 3)
-                            answer = currentElement
                         } else { // pass => step to lower index of array (= wider contour)
                             maxIndex = currentIndex - 1
                             this.logMessage(`Contour ${currentElement} dB pass the condition`, 3)
+                            linkMarginAnswer = currentElement
+                            correctResult = result
                         }
                     }
-                    this.logMessage(`Searching for max contour finished, answer is ${currentElement} dB`, 2)
-
-                    // Record max contour into this result
-                    result.maxContour = currentElement
+                    this.logMessage(`Searching for max contour finished, answer is ${linkMarginAnswer} dB`, 2)
 
                     this.logMessage('Saving clear sky result', 2)
-                    linkResult.clearSky = result
+                    // If correctAnswer has a value (not null), record it, otherwise, it is equal to the last iteration of the result
+                    linkResult.clearSky = correctResult || result
+                    // Record max contour to result if there is any answer, otherwise it is equal to contour of last iteration of the result
+                    linkResult.clearSky.maxContour = correctResult ? linkMarginAnswer : currentElement
 
                     // If this is forward link and find matching contour is selected, find the match contour for return link here
                     if (path === 'forward' && this.findMatchingReturnCoverage) {
@@ -1490,7 +1492,7 @@ class LinkBudget {
         }
 
     }
-
+    // TODO: Fix this hardcode to the real one
     findContourRange() {
         return {
             max: 0,
