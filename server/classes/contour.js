@@ -148,6 +148,62 @@ class Contour {
         }
     }
 
+    static async getDefinedContours({ beams, paths, definedContours, satellite }) {
+           /* name: tp.name,
+            path: tp.type,
+            parameter: tp.type === 'forward' ? 'eirp' : 'gt',
+            satellite: tp.satellite,
+            contourValue: _.has(tp, 'contour_eoc') ? tp.contour_eoc : 0*/
+        // Generate Request Objects
+        let requestObjects = []
+        // Find all transponders from the given beams path
+        try {
+            let transponders = await Transponders.find({
+                name: { $in: beams },
+                type: { $in: _.concat(paths, 'broadcast') },
+                satellite
+            })
+            for (let beam of beams) {
+                for (let path of paths) {
+                    // Find transponder from the queried transponders and instantiate new object
+                    let tp = new Transponder(Transponder.searchByBeamAndPath(transponders, beam, path))
+                    // Construct query object
+                    for (let definedContour of definedContours) {
+                        let contourValue = tp.getContour(definedContour)
+                        let queryObject = {
+                            name: beam,
+                            path,
+                            satellite,
+                            contourValue,
+                            definedContour
+                        }
+                        requestObjects.push(queryObject)
+                    }
+                }
+            }
+            let result = await this.getMultipleContourLines(requestObjects)
+
+            console.log(JSON.stringify(requestObjects))
+
+            // Re-map the defined contours (50%, EOC, EOC-2) back to the result by searching each line from the query object
+            result.contours.forEach(contour => {
+                let matchedQuery = requestObjects.find(o => {
+                    return contour.properties.name === o.name && contour.properties.satellite === o.satellite && contour.properties.path === o.path && Utils.round(contour.properties.relativeGain, 1) === Utils.round(o.contourValue, 1)
+                })
+                if (matchedQuery) {
+                    console.log('Contour found!! ' + matchedQuery.definedContour)
+                    contour.properties.definedContour = matchedQuery.definedContour
+                }
+            })
+
+            return result
+        } catch (e) {
+            console.log(e)
+            return null
+        }
+
+    }
+
     static async getMultipleContourLines(arrayOfRequestObjects) {
         try {
             let arrayOfQueries = arrayOfRequestObjects.map(convertContourRequestObjectToGeojsonQuery)

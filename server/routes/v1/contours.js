@@ -8,6 +8,7 @@ const turf = require('@turf/turf')
 const geojsonArea = require('@mapbox/geojson-area');
 const contourRouter = require('express').Router();
 const Contour = require('../../classes/contour')
+const Transponder = require('../../classes/transponder')
 
 var {Contours2} = require('../../models/contours');
 let {Grids} = require('../../models/grids')
@@ -79,6 +80,23 @@ contourRouter.post('/get-contour-lines', (req, res) => {
     }).catch(e => {
         res.status(404).send(e)
     })
+})
+
+// Return all defined contour lines of given beam names, path and defined contours
+contourRouter.post('/get-defined-contours', (req, res) => {
+    let {beams, paths, definedContours, satellite} = req.body
+    console.log('searching defined contours')
+    // Returns if beams, paths, defined contours does not have elements
+    if (!(beams.length > 0, paths.length > 0 & definedContours.length > 0 && satellite)) {
+        res.status(404).send()
+    } else {
+        Contour.getDefinedContours({ beams, paths, definedContours, satellite }).then(result => {
+            res.status(200).send(result)
+        }).catch(e => {
+            res.status(404).send(e)
+        })
+
+    }
 })
 
 // Return all EOC lines of given beam, path, or transponders
