@@ -1,3 +1,4 @@
+require('dotenv').config()
 const Antenna = require('./classes/antenna');
 const jsonLog = require('./lib/utils').jsonLog;
 const _ = require('lodash');
