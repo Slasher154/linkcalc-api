@@ -75,6 +75,7 @@ contourRouter.post('/find-matching-return-contour', (req, res) => {
 
 contourRouter.post('/get-contour-lines', (req, res) => {
     let {contourObjects} = req.body // Array of objects which specifies contour properties to query
+    console.log(`Contour objects = ${JSON.stringify(contourObjects)}`)
     Contour.getMultipleContourLines(contourObjects).then(result => {
         res.status(200).send(result)
     }).catch(e => {
