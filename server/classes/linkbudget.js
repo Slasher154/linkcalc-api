@@ -215,7 +215,12 @@ class LinkBudget {
         // this.logMessage(JSON.stringify(this.forwardLinkResults, undefined, 2))
         return {
             forwardLinkResults: this.forwardLinkResults,
-            returnLinkResults: this.returnLinkResults
+            returnLinkResults: this.returnLinkResults,
+            assumptions: {
+                maxMode: this.maxMode,
+                findBestTransponders: this.findBestTransponders,
+                findMaxCoverage: this.findMaxCoverage
+            }
         }
     }
 
@@ -297,13 +302,12 @@ class LinkBudget {
 
         // Check if this platform is MCG fixed
         if (!this.modem.findBestMcg) {
-            ``
             this.logMessage(`This modem is MCG fixed`, 2)
 
 
-            // If yes, set MCGs = all MCG given in the modem application
+            // If MCGS are fixed by the user selection, the list of MCGs are the ones that comes within application object
 
-            // Start looping MCG
+            // Start looping MCG inside application object
             for (let mcg of this.application.mcgs) {
 
                 // Set MCG
@@ -520,6 +524,8 @@ class LinkBudget {
 
         // Check MCG at clear sky result object
         let mcgClearSky = this.currentClearSkyResult.mcg
+        let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
+
         this.logMessage(`MCG at clear sky is ${mcgClearSky.name}`, 2)
 
         // Check if modem has ACM function and dynamic channel function and also user selects finding best MCG (utilizing the ACM feature)
@@ -527,26 +533,39 @@ class LinkBudget {
         // If yes-yes, perform normal search over looping MCG and available symbol rates
         if (this.application.acm && this.application.dynamic_channels && this.modem.findBestMcg) {
             this.logMessage('This app has ACM and dynamic channels', 2)
-            let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
-            let lowerBandwidthPool = this.findLowerBandwidthPool()
+            let lowerSymbolRatePool = this.findLowerBandwidthPool()
 
             let results = []
 
-            // await does not work with forEach
-            for (let mcg of lowerMcgs) {
-                this.mcg = mcg
-                for (let bandwidth of lowerBandwidthPool) {
-                    this.bandwidthValue = bandwidth
-                    this.bandwidthUnit = 'ksps'
+            // If finding max link availability option is selected, run on the lowest pair of bandwidth pool + mcg only
+            if (this.findMaxLinkAvailability) {
+                let lowestSymbolRate = _.min(lowerSymbolRatePool)
+                let leastEfficiencyMcg = _.min(lowerMcgs, mcg => mcg.spectral_efficiency)
+                this.bandwidthValue = lowestSymbolRate
+                this.bandwidthUnit = 'ksps'
+                this.mcg = leastEfficiencyMcg
+                try {
+                    let result = await this.runFindMaxAvailabilityLink()
+                    results.push(result)
+                } catch (e) {
+                    this.logMessage(e)
+                }
+            } else { // else run rain fade link over all pairs of symbol rate + MCG
+                for (let mcg of lowerMcgs) {
+                    this.mcg = mcg
+                    for (let symbolRate of lowerSymbolRatePool) {
+                        this.bandwidthValue = symbolRate
+                        this.bandwidthUnit = 'ksps'
 
-                    try {
-                        let result = await this.runLink()
-                        results.push(result)
-                    } catch (e) {
-                        this.logMessage(e)
+                        try {
+                            let result = await this.runLink()
+                            results.push(result)
+                        } catch (e) {
+                            this.logMessage(e)
+                        }
+
+
                     }
-
-
                 }
             }
 
@@ -556,61 +575,24 @@ class LinkBudget {
             })
         }
 
-        // If yes-no, perform binary search over looping MCG
+        // If yes-no => no dynamic channels, only MCG changes when rain fades
         else if (this.application.acm && this.modem.findBestMcg) {
             this.logMessage('This app has ACM (no dynamic channels)', 2)
-            let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
-            this.logMessage(lowerMcgs)
-            let minIndex = 0
-            let maxIndex = lowerMcgs.length - 1
-            let currentIndex
-            let currentElement
-            let answer = 0
-            let result, resultAnswer
 
-            while (minIndex <= maxIndex) {
-                currentIndex = (minIndex + maxIndex) / 2 | 0
-                currentElement = lowerMcgs[currentIndex]
-
-                // Set mcg to this value
-                this.mcg = currentElement
-                this.logMessage(`Setting MCG to ${currentElement.name}`, 3)
+            // If finding max link availability option is selected, run on the least efficient MCG only
+            if (this.findMaxLinkAvailability) {
+                let leastEfficiencyMcg = _.min(lowerMcgs, mcg => mcg.spectral_efficiency)
+                this.mcg = leastEfficiencyMcg
                 try {
-                    result = await this.runLink()
+                    rainFadeResult = await this.runFindMaxAvailabilityLink()
                 } catch (e) {
                     this.logMessage(e)
                 }
-
-                if (result.passed) { // pass
-                    minIndex = currentIndex + 1
-                    this.logMessage(`${currentElement.name} passes the rain fade condition`, 3)
-                    answer = currentElement
-                    resultAnswer = result
-                } else { // not pass
-                    maxIndex = currentIndex - 1
-                    this.logMessage(`${currentElement.name} doesn't pass the rain fade condition`, 3)
-                }
-            }
-            this.logMessage(`Searching the best MCG for rain fade finished, answer is ${answer.name}`, 2)
-            rainFadeResult = resultAnswer
-        } else {
-            this.logMessage(`This app has no ACM`, 2)
-            // If no-no, run link at the same code as clear sky case (there is no 'no-yes' case as dynamic channel always comes with ACM)
-            this.mcg = mcgClearSky
-            this.logMessage(`Running rain fade link`, 2)
-            try {
-                rainFadeResult = await this.runLink()
-
-            } catch (e) {
-                this.logMessage(e)
-            }
-
-            // If the existing condition still does not pass, perform binary search over link availability to find max total link availability
-            if (!rainFadeResult.passed) {
-                this.logMessage(`Link does not pass at rain fade, find maximum link availability`, 2)
-                let linkAvailabilityRange = _.range(95, 99.5, 0.1)
+            } else { // perform binary search over looping MCG
+                let lowerMcgs = this.findLowerMcgsThanClearSky(mcgClearSky)
+                this.logMessage(lowerMcgs)
                 let minIndex = 0
-                let maxIndex = linkAvailabilityRange.length - 1
+                let maxIndex = lowerMcgs.length - 1
                 let currentIndex
                 let currentElement
                 let answer = 0
@@ -618,12 +600,11 @@ class LinkBudget {
 
                 while (minIndex <= maxIndex) {
                     currentIndex = (minIndex + maxIndex) / 2 | 0
-                    currentElement = Utils.round(linkAvailabilityRange[currentIndex], 1)
+                    currentElement = lowerMcgs[currentIndex]
 
-                    // Set uplink or downlink availability to new value (forward link changes downlink avail, return link changes uplink avail)
-                    this.path === 'forward' ? this.downlinkAvailability = currentElement : this.uplinkAvailability = currentElement
-                    this.logMessage(`Setting uplink availability to ${this.uplinkAvailability}% and downlink availability to ${this.downlinkAvailability}%`, 3)
-
+                    // Set mcg to this value
+                    this.mcg = currentElement
+                    this.logMessage(`Setting MCG to ${currentElement.name}`, 3)
                     try {
                         result = await this.runLink()
                     } catch (e) {
@@ -632,22 +613,82 @@ class LinkBudget {
 
                     if (result.passed) { // pass
                         minIndex = currentIndex + 1
-                        this.logMessage(`${currentElement}% passes the condition`, 3)
+                        this.logMessage(`${currentElement.name} passes the rain fade condition`, 3)
                         answer = currentElement
                         resultAnswer = result
                     } else { // not pass
                         maxIndex = currentIndex - 1
-                        this.logMessage(`${currentElement}% doesn't pass the condition`, 3)
+                        this.logMessage(`${currentElement.name} doesn't pass the rain fade condition`, 3)
                     }
                 }
-                this.logMessage(`Searching the max link availability finished, answer is ${answer}%`, 2)
+                this.logMessage(`Searching the best MCG for rain fade finished, answer is ${answer.name}`, 2)
                 rainFadeResult = resultAnswer
             }
-
+        } else {
+            this.logMessage(`This app has no ACM`, 2)
+            // If no-no, run link at the same code as clear sky case (there is no 'no-yes' case as dynamic channel always comes with ACM)
+            this.mcg = mcgClearSky
+            this.logMessage(`Running rain fade link`, 2)
+            // If finding max link availability
+            try {
+                if (this.findMaxAvailability) {
+                    rainFadeResult = await this.runFindMaxAvailabilityLink()
+                } else {
+                    rainFadeResult = await this.runLink()
+                    // If the existing condition still does not pass, perform binary search over link availability to find max total link availability
+                    if (!rainFadeResult.passed) {
+                        console.log('Link at lowest MCG still does not pass, lowering link availability to make it pass')
+                        rainFadeResult = await this.runFindMaxAvailabilityLink()
+                    }
+                }
+            } catch (e) {
+                this.logMessage(e)
+            }
         }
 
         // Return result
+        console.log('Rain fade result = ' + JSON.stringify(rainFadeResult, undefined, 2))
         return rainFadeResult
+    }
+
+    async runFindMaxAvailabilityLink () {
+        this.logMessage(`Finding maximum link availability`, 2)
+        let linkAvailabilityRange = _.range(95, 99.5, 0.1)
+        let minIndex = 0
+        let maxIndex = linkAvailabilityRange.length - 1
+        let currentIndex
+        let currentElement
+        let answer = 0
+        let result, resultAnswer
+
+        while (minIndex <= maxIndex) {
+            currentIndex = (minIndex + maxIndex) / 2 | 0
+            currentElement = Utils.round(linkAvailabilityRange[currentIndex], 1)
+
+            // Set uplink or downlink availability to new value (forward link changes downlink avail, return link changes uplink avail)
+            this.path === 'forward' ? this.downlinkAvailability = currentElement : this.uplinkAvailability = currentElement
+            this.logMessage(`Setting uplink availability to ${this.uplinkAvailability}% and downlink availability to ${this.downlinkAvailability}%`, 3)
+
+            try {
+                result = await this.runLink()
+            } catch (e) {
+                this.logMessage(e)
+            }
+
+            if (result.passed) { // pass
+                minIndex = currentIndex + 1
+                this.logMessage(`${currentElement}% passes the condition`, 3)
+                answer = currentElement
+                resultAnswer = result
+            } else { // not pass
+                maxIndex = currentIndex - 1
+                this.logMessage(`${currentElement}% doesn't pass the condition`, 3)
+            }
+        }
+        this.logMessage(`Searching the max link availability finished, answer is ${answer}%`, 2)
+        // If the result at the minimum range of link availability still does not pass, the result answer will be undefined.
+        // Set it equal to result
+        return resultAnswer || result
     }
 
     async runLink() {
@@ -1193,7 +1234,7 @@ class LinkBudget {
             requiredMargin: this.requiredMargin,
             passed: passed,
             passedText: passed ? 'Yes' : 'No',
-            linkAvailability: Utils.round(linkAvailability, 2),
+            // linkAvailability: passed ? Utils.round(linkAvailability, 2) : 'N/A',
             mcg: this.mcg,
             occupiedBandwidth: Utils.round(this.occupiedBandwidth, 2),
             noiseBandwidth: Utils.round(noiseBandwidth, 2),
@@ -1203,6 +1244,13 @@ class LinkBudget {
             powerUtilPercent: Utils.round(powerUtilPercent, 2),
             rollOffFactor: this.application.roll_off_factor
         });
+
+        // Add total link availability to the result only if the condition is rain
+        if (this.condition === 'rain') {
+            _.assign(result, {
+                linkAvailability: passed ? Utils.round(linkAvailability, 2) : 'N/A'
+            })
+        }
 
         this.logMessage('-----------')
         this.logMessage('***********')

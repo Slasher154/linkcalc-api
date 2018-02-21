@@ -111,7 +111,8 @@ contourRouter.post('/get-eoc-lines', (req, res) => {
                 path: tp.type,
                 parameter: tp.type === 'forward' ? 'eirp' : 'gt',
                 satellite: tp.satellite,
-                contourValue: _.has(tp, 'contour_eoc') ? tp.contour_eoc : 0
+                contourValue: _.has(tp, 'contour_eoc') ? tp.contour_eoc : 0,
+                category: 'EOC'
             }
         })
         try {
