@@ -39,7 +39,9 @@ class LinkBudget {
 
     async runLinkBudget() {
 
-        this.debugLevel = 5
+        this.debugLevel = 3
+        this.forwardWarningMessages = []
+        this.returnWarningMessages = []
 
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
@@ -136,6 +138,28 @@ class LinkBudget {
                     this.modem = new Modem(modem)
                     this.modem.print()
 
+                    // If this modem has symbol rate min/max/steps, add warning messages
+                    let paths = ['forward', 'return']
+                    paths.forEach(p => {
+                        let application = this.findApplicationByPath(p)
+                        if (application.minimum_symbol_rate > 0 && application.maximum_symbol_rate > 0) {
+                            let message = ''
+                            message += `${this.modem.name} - ${application.name}`
+                            message += ` has available symbol rate between ${application.minimum_symbol_rate} to ${application.maximum_symbol_rate} ksps.`
+                            message += ` If the input data rate (in bps) demands the symbol rate out of this range, the result will be calculated at this min/max instead.`
+                            message += ` This will make the output data rate not exactly as the request input`
+                            this[p + 'WarningMessages'].push(message)
+                        }
+                        if (application.symbol_rates.length > 0) {
+                            let message = ''
+                            message += `${this.modem.name} - ${application.name} has  available symbol rates steps of ${application.symbol_rates.join(',')} ksps.`
+                            message += ` Therefore, the output data rate (in bps) will be not exactly as the given data rate input since the link must use the available symbol rates instead of calculated symbol rates to get an exact given data rate (in bps)`
+                            message += ` The program will attempt to find the minimum symbol rate from available pool to get the data rate equal or higher than the given in request input`
+                            this[p + 'WarningMessages'].push(message)
+                        }
+                    })
+
+
                     let targetedForwardLinkMargins = []
                     let targetedReturnLinkMargins = []
                     if (this.findMaxCoverage) {
@@ -220,7 +244,9 @@ class LinkBudget {
                 maxMode: this.maxMode,
                 findBestTransponders: this.findBestTransponders,
                 findMaxCoverage: this.findMaxCoverage
-            }
+            },
+            forwardWarningMessages: _.uniq(this.forwardWarningMessages),
+            returnWarningMessages: _.uniq(this.returnWarningMessages)
         }
     }
 
@@ -448,7 +474,7 @@ class LinkBudget {
             // If there is no answer, just set MCG to the least efficient MCG (first MCG)
             this.logMessage(`Searching for best MCG finished, answer is ${answer.name}`, 2)
             this.logMessage('Saving clear sky result')
-            linkResult.clearSky = resultAnswer
+            linkResult.clearSky = resultAnswer || result
 
             // Run the rain fade link
             // Set clear sky result to instance of an object so it can get referred in rain fade case
@@ -485,6 +511,9 @@ class LinkBudget {
         this.logMessage('Setting conditions for CLEAR SKY')
         this.condition = 'clear'
 
+        // This parameters indicate that the link needs to seek occupied bandwidth
+        this.seekOccupiedBandwidthAtThisCase = true
+
         // if finding max coverage, set link margin to the custom one
         if (this.findMaxCoverage && this.path === 'forward') {
             this.logMessage(`Finding max coverage on forward link`, 1)
@@ -503,6 +532,7 @@ class LinkBudget {
         try {
             let clearSkyResult = await this.runLink()
             this.logMessage(`Clear sky result shows MCG = ${clearSkyResult.mcg.name}`, 2)
+            this.logMessage(`Occ.BW = ${clearSkyResult.occupied_bandwidth} MHz`)
             return clearSkyResult
         } catch (e) {
             this.logMessage(e)
@@ -528,12 +558,19 @@ class LinkBudget {
 
         this.logMessage(`MCG at clear sky is ${mcgClearSky.name}`, 2)
 
+        // Parameter to tell if bandwidth changes at rain
+        this.seekOccupiedBandwidthAtThisCase = false
+
         // Check if modem has ACM function and dynamic channel function and also user selects finding best MCG (utilizing the ACM feature)
 
         // If yes-yes, perform normal search over looping MCG and available symbol rates
         if (this.application.acm && this.application.dynamic_channels && this.modem.findBestMcg) {
             this.logMessage('This app has ACM and dynamic channels', 2)
             let lowerSymbolRatePool = this.findLowerBandwidthPool()
+
+            // In dynamic channels, seek new occupied bandwidth at rain fade
+            this.seekOccupiedBandwidthAtThisCase = true
+
 
             let results = []
 
@@ -575,7 +612,7 @@ class LinkBudget {
             })
         }
 
-        // If yes-no => no dynamic channels, only MCG changes when rain fades
+        // If yes-no => no dynamic channels, only MCG changes when rain fades (bandwidth do not change)
         else if (this.application.acm && this.modem.findBestMcg) {
             this.logMessage('This app has ACM (no dynamic channels)', 2)
 
@@ -605,6 +642,7 @@ class LinkBudget {
                     // Set mcg to this value
                     this.mcg = currentElement
                     this.logMessage(`Setting MCG to ${currentElement.name}`, 3)
+                    this.logMessage(`Seek occupied bandwidth = ${this.seekOccupiedBandwidthAtThisCase}`)
                     try {
                         result = await this.runLink()
                     } catch (e) {
@@ -622,7 +660,8 @@ class LinkBudget {
                     }
                 }
                 this.logMessage(`Searching the best MCG for rain fade finished, answer is ${answer.name}`, 2)
-                rainFadeResult = resultAnswer
+                // If the last MCG doesn't give answer, use it as answer
+                rainFadeResult = resultAnswer || result
             }
         } else {
             this.logMessage(`This app has no ACM`, 2)
@@ -647,7 +686,6 @@ class LinkBudget {
         }
 
         // Return result
-        console.log('Rain fade result = ' + JSON.stringify(rainFadeResult, undefined, 2))
         return rainFadeResult
     }
 
@@ -696,9 +734,16 @@ class LinkBudget {
         let result = {}
         this.overusedPower = 0
 
-        // Seek the occupied bandwidth
-        this.seekOccupiedBandwidth()
-        this.logMessage('Seeking occupied bandwidth')
+        // Seek the occupied bandwidth if true (false when this case is rain fade without dynamic channels feature in modem)
+        if (this.seekOccupiedBandwidthAtThisCase) {
+            this.seekOccupiedBandwidth()
+            this.logMessage('Seeking occupied bandwidth')
+        } else { // Set the occupied bandwidth to the current clear sky case
+            this.logMessage('Current clear sky BW: ' + this.currentClearSkyResult.occupiedBandwidth, 1)
+            this.occupiedBandwidth = this.currentClearSkyResult.occupiedBandwidth
+        }
+        this.logMessage('Condition: ' + this.condition, 1)
+        this.logMessage('Occ.BW = ' + this.occupiedBandwidth, 1)
 
         // Setup parameters
         let orbitalSlot = this.satellite.orbital_slot
@@ -1236,6 +1281,7 @@ class LinkBudget {
             passedText: passed ? 'Yes' : 'No',
             // linkAvailability: passed ? Utils.round(linkAvailability, 2) : 'N/A',
             mcg: this.mcg,
+            mcgEbe: Utils.round(dataRate / this.occupiedBandwidth, 2),
             occupiedBandwidth: Utils.round(this.occupiedBandwidth, 2),
             noiseBandwidth: Utils.round(noiseBandwidth, 2),
             roundupBandwidth: Utils.round(roundupBandwidth, 2),
@@ -1667,7 +1713,7 @@ class LinkBudget {
         this.logMessage('Calculate bandwidth from App ' + app.name + " mcg = " + mcg.name + " spec.eff = " + mcg.spectral_efficiency);
         this.logMessage('Bandwidth input = ' + value + " " + unit + " | BT = " + bt);
 
-        // if user input data rate, find the bandwidth from data rate / current mcg ebe
+        // if user input data rate, find the bandwidth from data rate / current mcg mod-bit efficiency
         var sr = 0;
         if (_.includes(["Mbps", "kbps"], unit)) {
             // if Mbps, convert to kbps
