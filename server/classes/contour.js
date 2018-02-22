@@ -209,20 +209,28 @@ class Contour {
             let arrayOfQueries = arrayOfRequestObjects.map(convertContourRequestObjectToGeojsonQuery)
             // Merge request with $or
             console.log(`Queries = ${JSON.stringify(arrayOfQueries)}`)
-            let returnResults = await Contours2.find({ $or: arrayOfQueries })
+            // Filter the falsey value from the request array
+            let nonFalseResults = arrayOfQueries.filter(v => !!v)
+            if (nonFalseResults.length > 0) {
+                let returnResults = await Contours2.find({ $or: nonFalseResults })
 
-            // Re-map the category back to the result if input has any category
-            returnResults.forEach(contour => {
-                let matchedQuery = arrayOfRequestObjects.find(o => {
-                    return contour.properties.name === o.name && contour.properties.satellite === o.satellite && contour.properties.path === o.path && Utils.round(contour.properties.relativeGain, 1) === Utils.round(o.contourValue, 1)
+                // Re-map the category back to the result if input has any category
+                returnResults.forEach(contour => {
+                    let matchedQuery = arrayOfRequestObjects.find(o => {
+                        return contour.properties.name === o.name && contour.properties.satellite === o.satellite && contour.properties.path === o.path && Utils.round(contour.properties.relativeGain, 1) === Utils.round(o.contourValue, 1)
+                    })
+                    if (matchedQuery && matchedQuery.category) {
+                        console.log('Contour found!! ' + matchedQuery.category)
+                        contour.properties.category = matchedQuery.category
+                    }
                 })
-                if (matchedQuery && matchedQuery.category) {
-                    console.log('Contour found!! ' + matchedQuery.category)
-                    contour.properties.category = matchedQuery.category
-                }
-            })
 
-            return { contours: returnResults }
+                return { contours: returnResults }
+            } else {
+                // If query all false, ex. request for Peak contours which has no line, return blank array
+                return { contours: [] }
+            }
+
         } catch (e) {
             console.log(e)
             return false
