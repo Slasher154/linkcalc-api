@@ -7,6 +7,7 @@ const Antenna = require('./antenna')
 const Atmospheric = require('./atmospheric')
 const Bandwidth = require('./bandwidth')
 const Buc = require('./buc')
+const Constant = require('./constants')
 const Contour = require('./contour')
 const GatewayStation = require('./gatewayStation')
 const Location = require('./location')
@@ -18,9 +19,10 @@ const Transponder = require('./transponder')
 const Utils = require('./utils')
 
 // Mongoose Models
+const {Constants} = require('../models/constants')
 const {Gateways} = require('../models/gateways')
 const {Locations} = require('../models/locations')
-const {Satellites} = require('../models/satellites');
+const {Satellites} = require('../models/satellites')
 const {Transponders} = require('../models/transponders')
 
 class LinkBudget {
@@ -42,6 +44,14 @@ class LinkBudget {
         this.debugLevel = 3
         this.forwardWarningMessages = []
         this.returnWarningMessages = []
+
+        // Retrieve all constants from database
+        try {
+            let constantArray = await Constants.find()
+            this.constants = new Constant(constantArray)
+        } catch (e) {
+            console.log(e)
+        }
 
         // If default gateway is selected, add a single gatewway object
         if (this.useDefaultGateway) {
@@ -691,7 +701,11 @@ class LinkBudget {
 
     async runFindMaxAvailabilityLink () {
         this.logMessage(`Finding maximum link availability`, 2)
-        let linkAvailabilityRange = _.range(95, 99.5, 0.1)
+        let minimumLinkAvailabilitySeekRange = this.constants.minimumLinkAvailabilitySeekRange
+        let maximumLinkAvailabilitySeekRange = this.constants.maximumLinkAvailabilitySeekRange
+        let linkAvailabilitySeekStep = this.constants.linkAvailabilitySeekStep
+        this.logMessage(`Seeking link availability between range ${minimumLinkAvailabilitySeekRange} % to ${maximumLinkAvailabilitySeekRange} % with a step of ${linkAvailabilitySeekStep} %`, 2)
+        let linkAvailabilityRange = _.range(minimumLinkAvailabilitySeekRange, maximumLinkAvailabilitySeekRange, linkAvailabilitySeekStep)
         let minIndex = 0
         let maxIndex = linkAvailabilityRange.length - 1
         let currentIndex
