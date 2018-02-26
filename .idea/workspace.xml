@@ -2,11 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/classes/constants.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/models/constants.js" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/routes/v1/constants.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/index.js" afterPath="$PROJECT_DIR$/server/routes/v1/index.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/constants.js" afterPath="$PROJECT_DIR$/server/routes/v1/constants.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/gateways.js" afterPath="$PROJECT_DIR$/server/routes/v1/gateways.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -25,13 +23,43 @@
       <file leaf-file-name="linkbudget.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="244">
-              <caret line="712" column="34" lean-forward="false" selection-start-line="712" selection-start-column="34" selection-end-line="712" selection-end-column="34" />
+            <state relative-caret-position="560">
+              <caret line="710" column="24" lean-forward="false" selection-start-line="710" selection-start-column="24" selection-end-line="710" selection-end-column="24" />
               <folding>
-                <element signature="e#15298#19037#0" expanded="false" />
-                <element signature="e#26093#27969#0" expanded="false" />
-                <element signature="e#28366#28703#0" expanded="false" />
+                <element signature="e#15622#19361#0" expanded="false" />
+                <element signature="e#26417#28293#0" expanded="false" />
+                <element signature="e#28690#29027#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gateways.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/models/gateways.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="gateways.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/gateways.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="433">
+              <caret line="46" column="19" lean-forward="true" selection-start-line="46" selection-start-column="19" selection-end-line="46" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="buc.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/buc.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -39,8 +67,8 @@
       <file leaf-file-name="contours.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="325">
-              <caret line="78" column="27" lean-forward="false" selection-start-line="78" selection-start-column="27" selection-end-line="78" selection-end-column="27" />
+            <state relative-caret-position="550">
+              <caret line="93" column="25" lean-forward="false" selection-start-line="93" selection-start-column="25" selection-end-line="93" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -56,22 +84,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="constants.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/classes/constants.js">
+      <file leaf-file-name="contour.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="satellites.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/routes/v1/satellites.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
+            <state relative-caret-position="204">
+              <caret line="150" column="17" lean-forward="false" selection-start-line="150" selection-start-column="17" selection-end-line="150" selection-end-column="17" />
+              <folding>
+                <element signature="n#!!block;n#getContour#0;n#Contour#0" expanded="false" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -86,11 +106,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="constants.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="constants.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/routes/v1/constants.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="36" column="18" lean-forward="true" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
+            <state relative-caret-position="294">
+              <caret line="23" column="21" lean-forward="false" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="bucs.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/bucs.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="360">
+              <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="32" selection-end-column="3" />
               <folding />
             </state>
           </provider>
@@ -107,12 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>../../models/gri</find>
-      <find>G</find>
-      <find>Gridss</find>
-      <find>Grids</find>
-      <find>findTransponderByPath</find>
-      <find>Utils.round</find>
       <find>getMulti</find>
       <find>maxMode</find>
       <find>category</find>
@@ -136,11 +160,15 @@
       <find>Contour objec</find>
       <find>Contour objects</find>
       <find>Constants</find>
+      <find>range</find>
+      <find>99.5</find>
+      <find>99.</find>
+      <find>alias</find>
+      <find>minimumLin</find>
+      <find>constant</find>
       <find>buc</find>
     </findStrings>
     <replaceStrings>
-      <replace>return</replace>
-      <replace>orbitalSlot</replace>
       <replace>this.logTitle</replace>
       <replace>Antenna.temp(</replace>
       <replace>Station.systemTemp(</replace>
@@ -167,8 +195,10 @@
       <replace>modem</replace>
       <replace>SavedRequests</replace>
       <replace>Bucs</replace>
-      <replace>constant</replace>
+      <replace>name</replace>
       <replace>seekOccupiedBandwidthAtThisCase</replace>
+      <replace>gateway</replace>
+      <replace>constant</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/server/routes</dir>
@@ -180,7 +210,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/server/lib/utils.js" />
         <option value="$PROJECT_DIR$/server/classes/bandwidth.js" />
         <option value="$PROJECT_DIR$/server/classes/transmission.js" />
         <option value="$PROJECT_DIR$/server/classes/atmosphericLoss.js" />
@@ -223,14 +252,15 @@
         <option value="$PROJECT_DIR$/server/db/mongoose.js" />
         <option value="$PROJECT_DIR$/server/classes/transponder.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/contours.js" />
-        <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
         <option value="$PROJECT_DIR$/server/classes/contour.js" />
-        <option value="$PROJECT_DIR$/server/classes/constants.js" />
         <option value="$PROJECT_DIR$/server/models/constants.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/bucs.js" />
         <option value="$PROJECT_DIR$/server/models/bucs.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/index.js" />
+        <option value="$PROJECT_DIR$/server/classes/constants.js" />
+        <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/constants.js" />
+        <option value="$PROJECT_DIR$/server/routes/v1/gateways.js" />
       </list>
     </option>
   </component>
@@ -516,7 +546,7 @@
     </panes>
   </component>
   <component name="PropertiesComponent">
-    <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
+    <property name="settings.editor.selected.configurable" value="watcher.settings" />
     <property name="JavaScriptPreferStrict" value="false" />
     <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -707,21 +737,7 @@
       <workItem from="1515470286476" duration="51516000" />
       <workItem from="1516688872161" duration="5523000" />
       <workItem from="1518161453370" duration="11000" />
-      <workItem from="1519111897360" duration="16880000" />
-    </task>
-    <task id="LOCAL-00007" summary="Update readme to include API docs">
-      <created>1505882889736</created>
-      <option name="number" value="00007" />
-      <option name="presentableId" value="LOCAL-00007" />
-      <option name="project" value="LOCAL" />
-      <updated>1505882889736</updated>
-    </task>
-    <task id="LOCAL-00008" summary="Enable CORS">
-      <created>1506680115917</created>
-      <option name="number" value="00008" />
-      <option name="presentableId" value="LOCAL-00008" />
-      <option name="project" value="LOCAL" />
-      <updated>1506680115917</updated>
+      <workItem from="1519111897360" duration="20723000" />
     </task>
     <task id="LOCAL-00009" summary="Add all transponders API">
       <created>1507025673084</created>
@@ -1052,11 +1068,25 @@
       <option name="project" value="LOCAL" />
       <updated>1519269568529</updated>
     </task>
-    <option name="localTasksCounter" value="56" />
+    <task id="LOCAL-00056" summary="Add CRUD API for constants">
+      <created>1519272855044</created>
+      <option name="number" value="00056" />
+      <option name="presentableId" value="LOCAL-00056" />
+      <option name="project" value="LOCAL" />
+      <updated>1519272855044</updated>
+    </task>
+    <task id="LOCAL-00057" summary="Update link availability seek to use constants from database">
+      <created>1519274687524</created>
+      <option name="number" value="00057" />
+      <option name="presentableId" value="LOCAL-00057" />
+      <option name="project" value="LOCAL" />
+      <updated>1519274687524</updated>
+    </task>
+    <option name="localTasksCounter" value="58" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="324873000" />
+    <option name="totallyTimeSpent" value="328716000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -1111,8 +1141,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Fix the array of remote stations and transponders not being combined" />
-    <MESSAGE value="Add finding maximum coverage" />
     <MESSAGE value="Add API to fetch multiple contour lines to show on Google Maps" />
     <MESSAGE value="Add insert modem API" />
     <MESSAGE value="Add Edit and Delete modem API" />
@@ -1136,7 +1164,9 @@
     <MESSAGE value="Remove total link availability field from clear sky result and add find max link availability option" />
     <MESSAGE value="Set rain fade case bandwidth to be equal to clear sky result bandwidth in case of ACM apps" />
     <MESSAGE value="Fix the error where the contour line request is invalid (i.e. request for peak contour lines)" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix the error where the contour line request is invalid (i.e. request for peak contour lines)" />
+    <MESSAGE value="Add CRUD API for constants" />
+    <MESSAGE value="Update link availability seek to use constants from database" />
+    <option name="LAST_COMMIT_MESSAGE" value="Update link availability seek to use constants from database" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1145,20 +1175,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/transponders.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" column="18" lean-forward="false" selection-start-line="37" selection-start-column="18" selection-end-line="37" selection-end-column="18" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/locations.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="69" column="15" lean-forward="false" selection-start-line="69" selection-start-column="0" selection-end-line="69" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/models/contours.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1404,28 +1420,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="712" column="34" lean-forward="false" selection-start-line="712" selection-start-column="34" selection-end-line="712" selection-end-column="34" />
-          <folding>
-            <element signature="e#15298#19037#0" expanded="false" />
-            <element signature="e#26093#27969#0" expanded="false" />
-            <element signature="e#28366#28703#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="442">
-          <caret line="222" column="36" lean-forward="false" selection-start-line="222" selection-start-column="36" selection-end-line="222" selection-end-column="36" />
-          <folding>
-            <element signature="n#!!block;n#getContour#0;n#Contour#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/satellites.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -1442,47 +1436,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/buc.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="20" lean-forward="false" selection-start-line="16" selection-start-column="20" selection-end-line="16" selection-end-column="20" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/bucs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="17" lean-forward="true" selection-start-line="22" selection-start-column="17" selection-end-line="22" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/models/bucs.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="4" lean-forward="true" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="4" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="325">
-          <caret line="78" column="27" lean-forward="false" selection-start-line="78" selection-start-column="27" selection-end-line="78" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/classes/constants.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
@@ -1498,6 +1452,76 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/contours.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="550">
+          <caret line="93" column="25" lean-forward="false" selection-start-line="93" selection-start-column="25" selection-end-line="93" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/contour.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="204">
+          <caret line="150" column="17" lean-forward="false" selection-start-line="150" selection-start-column="17" selection-end-line="150" selection-end-column="17" />
+          <folding>
+            <element signature="n#!!block;n#getContour#0;n#Contour#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/buc.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/constants.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="5" lean-forward="true" selection-start-line="9" selection-start-column="5" selection-end-line="9" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/classes/linkbudget.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="560">
+          <caret line="710" column="24" lean-forward="false" selection-start-line="710" selection-start-column="24" selection-end-line="710" selection-end-column="24" />
+          <folding>
+            <element signature="e#15622#19361#0" expanded="false" />
+            <element signature="e#26417#28293#0" expanded="false" />
+            <element signature="e#28690#29027#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/models/gateways.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/models/bucs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/bucs.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="360">
+          <caret line="24" column="0" lean-forward="false" selection-start-line="24" selection-start-column="0" selection-end-line="32" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/models/constants.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="195">
@@ -1508,8 +1532,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/constants.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="36" column="18" lean-forward="true" selection-start-line="36" selection-start-column="18" selection-end-line="36" selection-end-column="18" />
+        <state relative-caret-position="294">
+          <caret line="23" column="21" lean-forward="false" selection-start-line="23" selection-start-column="21" selection-end-line="23" selection-end-column="21" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/gateways.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="433">
+          <caret line="46" column="19" lean-forward="true" selection-start-line="46" selection-start-column="19" selection-end-line="46" selection-end-column="19" />
           <folding />
         </state>
       </provider>

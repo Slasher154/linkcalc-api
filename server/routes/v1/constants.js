@@ -18,6 +18,18 @@ constantRouter.get('/constants', (req, res) => {
     });
 });
 
+// find constant by ID
+
+constantRouter.post('/constants/find-by-id', (req, res) => {
+    const constantId = req.body.constantId;
+    console.log(`Constant ID = ${constantId}`)
+    Constants.findById(constantId).then(constant => {
+        res.status(200).send({constant})
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+});
+
 // find constant by alias
 
 constantRouter.post('/constants/find-by-alias', (req, res) => {
