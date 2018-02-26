@@ -3,6 +3,7 @@
  */
 
 const _ = require('lodash');
+const mongoose = require('mongoose')
 const gatewayRouter = require('express').Router();
 
 var {Gateways} = require('../../models/gateways');
