@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="">
+    <list default="true" id="e0b4f608-ac83-4e59-af81-94ef1f74915e" name="Default" comment="Add mongoose package import to gateway router">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/server/routes/v1/contourMigration.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/server/routes/v1/gateways.js" afterPath="$PROJECT_DIR$/server/routes/v1/gateways.js" />
     </list>
     <ignored path="$PROJECT_DIR$/.tmp/" />
     <ignored path="$PROJECT_DIR$/temp/" />
@@ -43,11 +44,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="gateways.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="gateways.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/server/routes/v1/gateways.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="39" lean-forward="true" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="39" />
+            <state relative-caret-position="570">
+              <caret line="38" column="19" lean-forward="true" selection-start-line="37" selection-start-column="39" selection-end-line="38" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="contourMigration.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/server/routes/v1/contourMigration.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/.gitignore">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -58,16 +79,6 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="550">
               <caret line="93" column="25" lean-forward="false" selection-start-line="93" selection-start-column="25" selection-end-line="93" selection-end-column="25" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="index.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/server/routes/v1/index.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="809">
-              <caret line="69" column="38" lean-forward="false" selection-start-line="69" selection-start-column="38" selection-end-line="69" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -153,9 +164,9 @@
       <find>99.5</find>
       <find>99.</find>
       <find>alias</find>
+      <find>buc</find>
       <find>minimumLin</find>
       <find>constant</find>
-      <find>buc</find>
     </findStrings>
     <replaceStrings>
       <replace>this.logTitle</replace>
@@ -185,9 +196,9 @@
       <replace>SavedRequests</replace>
       <replace>Bucs</replace>
       <replace>name</replace>
+      <replace>constant</replace>
       <replace>seekOccupiedBandwidthAtThisCase</replace>
       <replace>gateway</replace>
-      <replace>constant</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/server/routes</dir>
@@ -199,7 +210,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/server/classes/bandwidth.js" />
         <option value="$PROJECT_DIR$/server/classes/transmission.js" />
         <option value="$PROJECT_DIR$/server/classes/atmosphericLoss.js" />
         <option value="$PROJECT_DIR$/server/classes/satellite.js" />
@@ -250,6 +260,7 @@
         <option value="$PROJECT_DIR$/server/classes/linkbudget.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/constants.js" />
         <option value="$PROJECT_DIR$/server/routes/v1/gateways.js" />
+        <option value="$PROJECT_DIR$/.gitignore" />
       </list>
     </option>
   </component>
@@ -726,14 +737,7 @@
       <workItem from="1515470286476" duration="51516000" />
       <workItem from="1516688872161" duration="5523000" />
       <workItem from="1518161453370" duration="11000" />
-      <workItem from="1519111897360" duration="20867000" />
-    </task>
-    <task id="LOCAL-00010" summary="Add all gateways API">
-      <created>1507084159812</created>
-      <option name="number" value="00010" />
-      <option name="presentableId" value="LOCAL-00010" />
-      <option name="project" value="LOCAL" />
-      <updated>1507084159812</updated>
+      <workItem from="1519111897360" duration="21626000" />
     </task>
     <task id="LOCAL-00011" summary="Add adjacent satellites API">
       <created>1509093416795</created>
@@ -1071,11 +1075,18 @@
       <option name="project" value="LOCAL" />
       <updated>1519643454787</updated>
     </task>
-    <option name="localTasksCounter" value="59" />
+    <task id="LOCAL-00059" summary="Add mongoose package import to gateway router">
+      <created>1519643593308</created>
+      <option name="number" value="00059" />
+      <option name="presentableId" value="LOCAL-00059" />
+      <option name="project" value="LOCAL" />
+      <updated>1519643593308</updated>
+    </task>
+    <option name="localTasksCounter" value="60" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="328860000" />
+    <option name="totallyTimeSpent" value="329619000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="1280" y="0" width="1920" height="1080" extended-state="0" />
@@ -1087,7 +1098,7 @@
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Execute Anonymous" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32876712" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36102235" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.36102235" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.16613418" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32871288" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -1130,7 +1141,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="Add insert modem API" />
     <MESSAGE value="Add Edit and Delete modem API" />
     <MESSAGE value="Add Create, Edit and Delete antenna API" />
     <MESSAGE value="Add schema to cover custom antenna gain" />
@@ -1155,7 +1165,8 @@
     <MESSAGE value="Add CRUD API for constants" />
     <MESSAGE value="Update link availability seek to use constants from database" />
     <MESSAGE value="Fix Gateway Edit API to entirely replace the whole gateway document" />
-    <option name="LAST_COMMIT_MESSAGE" value="Fix Gateway Edit API to entirely replace the whole gateway document" />
+    <MESSAGE value="Add mongoose package import to gateway router" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add mongoose package import to gateway router" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -1164,14 +1175,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/server/models/contours.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/controllers/contours.js" />
     <entry file="file://$PROJECT_DIR$/server/classes/atmospheric.js">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="375">
@@ -1197,13 +1200,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
           <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/server/routes/v1/contourMigration.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" column="18" lean-forward="false" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
         </state>
       </provider>
     </entry>
@@ -1527,10 +1523,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/linkbudget2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/server/routes/v1/gateways.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="39" lean-forward="true" selection-start-line="25" selection-start-column="39" selection-end-line="25" selection-end-column="39" />
+        <state relative-caret-position="570">
+          <caret line="38" column="19" lean-forward="true" selection-start-line="37" selection-start-column="39" selection-end-line="38" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/server/routes/v1/contourMigration.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="0" lean-forward="true" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="0" lean-forward="true" selection-start-line="9" selection-start-column="0" selection-end-line="9" selection-end-column="0" />
           <folding />
         </state>
       </provider>
