@@ -60,14 +60,14 @@ class Station {
 
     async seekContourAndCoordinates (transponder) {
         console.log(`Finding contour of station with location ${this.printLocation()}, for Transponder ${transponder.name}-${transponder.type} `)
-        if (this.location.type === 'definedContours') {
+        if (this.location.type === 'definedContours' || this.location.type === 'maxContour') {
             let contourValue = this.location.name.replace('%', '').toLocaleLowerCase() // Remove % signs from 50% value and transform EOC to eoc
 
             if (contourValue === 'eoc-2') {
                 this.contour = transponder[`contour_eoc`] - 2
             } else if (contourValue === 'peak') {
                 this.contour = 0
-            } else if (contourValue === 'maxcontour') {
+            } else if (contourValue === 'maxContour') {
                 // do nothing here
             } else {
                 this.contour = transponder[`contour_${contourValue}`]

@@ -41,7 +41,7 @@ class LinkBudget {
 
     async runLinkBudget() {
 
-        this.debugLevel = 3
+        this.debugLevel = 5
         this.forwardWarningMessages = []
         this.returnWarningMessages = []
 
