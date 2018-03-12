@@ -22,6 +22,17 @@ var {Transponders} = require('../../models/transponders');
 //     });
 // })
 
+// find transponder by id
+transponderRouter.post('/transponders/find-by-id', (req, res) => {
+    const transponderId = req.body.transponderId;
+    console.log(`Transopnder ID = ${transponderId}`)
+    Transponders.findById(transponderId).then(transponder => {
+        res.status(200).send({transponder})
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+});
+
 transponderRouter.post('/transponders-by-satellite', (req, res) => {
     const satellite = req.body.satellite
     Transponders.find({satellite}).then((transponders) => {

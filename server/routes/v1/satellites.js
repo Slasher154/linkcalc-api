@@ -25,7 +25,18 @@ satelliteRouter.get('/satellites/:id', (req, res) => {
     });
 });
 
-// find satellite by slot => '/satellites/:slot'
+// find satellite by name => '
+
+satelliteRouter.post('/satellites-by-name', (req, res) => {
+    let {name} = req.body
+    Satellites.find({ name }).then((satellites) => {
+        res.status(200).json({satellites});
+    }).catch((e) => {
+        res.status(404).send(e);
+    });
+});
+
+// find satellite by slot
 
 satelliteRouter.post('/satellites-by-slot', (req, res) => {
     let {slot} = req.body
