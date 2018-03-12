@@ -26,7 +26,7 @@ var {Transponders} = require('../../models/transponders');
 // find transponder by id
 transponderRouter.post('/transponders/find-by-id', (req, res) => {
     const transponderId = req.body.transponderId;
-    console.log(`Transopnder ID = ${transponderId}`)
+    console.log(`Transponder ID = ${transponderId}`)
     Transponders.findById(transponderId).then(transponder => {
         res.status(200).send({transponder})
     }).catch(e => {
