@@ -83,4 +83,39 @@ transponderRouter.post('/update-eirp', (req, res) => {
     })
 })
 
+// edit transponder
+
+transponderRouter.post('/transponders/edit', (req, res) => {
+    const transponder = req.body.transponder
+    Transponders.findOneAndUpdate({ _id: transponder._id}, transponder).then(transponder => {
+        res.status(200).send({transponder})
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
+// add transponder
+
+transponderRouter.post('/transponders/add', (req, res) => {
+    const transponder = req.body.transponder;
+    console.log('Incoming transponder = ' + JSON.stringify(transponder, undefined, 2))
+    transponder._id = mongoose.Types.ObjectId().toString() // Generate the Object ID in String format
+    Transponders.insertMany([transponder]).then(transponder => {
+        res.status(200).send({transponder: transponder[0]});
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
+// delete transponder
+
+transponderRouter.post('/transponders/delete', (req, res) => {
+    const transponderId = req.body.transponderId;
+    Transponders.findByIdAndRemove(transponderId).then(transponder => {
+        res.status(200).send({transponder})
+    }).catch(e => {
+        res.status(404).send(e)
+    })
+})
+
 module.exports = transponderRouter;

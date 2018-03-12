@@ -46,6 +46,7 @@ var Transponders = mongoose.model('channels', new mongoose.Schema({
     ci_uplink_adj_cell: Number,
     ci_downlink_adj_cell: Number,
     eirp_density_adjacent_satellite_downlink: Number,
+    eirp_density_adjacent_satellite_uplink: Number,
     adjacent_satellite_orbital_slot: Number,
     delta_eirp_down: Number
     

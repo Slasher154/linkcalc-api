@@ -29,8 +29,8 @@ satelliteRouter.get('/satellites/:id', (req, res) => {
 
 satelliteRouter.post('/satellites-by-name', (req, res) => {
     let {name} = req.body
-    Satellites.find({ name }).then((satellites) => {
-        res.status(200).json({satellites});
+    Satellites.findOne({ name }).then((satellite) => {
+        res.status(200).json({satellite});
     }).catch((e) => {
         res.status(404).send(e);
     });
