@@ -333,8 +333,13 @@ class LinkBudget {
         }
 
         // Set default link availability and site diversity based on the given stations
-        this.uplinkAvailability = this.uplinkStation.gateway_availability || 99.5
-        this.downlinkAvailability = this.downlinkStation.gateway_availability || 99.5
+        // Link availability depends on value in the gateway field.
+        // Uplink - forward => gateway_avail
+        // Uplink - return => remote_avail
+        // Downlink - forward => remote_avail
+        // Downlink - return => gateway_avail
+        this.uplinkAvailability = this.uplinkStation.gateway_availability || this.downlinkStation.remote_availability
+        this.downlinkAvailability = this.downlinkStation.gateway_availability || this.uplinkStation.remote_availability
 
         // Check if this platform is MCG fixed
         if (!this.modem.findBestMcg) {
