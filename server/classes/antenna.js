@@ -17,7 +17,8 @@ class Antenna {
 
         // Check if this antenna already has the property tx_gain that user inputs when antenna is created
         // tx_gain is used when the gain value is from brochure (not use normal antenna gain formula)
-        if (path && this[path + '_gain']) {
+        // Check if frequency is more than zero means there is a gain value for this antenna
+        if (path && this[path + '_gain'] && this[path + '_gain'].freq > 0) {
             return this.gainAtFrequency(freq, path)
         }
         return 10 * Utils.log10(eff * Math.pow(Math.PI * this.size / Utils.lambda(freq), 2));
@@ -60,7 +61,7 @@ class Antenna {
                 gain_improvement = Utils.linearInterpolation(deg_diff,min_data.degrees, max_data.degrees, min_data.value, max_data.value);
             }
         }
-    
+
         return gain_improvement;
     }
 
@@ -169,12 +170,12 @@ class Antenna {
     // Return off-axis gain
     offAxisGain(freq, offset) {
         var gain_max = this.gain(freq);
-    
+
         var theta_r = 95 * Utils.lambda(freq) / this.size;
         var g1 = 29 - 25 * Utils.log10(theta_r);
         var theta_m = Utils.lambda(freq) / this.size * Math.sqrt((gain_max - g1) / 0.0025);
         var theta_b = Math.pow(10, 34.0 / 25);
-    
+
         var result = 0;
         var abs_offset = Math.abs(offset);
         if (abs_offset < theta_m) {
