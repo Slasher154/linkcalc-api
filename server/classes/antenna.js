@@ -26,7 +26,7 @@ class Antenna {
 
     gainAtFrequency(freq ,path) {
         // derives the equation to get this antenna efficiency
-        let eff = Math.pow(10, this[path+'_gain'][value] / 10) / Math.pow((this.size / Utils.lambda(this[path+'_gain'][freq]) * Math.PI), 2);
+        let eff = Math.pow(10, this[path+'_gain'].value / 10) / Math.pow((this.size / Utils.lambda(this[path+'_gain'].freq) * Math.PI), 2);
         return 10 * Utils.log10(eff * Math.pow(Math.PI * this.size / Utils.lambda(freq), 2));
     }
 
